@@ -507,6 +507,14 @@ class GOBPKnowledgeGraph:
             with open(filepath, 'rb') as f:
                 self.graph = pickle.load(f)
         
+        # Initialize missing attributes for loaded graphs
+        if not hasattr(self, 'gene_id_mappings'):
+            self.gene_id_mappings = {}
+        if not hasattr(self, 'go_terms'):
+            self.go_terms = {}
+        if not hasattr(self, 'go_alt_ids'):
+            self.go_alt_ids = {}
+        
         # Recalculate stats
         self._calculate_stats()
         logger.info("Graph loaded successfully")
