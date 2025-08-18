@@ -1,18 +1,22 @@
 """
 Data parsers for Gene Ontology Biological Process (GO_BP) data.
 
-This module provides utilities to parse GO_BP data files and extract
-structured information for knowledge graph construction.
+This module provides comprehensive utilities to parse all GO_BP data files and extract
+structured information for knowledge graph construction, including:
+- GO term definitions and relationships
+- Gene-GO associations from GAF format
+- Cross-identifier mappings (Symbol, Entrez, UniProt)
+- Alternative GO ID mappings
+- Rich ontology definitions from OBO format
 """
 
+import gzip
 import pandas as pd
-import pickle
 from pathlib import Path
-from typing import Dict, List, Tuple, Set
+from typing import Dict, List, Set
 import logging
 
-# Set up logging
-logging.basicConfig(level=logging.INFO)
+# Configure logging
 logger = logging.getLogger(__name__)
 
 
@@ -24,12 +28,19 @@ class GOBPDataParser:
         Initialize parser with GO_BP data directory.
         
         Args:
-            data_dir: Path to GO_BP data directory
+            data_dir: Path to GO_BP data directory containing all required files
         """
         self.data_dir = Path(data_dir)
+        
+        # Core data structures
         self.go_terms = {}
         self.go_relationships = []
         self.gene_go_associations = []
+        
+        # Enhanced data structures
+        self.go_alt_ids = {}
+        self.gene_id_mappings = {}
+        self.collapsed_data = {}  # Cache for collapsed_go file data
         
     def parse_go_terms(self) -> Dict[str, Dict]:
         """
@@ -110,7 +121,6 @@ class GOBPDataParser:
         associations = []
         
         # Read compressed GAF file
-        import gzip
         with gzip.open(gaf_file, 'rt') as f:
             for line in f:
                 # Skip comment lines
@@ -148,10 +158,82 @@ class GOBPDataParser:
         self.gene_go_associations = associations
         return associations
     
+    def parse_collapsed_go_file(self, identifier_type: str = 'symbol') -> Dict:
+        """
+        Parse collapsed_go files which contain both GO clustering and gene associations.
+        
+        Format structure:
+        - Lines 1-27,733: GO-GO clustering relationships (GO_ID -> GO_ID -> 'default')
+        - Lines 27,734+: Gene-GO associations (GO_ID -> GENE_ID -> 'gene')
+        
+        Args:
+            identifier_type: Type of file to parse ('symbol', 'entrez', 'uniprot')
+            
+        Returns:
+            Dictionary with 'clusters' and 'gene_associations' keys
+        """
+        # Check cache first to avoid re-parsing
+        if identifier_type in self.collapsed_data:
+            return self.collapsed_data[identifier_type]
+        
+        logger.info(f"Parsing collapsed_go.{identifier_type} file...")
+        
+        file_mapping = {
+            'symbol': 'collapsed_go.symbol',
+            'entrez': 'collapsed_go.entrez', 
+            'uniprot': 'collapsed_go.uniprot'
+        }
+        
+        if identifier_type not in file_mapping:
+            raise ValueError(f"Invalid identifier type: {identifier_type}. Must be one of {list(file_mapping.keys())}")
+        
+        collapsed_file = self.data_dir / file_mapping[identifier_type]
+        if not collapsed_file.exists():
+            raise FileNotFoundError(f"File not found: {collapsed_file}")
+        
+        clusters = {}
+        gene_associations = []
+        
+        with open(collapsed_file, 'r', encoding='utf-8') as f:
+            for line in f:
+                parts = line.strip().split('\t')
+                if len(parts) < 3:
+                    continue
+                
+                col1, col2, col3 = parts[0], parts[1], parts[2]
+                
+                # GO-GO clustering relationships
+                if col1.startswith('GO:') and col2.startswith('GO:') and col3 == 'default':
+                    if col1 not in clusters:
+                        clusters[col1] = []
+                    clusters[col1].append({
+                        'child_go': col2,
+                        'cluster_type': col3
+                    })
+                
+                # Gene-GO associations  
+                elif col1.startswith('GO:') and col3 == 'gene':
+                    gene_associations.append({
+                        'go_id': col1,
+                        'gene_id': col2,
+                        'identifier_type': identifier_type,
+                        'annotation_type': col3
+                    })
+        
+        result = {
+            'clusters': clusters,
+            'gene_associations': gene_associations
+        }
+        
+        # Cache the result
+        self.collapsed_data[identifier_type] = result
+        
+        logger.info(f"Parsed {len(clusters)} GO clusters and {len(gene_associations)} {identifier_type} gene associations")
+        return result
+    
     def parse_go_term_clustering(self, identifier_type: str = 'symbol') -> Dict:
         """
-        Parse GO term clustering/grouping from collapsed_go files.
-        These files seem to contain GO-GO relationships for clustering.
+        Parse GO term clustering from collapsed_go files (backward compatibility).
         
         Args:
             identifier_type: Type of file to parse ('symbol', 'entrez', 'uniprot')
@@ -159,63 +241,243 @@ class GOBPDataParser:
         Returns:
             Dictionary mapping parent GO terms to child GO terms
         """
-        logger.info(f"Parsing GO term clustering from {identifier_type} file...")
+        result = self.parse_collapsed_go_file(identifier_type)
+        return result['clusters']
+    
+    def parse_go_alternative_ids(self) -> Dict[str, str]:
+        """
+        Parse GO alternative/obsolete ID mappings from goID_2_alt_id.tab.
         
-        file_map = {
-            'symbol': 'collapsed_go.symbol',
-            'entrez': 'collapsed_go.entrez', 
-            'uniprot': 'collapsed_go.uniprot'
-        }
+        Returns:
+            Dictionary mapping alternative GO IDs to primary GO IDs
+        """
+        logger.info("Parsing GO alternative ID mappings...")
         
-        clustering_file = self.data_dir / file_map[identifier_type]
+        alt_ids_file = self.data_dir / "goID_2_alt_id.tab"
         
-        clusters = {}
-        with open(clustering_file, 'r') as f:
+        alt_ids = {}
+        with open(alt_ids_file, 'r') as f:
             for line in f:
                 parts = line.strip().split('\t')
-                if len(parts) >= 3 and parts[0].startswith('GO:') and parts[1].startswith('GO:'):
-                    parent_go = parts[0]
-                    child_go = parts[1]
-                    cluster_type = parts[2] if len(parts) > 2 else 'default'
-                    
-                    if parent_go not in clusters:
-                        clusters[parent_go] = []
-                    clusters[parent_go].append({
-                        'child_go': child_go,
-                        'cluster_type': cluster_type
-                    })
+                if len(parts) >= 2 and parts[0].startswith('GO:') and parts[1].startswith('GO:'):
+                    primary_id = parts[0]
+                    alt_id = parts[1]
+                    alt_ids[alt_id] = primary_id
         
-        logger.info(f"Parsed {len(clusters)} GO term clusters")
-        return clusters
+        logger.info(f"Parsed {len(alt_ids)} alternative GO ID mappings")
+        self.go_alt_ids = alt_ids
+        return alt_ids
     
-    def load_pickle_data(self, identifier_type: str = 'symbol') -> Dict:
+    def parse_all_gene_associations_from_collapsed_files(self) -> Dict[str, List]:
         """
-        Load pre-processed data from pickle files.
+        Parse gene associations from all collapsed_go files to get comprehensive 
+        gene-GO mappings with different identifier types.
         
-        Args:
-            identifier_type: Type of gene identifier ('symbol', 'entrez', 'uniprot')
-            
         Returns:
-            Loaded data dictionary
+            Dictionary with gene associations by identifier type
         """
-        logger.info(f"Loading pickle data for {identifier_type} identifiers...")
+        logger.info("Parsing gene associations from all collapsed_go files...")
         
-        file_map = {
-            'symbol': 'collapsed_go.symbol.pkl',
-            'entrez': 'collapsed_go.entrez.pkl',
-            'uniprot': 'collapsed_go.uniprot.pkl'
+        all_associations = {}
+        
+        # Parse each collapsed_go file
+        for id_type in ['symbol', 'entrez', 'uniprot']:
+            try:
+                collapsed_data = self.parse_collapsed_go_file(id_type)
+                all_associations[id_type] = collapsed_data['gene_associations']
+            except (FileNotFoundError, ValueError) as e:
+                logger.warning(f"Could not parse {id_type} file: {e}")
+                all_associations[id_type] = []
+        
+        logger.info(f"Parsed gene associations: "
+                   f"Symbol={len(all_associations['symbol'])}, "
+                   f"Entrez={len(all_associations['entrez'])}, "
+                   f"UniProt={len(all_associations['uniprot'])}")
+        
+        return all_associations
+    
+    def parse_gene_identifier_mappings(self) -> Dict[str, Dict]:
+        """
+        Parse comprehensive gene identifier mappings from multiple sources.
+        
+        Returns:
+            Dictionary with mappings between different gene identifier systems
+        """
+        logger.info("Parsing comprehensive gene identifier mappings...")
+        
+        mappings = {
+            'symbol_to_entrez': {},
+            'symbol_to_uniprot': {},
+            'entrez_to_symbol': {},
+            'uniprot_to_symbol': {},
+            'entrez_to_uniprot': {},
+            'uniprot_to_entrez': {}
         }
         
-        pickle_file = self.data_dir / file_map[identifier_type]
+        # Method 1: Extract from GAF file (Symbol <-> UniProt)
+        gaf_file = self.data_dir / "goa_human.gaf.gz"
+        with gzip.open(gaf_file, 'rt') as f:
+            for line in f:
+                if line.startswith('!'):
+                    continue
+                    
+                parts = line.strip().split('\t')
+                if len(parts) >= 15:
+                    uniprot_id = parts[1]
+                    gene_symbol = parts[2]
+                    
+                    # Store bidirectional mappings
+                    mappings['symbol_to_uniprot'][gene_symbol] = uniprot_id
+                    mappings['uniprot_to_symbol'][uniprot_id] = gene_symbol
         
-        try:
-            with open(pickle_file, 'rb') as f:
-                data = pickle.load(f)
-            logger.info(f"Loaded pickle data with {len(data)} entries")
-            return data
-        except Exception as e:
-            logger.error(f"Error loading pickle file: {e}")
-            return {}
+        # Method 2: Cross-reference using collapsed_go files
+        # Get gene associations from all collapsed files
+        all_associations = self.parse_all_gene_associations_from_collapsed_files()
+        
+        # Build GO-term based cross-references
+        go_to_symbols = {}
+        go_to_entrez = {}
+        go_to_uniprot = {}
+        
+        # Group genes by GO terms
+        for assoc in all_associations['symbol']:
+            go_id = assoc['go_id']
+            if go_id not in go_to_symbols:
+                go_to_symbols[go_id] = set()
+            go_to_symbols[go_id].add(assoc['gene_id'])
+        
+        for assoc in all_associations['entrez']:
+            go_id = assoc['go_id']
+            if go_id not in go_to_entrez:
+                go_to_entrez[go_id] = set()
+            go_to_entrez[go_id].add(assoc['gene_id'])
+        
+        for assoc in all_associations['uniprot']:
+            go_id = assoc['go_id']
+            if go_id not in go_to_uniprot:
+                go_to_uniprot[go_id] = set()
+            go_to_uniprot[go_id].add(assoc['gene_id'])
+        
+        # Find cross-references through shared GO terms (only for unambiguous mappings)
+        self._create_cross_references(go_to_symbols, go_to_entrez, mappings, 'symbol', 'entrez')
+        self._create_cross_references(go_to_uniprot, go_to_entrez, mappings, 'uniprot', 'entrez')
+        
+        logger.info(f"Parsed comprehensive gene ID mappings: "
+                   f"Symbol-UniProt: {len(mappings['symbol_to_uniprot'])}, "
+                   f"Symbol-Entrez: {len(mappings['symbol_to_entrez'])}, "
+                   f"UniProt-Entrez: {len(mappings['uniprot_to_entrez'])}")
+        
+        self.gene_id_mappings = mappings
+        return mappings
+    
+    def _create_cross_references(self, source_dict: Dict, target_dict: Dict, 
+                               mappings: Dict, source_type: str, target_type: str) -> None:
+        """
+        Helper method to create cross-references between identifier types.
+        
+        Args:
+            source_dict: Dictionary mapping GO terms to source identifiers
+            target_dict: Dictionary mapping GO terms to target identifiers  
+            mappings: Main mappings dictionary to update
+            source_type: Source identifier type (e.g., 'symbol')
+            target_type: Target identifier type (e.g., 'entrez')
+        """
+        source_to_target_key = f"{source_type}_to_{target_type}"
+        target_to_source_key = f"{target_type}_to_{source_type}"
+        
+        for go_id in source_dict:
+            if go_id in target_dict:
+                source_ids = source_dict[go_id]
+                target_ids = target_dict[go_id]
+                
+                # Only create mappings for unambiguous cases (1:1 mapping)
+                if len(source_ids) == 1 and len(target_ids) == 1:
+                    source_id = list(source_ids)[0]
+                    target_id = list(target_ids)[0]
+                    
+                    mappings[source_to_target_key][source_id] = target_id
+                    mappings[target_to_source_key][target_id] = source_id
+    
+    def parse_obo_ontology(self) -> Dict[str, Dict]:
+        """
+        Parse rich GO ontology structure from OBO format file.
+        
+        Returns:
+            Dictionary with enhanced GO term information including definitions and synonyms
+        """
+        logger.info("Parsing OBO ontology file...")
+        
+        obo_file = self.data_dir / "go-basic-filtered.obo"
+        
+        terms = {}
+        current_term = None
+        
+        with open(obo_file, 'r') as f:
+            for line in f:
+                line = line.strip()
+                
+                if line == "[Term]":
+                    current_term = {}
+                elif line.startswith("id: GO:"):
+                    go_id = line.split(": ")[1]
+                    current_term['id'] = go_id
+                elif line.startswith("name: "):
+                    current_term['name'] = line.split(": ", 1)[1]
+                elif line.startswith("def: "):
+                    # Extract definition (remove quotes and reference)
+                    definition = line.split(": \"", 1)[1]
+                    if "\" [" in definition:
+                        definition = definition.split("\" [")[0]
+                    current_term['definition'] = definition
+                elif line.startswith("synonym: "):
+                    if 'synonyms' not in current_term:
+                        current_term['synonyms'] = []
+                    # Extract synonym (remove quotes and type info)
+                    synonym = line.split(": \"", 1)[1]
+                    if "\" " in synonym:
+                        synonym = synonym.split("\" ")[0]
+                    current_term['synonyms'].append(synonym)
+                elif line.startswith("namespace: "):
+                    current_term['namespace'] = line.split(": ")[1]
+                elif line.startswith("is_obsolete: true"):
+                    current_term['is_obsolete'] = True
+                elif line == "" and current_term and 'id' in current_term:
+                    # End of term, store it
+                    terms[current_term['id']] = current_term
+                    current_term = None
+        
+        # Store last term if file doesn't end with blank line
+        if current_term and 'id' in current_term:
+            terms[current_term['id']] = current_term
+        
+        logger.info(f"Parsed {len(terms)} terms from OBO file")
+        return terms
+    
+    def validate_parsed_data(self) -> Dict[str, bool]:
+        """
+        Validate the integrity of parsed data.
+        
+        Returns:
+            Dictionary with validation results
+        """
+        validation = {
+            'has_go_terms': len(self.go_terms) > 0,
+            'has_go_relationships': len(self.go_relationships) > 0,
+            'has_gene_associations': len(self.gene_go_associations) > 0,
+            'has_alt_ids': len(self.go_alt_ids) > 0,
+            'has_id_mappings': len(self.gene_id_mappings) > 0,
+            'relationships_valid': all(
+                rel['parent_id'].startswith('GO:') and rel['child_id'].startswith('GO:')
+                for rel in self.go_relationships
+            ) if self.go_relationships else False,
+            'associations_valid': all(
+                assoc['go_id'].startswith('GO:') and assoc['gene_symbol']
+                for assoc in self.gene_go_associations
+            ) if self.gene_go_associations else False
+        }
+        
+        validation['overall_valid'] = all(validation.values())
+        return validation
     
     def get_data_summary(self) -> Dict:
         """
@@ -240,45 +502,91 @@ class GOBPDataParser:
 
 
 def main():
-    """Example usage of the GO_BP data parser."""
+    """Comprehensive demonstration of GO_BP data parser capabilities."""
     
     # Initialize parser
     data_dir = "/home/mreddy1/knowledge_graph/llm_evaluation_for_gene_set_interpretation/data/GO_BP"
     parser = GOBPDataParser(data_dir)
     
-    # Parse GO terms
+    print("=" * 60)
+    print("GO_BP DATA PARSER COMPREHENSIVE DEMONSTRATION")
+    print("=" * 60)
+    
+    # Parse core data structures
+    print("\n1. CORE DATA PARSING")
+    print("-" * 30)
+    
     go_terms = parser.parse_go_terms()
-    print(f"Sample GO terms:")
-    for go_id, info in list(go_terms.items())[:3]:
-        print(f"  {go_id}: {info['name']}")
-    
-    # Parse relationships
     relationships = parser.parse_go_relationships()
-    print(f"\nSample relationships:")
-    for rel in relationships[:3]:
-        print(f"  {rel['child_id']} --{rel['relationship_type']}--> {rel['parent_id']}")
-    
-    # Parse gene-GO associations from GAF file
     associations = parser.parse_gene_go_associations_from_gaf()
-    print(f"\nSample gene-GO associations:")
-    for assoc in associations[:3]:
-        print(f"  {assoc['gene_symbol']} -> {assoc['go_id']} ({parser.go_terms.get(assoc['go_id'], {}).get('name', 'Unknown')})")
     
-    # Parse GO term clustering
-    clusters = parser.parse_go_term_clustering('symbol')
-    print(f"\nSample GO clusters:")
-    for parent_go, children in list(clusters.items())[:2]:
-        parent_name = parser.go_terms.get(parent_go, {}).get('name', 'Unknown')
-        print(f"  {parent_go} ({parent_name}):")
-        for child in children[:3]:
-            child_name = parser.go_terms.get(child['child_go'], {}).get('name', 'Unknown')
-            print(f"    -> {child['child_go']} ({child_name})")
+    print(f"✓ GO terms: {len(go_terms):,}")
+    print(f"✓ GO relationships: {len(relationships):,}")  
+    print(f"✓ Gene-GO associations: {len(associations):,}")
     
-    # Print summary
+    # Parse enhanced data structures
+    print("\n2. ENHANCED DATA PARSING")
+    print("-" * 30)
+    
+    alt_ids = parser.parse_go_alternative_ids()
+    id_mappings = parser.parse_gene_identifier_mappings()
+    obo_terms = parser.parse_obo_ontology()
+    
+    print(f"✓ Alternative GO IDs: {len(alt_ids):,}")
+    print(f"✓ Gene ID cross-references: {sum(len(m) for m in id_mappings.values()):,}")
+    print(f"✓ OBO enhanced terms: {len(obo_terms):,}")
+    
+    # Demonstrate collapsed file parsing
+    print("\n3. COLLAPSED FILE ANALYSIS")
+    print("-" * 30)
+    
+    for id_type in ['symbol', 'entrez', 'uniprot']:
+        collapsed_data = parser.parse_collapsed_go_file(id_type)
+        print(f"✓ {id_type.title()}: {len(collapsed_data['clusters']):,} clusters, "
+              f"{len(collapsed_data['gene_associations']):,} gene associations")
+    
+    # Show validation results
+    print("\n4. DATA VALIDATION")
+    print("-" * 30)
+    
+    validation = parser.validate_parsed_data()
+    for check, result in validation.items():
+        status = "✓" if result else "✗"
+        print(f"{status} {check.replace('_', ' ').title()}: {result}")
+    
+    # Show examples
+    print("\n5. EXAMPLES")
+    print("-" * 30)
+    
+    # Sample terms
+    sample_terms = list(go_terms.items())[:2]
+    for go_id, info in sample_terms:
+        print(f"GO Term: {go_id} - {info['name']}")
+    
+    # Sample cross-reference
+    if id_mappings['symbol_to_entrez']:
+        sample_symbol = list(id_mappings['symbol_to_entrez'].keys())[0]
+        entrez_id = id_mappings['symbol_to_entrez'][sample_symbol]
+        uniprot_id = id_mappings['symbol_to_uniprot'].get(sample_symbol, 'N/A')
+        print(f"Cross-ref: {sample_symbol} = {entrez_id} (Entrez) = {uniprot_id} (UniProt)")
+    
+    # Enhanced term example
+    if obo_terms:
+        sample_obo = list(obo_terms.values())[0]
+        if 'definition' in sample_obo:
+            print(f"Enhanced: {sample_obo['id']} has full definition and metadata")
+    
+    # Final summary
     summary = parser.get_data_summary()
-    print(f"\nData Summary:")
-    for key, value in summary.items():
-        print(f"  {key}: {value}")
+    print(f"\n6. FINAL SUMMARY")
+    print("-" * 30)
+    print(f"Total unique genes: {summary['num_unique_genes']:,}")
+    print(f"Relationship types: {', '.join(summary['relationship_types'])}")
+    print(f"Overall validation: {'PASSED' if validation['overall_valid'] else 'FAILED'}")
+    
+    print(f"\n{'='*60}")
+    print("PARSER DEMONSTRATION COMPLETE")
+    print(f"{'='*60}")
 
 
 if __name__ == "__main__":
