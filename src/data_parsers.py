@@ -20,17 +20,31 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class GOBPDataParser:
-    """Parser for Gene Ontology Biological Process data."""
+class GODataParser:
+    """Parser for Gene Ontology data (supports GO_BP, GO_CC, GO_MF)."""
     
-    def __init__(self, data_dir: str):
+    def __init__(self, data_dir: str, namespace: str = None):
         """
-        Initialize parser with GO_BP data directory.
+        Initialize parser with GO data directory.
         
         Args:
-            data_dir: Path to GO_BP data directory containing all required files
+            data_dir: Path to GO data directory containing all required files
+            namespace: GO namespace ('biological_process', 'cellular_component', 'molecular_function')
+                      If None, will auto-detect from directory name
         """
         self.data_dir = Path(data_dir)
+        
+        # Auto-detect namespace from directory name if not provided
+        if namespace is None:
+            dir_name = self.data_dir.name
+            namespace_map = {
+                'GO_BP': 'biological_process',
+                'GO_CC': 'cellular_component', 
+                'GO_MF': 'molecular_function'
+            }
+            self.namespace = namespace_map.get(dir_name, 'biological_process')
+        else:
+            self.namespace = namespace
         
         # Core data structures
         self.go_terms = {}
@@ -67,7 +81,7 @@ class GOBPDataParser:
             if pd.notna(row['go_id']) and row['go_id'].startswith('GO:'):
                 go_terms[row['go_id']] = {
                     'name': row['name'],
-                    'namespace': 'biological_process'  # This is GO_BP folder
+                    'namespace': self.namespace
                 }
         
         # Add namespace info if available
@@ -150,11 +164,18 @@ class GOBPDataParser:
                         'assigned_by': parts[14]
                     }
                     
-                    # Filter for biological processes only (aspect = 'P')
-                    if association['aspect'] == 'P':
+                    # Filter by namespace aspect
+                    namespace_to_aspect = {
+                        'biological_process': 'P',
+                        'cellular_component': 'C',
+                        'molecular_function': 'F'
+                    }
+                    target_aspect = namespace_to_aspect.get(self.namespace, 'P')
+                    
+                    if association['aspect'] == target_aspect:
                         associations.append(association)
         
-        logger.info(f"Parsed {len(associations)} gene-GO biological process associations")
+        logger.info(f"Parsed {len(associations)} gene-GO {self.namespace} associations")
         self.gene_go_associations = associations
         return associations
     
@@ -501,10 +522,132 @@ class GOBPDataParser:
         }
 
 
-def main():
-    """Comprehensive demonstration of GO_BP data parser capabilities."""
+# Backward compatibility alias
+GOBPDataParser = GODataParser
+
+
+class CombinedGOParser:
+    """Parser for multiple GO namespaces (GO_BP + GO_CC + GO_MF)."""
     
-    # Initialize parser
+    def __init__(self, base_data_dir: str):
+        """
+        Initialize combined parser for multiple GO namespaces.
+        
+        Args:
+            base_data_dir: Base directory containing GO_BP, GO_CC, GO_MF subdirectories
+        """
+        self.base_data_dir = Path(base_data_dir)
+        self.parsers = {}
+        
+        # Initialize parsers for each namespace
+        namespace_dirs = {
+            'biological_process': 'GO_BP',
+            'cellular_component': 'GO_CC',
+            'molecular_function': 'GO_MF'
+        }
+        
+        for namespace, dir_name in namespace_dirs.items():
+            data_dir = self.base_data_dir / dir_name
+            if data_dir.exists():
+                self.parsers[namespace] = GODataParser(str(data_dir), namespace)
+                logger.info(f"Initialized parser for {namespace}")
+            else:
+                logger.warning(f"Directory not found: {data_dir}")
+    
+    def parse_all_namespaces(self) -> Dict[str, Dict]:
+        """
+        Parse data from all available GO namespaces.
+        
+        Returns:
+            Dictionary with parsed data by namespace
+        """
+        results = {}
+        
+        for namespace, parser in self.parsers.items():
+            logger.info(f"Parsing {namespace} data...")
+            
+            results[namespace] = {
+                'go_terms': parser.parse_go_terms(),
+                'go_relationships': parser.parse_go_relationships(), 
+                'gene_associations': parser.parse_gene_go_associations_from_gaf(),
+                'alt_ids': parser.parse_go_alternative_ids(),
+                'id_mappings': parser.parse_gene_identifier_mappings(),
+                'obo_terms': parser.parse_obo_ontology(),
+                'collapsed_data': {
+                    'symbol': parser.parse_collapsed_go_file('symbol'),
+                    'entrez': parser.parse_collapsed_go_file('entrez'),
+                    'uniprot': parser.parse_collapsed_go_file('uniprot')
+                }
+            }
+            
+            logger.info(f"Completed parsing {namespace}: {len(results[namespace]['go_terms'])} terms")
+        
+        return results
+    
+    def get_combined_summary(self) -> Dict:
+        """
+        Get summary statistics across all parsed namespaces.
+        
+        Returns:
+            Combined summary dictionary
+        """
+        summary = {
+            'namespaces': list(self.parsers.keys()),
+            'by_namespace': {}
+        }
+        
+        for namespace, parser in self.parsers.items():
+            summary['by_namespace'][namespace] = parser.get_data_summary()
+        
+        return summary
+
+
+def main():
+    """Comprehensive demonstration of GO data parser capabilities (BP + CC support)."""
+    
+    print("=" * 80)
+    print("COMBINED GO DATA PARSER DEMONSTRATION (GO_BP + GO_CC)")
+    print("=" * 80)
+    
+    # Test combined parser first
+    base_data_dir = "/home/mreddy1/knowledge_graph/llm_evaluation_for_gene_set_interpretation/data"
+    combined_parser = CombinedGOParser(base_data_dir)
+    
+    print(f"\nAvailable namespaces: {list(combined_parser.parsers.keys())}")
+    
+    # Demonstrate individual namespace parsing
+    print("\n" + "="*60)
+    print("INDIVIDUAL NAMESPACE DEMONSTRATIONS")
+    print("="*60)
+    
+    for namespace in ['biological_process', 'cellular_component']:
+        if namespace in combined_parser.parsers:
+            print(f"\n{namespace.upper().replace('_', ' ')} DATA PARSING")
+            print("-" * 40)
+            
+            parser = combined_parser.parsers[namespace]
+            
+            # Parse core data
+            go_terms = parser.parse_go_terms()
+            relationships = parser.parse_go_relationships()
+            associations = parser.parse_gene_go_associations_from_gaf()
+            
+            print(f"✓ GO terms: {len(go_terms):,}")
+            print(f"✓ GO relationships: {len(relationships):,}")
+            print(f"✓ Gene associations: {len(associations):,}")
+            
+            # Show sample terms
+            if go_terms:
+                sample_terms = list(go_terms.items())[:2]
+                for go_id, info in sample_terms:
+                    print(f"  Sample: {go_id} - {info['name']}")
+    
+    # Original single parser demo for backward compatibility
+    print(f"\n\n" + "="*60)
+    print("BACKWARD COMPATIBILITY - GO_BP PARSER")
+    print("="*60)
+    
+    # Initialize single parser (backward compatible)
     data_dir = "/home/mreddy1/knowledge_graph/llm_evaluation_for_gene_set_interpretation/data/GO_BP"
     parser = GOBPDataParser(data_dir)
     
