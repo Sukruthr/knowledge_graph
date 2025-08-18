@@ -73,23 +73,52 @@ class TestGODataParser(unittest.TestCase):
         for assoc in associations[:100]:  # Check first 100
             self.assertEqual(assoc['aspect'], 'C')
     
+    def test_go_mf_parser(self):
+        """Test GO_MF parser functionality."""
+        mf_dir = self.base_data_dir + "/GO_MF"
+        parser = GODataParser(mf_dir)
+        
+        # Test namespace auto-detection
+        self.assertEqual(parser.namespace, 'molecular_function')
+        
+        # Test core parsing
+        go_terms = parser.parse_go_terms()
+        self.assertGreater(len(go_terms), 12000)
+        
+        # Verify namespace in parsed terms
+        sample_term = list(go_terms.values())[0]
+        self.assertEqual(sample_term['namespace'], 'molecular_function')
+        
+        # Test GAF parsing with correct aspect filtering
+        associations = parser.parse_gene_go_associations_from_gaf()
+        self.assertGreater(len(associations), 250000)
+        
+        # Verify all associations are molecular functions
+        for assoc in associations[:100]:  # Check first 100
+            self.assertEqual(assoc['aspect'], 'F')
+    
     def test_namespace_comparison(self):
-        """Test differences between GO_BP and GO_CC data."""
+        """Test differences between GO_BP, GO_CC, and GO_MF data."""
         bp_parser = GODataParser(self.go_bp_dir)
         cc_parser = GODataParser(self.go_cc_dir)
+        mf_parser = GODataParser(self.base_data_dir + "/GO_MF")
         
         bp_terms = bp_parser.parse_go_terms()
         cc_terms = cc_parser.parse_go_terms()
+        mf_terms = mf_parser.parse_go_terms()
         
-        # GO_BP should have more terms than GO_CC
-        self.assertGreater(len(bp_terms), len(cc_terms))
+        # GO_BP should have the most terms, then GO_MF, then GO_CC
+        self.assertGreater(len(bp_terms), len(mf_terms))
+        self.assertGreater(len(mf_terms), len(cc_terms))
         
         bp_associations = bp_parser.parse_gene_go_associations_from_gaf()
         cc_associations = cc_parser.parse_gene_go_associations_from_gaf()
+        mf_associations = mf_parser.parse_gene_go_associations_from_gaf()
         
-        # Both should have substantial associations
+        # All should have substantial associations
         self.assertGreater(len(bp_associations), 50000)
         self.assertGreater(len(cc_associations), 50000)
+        self.assertGreater(len(mf_associations), 200000)  # MF has the most associations
 
 
 class TestCombinedGOParser(unittest.TestCase):
@@ -155,6 +184,11 @@ class TestGOKnowledgeGraph(unittest.TestCase):
         cls.cc_kg = GOKnowledgeGraph(use_neo4j=False, namespace='cellular_component')
         cls.cc_kg.load_data(cls.base_data_dir + "/GO_CC")
         cls.cc_kg.build_graph()
+        
+        # Create MF knowledge graph
+        cls.mf_kg = GOKnowledgeGraph(use_neo4j=False, namespace='molecular_function')
+        cls.mf_kg.load_data(cls.base_data_dir + "/GO_MF")
+        cls.mf_kg.build_graph()
     
     def test_bp_graph_construction(self):
         """Test biological process graph construction."""
@@ -189,14 +223,32 @@ class TestGOKnowledgeGraph(unittest.TestCase):
         if cc_functions:
             for func in cc_functions[:5]:
                 self.assertEqual(func['namespace'], 'cellular_component')
+        
+        # Test MF graph
+        mf_functions = self.mf_kg.query_gene_functions('TP53')
+        if mf_functions:
+            for func in mf_functions[:5]:
+                self.assertEqual(func['namespace'], 'molecular_function')
+    
+    def test_mf_graph_construction(self):
+        """Test molecular function graph construction."""
+        stats = self.mf_kg.get_stats()
+        
+        self.assertEqual(stats['namespace'], 'molecular_function')
+        self.assertGreater(stats['total_nodes'], 40000)
+        self.assertGreater(stats['total_edges'], 400000)
+        self.assertGreater(stats['go_terms'], 12000)
+        self.assertGreater(stats['genes'], 15000)
     
     def test_graph_validation(self):
         """Test graph integrity validation."""
         bp_validation = self.bp_kg.validate_graph_integrity()
         cc_validation = self.cc_kg.validate_graph_integrity()
+        mf_validation = self.mf_kg.validate_graph_integrity()
         
         self.assertTrue(bp_validation['overall_valid'])
         self.assertTrue(cc_validation['overall_valid'])
+        self.assertTrue(mf_validation['overall_valid'])
 
 
 class TestCombinedGOKnowledgeGraph(unittest.TestCase):
@@ -220,14 +272,16 @@ class TestCombinedGOKnowledgeGraph(unittest.TestCase):
         self.assertGreater(stats['go_terms'], 40000)
         
         # Should have multiple namespaces
-        self.assertGreaterEqual(len(stats['namespace_counts']), 2)
+        self.assertGreaterEqual(len(stats['namespace_counts']), 3)
         self.assertIn('biological_process', stats['namespace_counts'])
         self.assertIn('cellular_component', stats['namespace_counts'])
+        self.assertIn('molecular_function', stats['namespace_counts'])
     
     def test_individual_graphs_preserved(self):
         """Test that individual graphs are preserved in combined structure."""
         self.assertIn('biological_process', self.combined_kg.individual_graphs)
         self.assertIn('cellular_component', self.combined_kg.individual_graphs)
+        self.assertIn('molecular_function', self.combined_kg.individual_graphs)
         
         # Individual graphs should have reasonable stats
         for namespace, kg in self.combined_kg.individual_graphs.items():
@@ -239,8 +293,14 @@ class TestCombinedGOKnowledgeGraph(unittest.TestCase):
         """Test querying across multiple namespaces."""
         all_functions = self.combined_kg.query_gene_functions_all_namespaces('TP53')
         
-        # Should have functions in multiple namespaces
+        # Should have functions in multiple namespaces (ideally 3)
         self.assertGreaterEqual(len(all_functions), 2)
+        
+        # Check that we have all three namespaces for TP53
+        if len(all_functions) == 3:
+            expected_namespaces = {'biological_process', 'cellular_component', 'molecular_function'}
+            actual_namespaces = set(all_functions.keys())
+            self.assertEqual(expected_namespaces, actual_namespaces)
         
         # Check that different namespaces return different GO terms
         all_go_ids = set()
@@ -311,8 +371,8 @@ class TestBackwardCompatibility(unittest.TestCase):
 def run_combined_tests():
     """Run all combined GO tests and provide detailed output."""
     print("="*80)
-    print("COMBINED GO KNOWLEDGE GRAPH TEST SUITE")
-    print("Enhanced tests for GO_BP + GO_CC + GO_MF integration")
+    print("COMPREHENSIVE GO KNOWLEDGE GRAPH TEST SUITE")
+    print("Complete tests for GO_BP + GO_CC + GO_MF integration")
     print("="*80)
     
     test_classes = [
@@ -344,9 +404,9 @@ def run_combined_tests():
     print(f"SUCCESS RATE: {((total_tests - total_failures) / total_tests * 100):.1f}%")
     
     if total_failures == 0:
-        print("\n✅ ALL TESTS PASSED - Full GO_BP + GO_CC integration successful")
-        print("✅ Combined knowledge graph functionality validated")
-        print("✅ Cross-namespace query capabilities confirmed") 
+        print("\n✅ ALL TESTS PASSED - Complete GO_BP + GO_CC + GO_MF integration successful")
+        print("✅ Tri-namespace knowledge graph functionality validated")
+        print("✅ Cross-namespace query capabilities confirmed across all 3 namespaces") 
         print("✅ Backward compatibility maintained")
     else:
         print(f"\n⚠️  {total_failures} test failures detected")

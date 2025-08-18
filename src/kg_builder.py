@@ -12,7 +12,10 @@ from pathlib import Path
 import json
 import pickle
 
-from data_parsers import GOBPDataParser, GODataParser, CombinedGOParser
+try:
+    from .data_parsers import GOBPDataParser, GODataParser, CombinedGOParser
+except ImportError:
+    from data_parsers import GOBPDataParser, GODataParser, CombinedGOParser
 
 logger = logging.getLogger(__name__)
 

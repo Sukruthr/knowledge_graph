@@ -17,10 +17,11 @@ from kg_builder import CombinedGOKnowledgeGraph
 
 
 def validate_combined_go_system():
-    """Perform comprehensive validation of the combined GO system."""
+    """Perform comprehensive validation of the complete tri-namespace GO system."""
     
     print("=" * 80)
-    print("COMBINED GO KNOWLEDGE GRAPH SYSTEM VALIDATION")
+    print("COMPLETE GO KNOWLEDGE GRAPH SYSTEM VALIDATION")
+    print("GO_BP + GO_CC + GO_MF Integration")
     print("=" * 80)
     
     # Track timing
