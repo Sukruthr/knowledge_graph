@@ -43,7 +43,7 @@ class GOBPKnowledgeGraph:
     
     def load_data(self, data_dir: str):
         """
-        Load and parse GO_BP data.
+        Load and parse GO_BP data comprehensively.
         
         Args:
             data_dir: Path to GO_BP data directory
@@ -55,30 +55,44 @@ class GOBPKnowledgeGraph:
         self.go_terms = self.parser.parse_go_terms()
         self.go_relationships = self.parser.parse_go_relationships()
         self.gene_associations = self.parser.parse_gene_go_associations_from_gaf()
-        self.go_clusters = self.parser.parse_go_term_clustering()
         
         # Parse enhanced data components
         self.go_alt_ids = self.parser.parse_go_alternative_ids()
         self.gene_id_mappings = self.parser.parse_gene_identifier_mappings()
         self.obo_terms = self.parser.parse_obo_ontology()
         
-        logger.info("Enhanced data loading complete")
+        # Parse collapsed GO data comprehensively
+        self.collapsed_symbol = self.parser.parse_collapsed_go_file('symbol')
+        self.collapsed_entrez = self.parser.parse_collapsed_go_file('entrez')
+        self.collapsed_uniprot = self.parser.parse_collapsed_go_file('uniprot')
+        self.all_collapsed_associations = self.parser.parse_all_gene_associations_from_collapsed_files()
+        
+        # Extract GO clusters (backward compatibility)
+        self.go_clusters = self.collapsed_symbol['clusters']
+        
+        logger.info("Comprehensive data loading complete")
     
     def build_graph(self):
-        """Build the knowledge graph from parsed data."""
-        logger.info("Building knowledge graph...")
+        """Build the comprehensive knowledge graph from parsed data."""
+        logger.info("Building comprehensive knowledge graph...")
         
-        # Add GO term nodes
+        # Add GO term nodes (with OBO enhancement)
         self._add_go_term_nodes()
         
-        # Add gene nodes
-        self._add_gene_nodes()
+        # Add comprehensive gene nodes (all identifier types)
+        self._add_comprehensive_gene_nodes()
         
-        # Add GO-GO relationships
+        # Add GO-GO hierarchical relationships
         self._add_go_relationships()
         
-        # Add gene-GO associations
-        self._add_gene_associations()
+        # Add GO clustering relationships
+        self._add_go_clusters()
+        
+        # Add comprehensive gene-GO associations
+        self._add_comprehensive_gene_associations()
+        
+        # Add gene cross-reference edges
+        self._add_gene_cross_references()
         
         # Add alternative GO ID mappings
         self._add_alternative_id_mappings()
@@ -86,7 +100,10 @@ class GOBPKnowledgeGraph:
         # Calculate enhanced statistics
         self._calculate_stats()
         
-        logger.info("Knowledge graph construction complete")
+        # Validate graph integrity
+        self.validate_graph_integrity()
+        
+        logger.info("Comprehensive knowledge graph construction complete")
     
     def _add_go_term_nodes(self):
         """Add enriched GO term nodes to the graph."""
@@ -122,42 +139,90 @@ class GOBPKnowledgeGraph:
         
         logger.info(f"Added {len(self.go_terms)} GO term nodes ({enhanced_count} with OBO enrichment)")
     
-    def _add_gene_nodes(self):
-        """Add gene nodes to the graph."""
-        logger.info("Adding gene nodes...")
+    def _add_comprehensive_gene_nodes(self):
+        """Add comprehensive gene nodes with all identifier types."""
+        logger.info("Adding comprehensive gene nodes...")
         
-        # Collect unique genes from associations
+        # Collect unique genes from all sources
         genes = {}
+        
+        # From GAF associations (primary source)
         for assoc in self.gene_associations:
             gene_symbol = assoc['gene_symbol']
             if gene_symbol not in genes:
                 genes[gene_symbol] = {
+                    'gene_symbol': gene_symbol,
                     'uniprot_id': assoc['uniprot_id'],
                     'gene_name': assoc['gene_name'],
                     'gene_type': assoc['gene_type'],
-                    'taxon': assoc['taxon']
+                    'taxon': assoc['taxon'],
+                    'sources': ['gaf']
                 }
+            else:
+                if 'gaf' not in genes[gene_symbol]['sources']:
+                    genes[gene_symbol]['sources'].append('gaf')
         
-        # Add enriched gene nodes
+        # Enhance with collapsed file data
+        for id_type, associations in self.all_collapsed_associations.items():
+            for assoc in associations:
+                gene_id = assoc['gene_id']
+                
+                # For symbol type, merge directly
+                if id_type == 'symbol':
+                    if gene_id not in genes:
+                        genes[gene_id] = {
+                            'gene_symbol': gene_id,
+                            'sources': ['collapsed_symbol']
+                        }
+                    else:
+                        if 'collapsed_symbol' not in genes[gene_id]['sources']:
+                            genes[gene_id]['sources'].append('collapsed_symbol')
+                
+                # For entrez and uniprot, use mappings to find corresponding symbols
+                elif id_type == 'entrez':
+                    # Try to find corresponding symbol
+                    symbol = self.gene_id_mappings.get('entrez_to_symbol', {}).get(gene_id)
+                    if symbol and symbol in genes:
+                        genes[symbol]['entrez_id'] = gene_id
+                        if 'collapsed_entrez' not in genes[symbol]['sources']:
+                            genes[symbol]['sources'].append('collapsed_entrez')
+                
+                elif id_type == 'uniprot':
+                    # Try to find corresponding symbol
+                    symbol = self.gene_id_mappings.get('uniprot_to_symbol', {}).get(gene_id)
+                    if symbol and symbol in genes:
+                        genes[symbol]['mapped_uniprot_id'] = gene_id
+                        if 'collapsed_uniprot' not in genes[symbol]['sources']:
+                            genes[symbol]['sources'].append('collapsed_uniprot')
+        
+        # Add comprehensive gene nodes
         for gene_symbol, gene_info in genes.items():
             node_attrs = {
                 'node_type': 'gene',
-                'uniprot_id': gene_info['uniprot_id'],
-                'gene_name': gene_info['gene_name'],
-                'gene_type': gene_info['gene_type'],
-                'taxon': gene_info['taxon']
+                'gene_symbol': gene_symbol,
+                'sources': gene_info.get('sources', [])
             }
             
-            # Add cross-reference information from gene ID mappings
+            # Add basic info if available
+            for attr in ['uniprot_id', 'gene_name', 'gene_type', 'taxon']:
+                if attr in gene_info:
+                    node_attrs[attr] = gene_info[attr]
+            
+            # Add cross-reference IDs
+            if gene_symbol in self.gene_id_mappings.get('symbol_to_entrez', {}):
+                node_attrs['entrez_id'] = self.gene_id_mappings['symbol_to_entrez'][gene_symbol]
+            
             if gene_symbol in self.gene_id_mappings.get('symbol_to_uniprot', {}):
                 node_attrs['cross_ref_uniprot'] = self.gene_id_mappings['symbol_to_uniprot'][gene_symbol]
             
-            # Add alternative names/symbols if available
-            # This could be enhanced further with additional gene name databases
+            # Add mapped IDs from collapsed files
+            for attr in ['entrez_id', 'mapped_uniprot_id']:
+                if attr in gene_info:
+                    node_attrs[attr] = gene_info[attr]
             
             self.graph.add_node(gene_symbol, **node_attrs)
         
-        logger.info(f"Added {len(genes)} gene nodes")
+        logger.info(f"Added {len(genes)} comprehensive gene nodes")
     
     def _add_go_relationships(self):
         """Add GO-GO relationships to the graph."""
@@ -182,11 +247,14 @@ class GOBPKnowledgeGraph:
         
         logger.info(f"Added {relationship_count} GO-GO relationships")
     
-    def _add_gene_associations(self):
-        """Add gene-GO associations to the graph."""
-        logger.info("Adding gene-GO associations...")
+    def _add_comprehensive_gene_associations(self):
+        """Add comprehensive gene-GO associations from all sources."""
+        logger.info("Adding comprehensive gene-GO associations...")
         
-        association_count = 0
+        gaf_count = 0
+        collapsed_count = 0
+        
+        # Add GAF associations (high-quality with evidence codes)
         for assoc in self.gene_associations:
             gene_symbol = assoc['gene_symbol']
             go_id = assoc['go_id']
@@ -197,14 +265,50 @@ class GOBPKnowledgeGraph:
                     gene_symbol,
                     go_id,
                     edge_type='gene_annotation',
+                    source='gaf',
                     evidence_code=assoc['evidence_code'],
                     qualifier=assoc['qualifier'],
                     assigned_by=assoc['assigned_by'],
-                    date=assoc['date']
+                    date=assoc['date'],
+                    database=assoc['database']
                 )
-                association_count += 1
+                gaf_count += 1
         
-        logger.info(f"Added {association_count} gene-GO associations")
+        # Add collapsed file associations (additional coverage)
+        added_collapsed = set()  # Track to avoid duplicates
+        
+        for id_type, associations in self.all_collapsed_associations.items():
+            for assoc in associations:
+                go_id = assoc['go_id']
+                gene_id = assoc['gene_id']
+                
+                # Map to gene symbol for graph consistency
+                if id_type == 'symbol':
+                    gene_symbol = gene_id
+                elif id_type == 'entrez':
+                    gene_symbol = self.gene_id_mappings.get('entrez_to_symbol', {}).get(gene_id)
+                elif id_type == 'uniprot':
+                    gene_symbol = self.gene_id_mappings.get('uniprot_to_symbol', {}).get(gene_id)
+                else:
+                    continue
+                
+                # Only add if both nodes exist and not already added
+                edge_key = (gene_symbol, go_id, id_type)
+                if (gene_symbol and gene_symbol in self.graph and go_id in self.graph and 
+                    edge_key not in added_collapsed):
+                    
+                    self.graph.add_edge(
+                        gene_symbol,
+                        go_id,
+                        edge_type='gene_annotation',
+                        source=f'collapsed_{id_type}',
+                        identifier_type=id_type,
+                        original_gene_id=gene_id
+                    )
+                    collapsed_count += 1
+                    added_collapsed.add(edge_key)
+        
+        logger.info(f"Added {gaf_count} GAF associations and {collapsed_count} collapsed file associations")
     
     def _add_alternative_id_mappings(self):
         """Add alternative GO ID mappings as edges."""
@@ -224,11 +328,99 @@ class GOBPKnowledgeGraph:
         
         logger.info(f"Added {mapping_count} alternative GO ID mappings")
     
+    def _add_go_clusters(self):
+        """Add GO clustering relationships from collapsed_go files."""
+        logger.info("Adding GO clustering relationships...")
+        
+        cluster_count = 0
+        for parent_go, children in self.go_clusters.items():
+            # Only add if parent GO exists
+            if parent_go in self.graph:
+                for child_info in children:
+                    child_go = child_info['child_go']
+                    cluster_type = child_info['cluster_type']
+                    
+                    # Only add if child GO exists
+                    if child_go in self.graph:
+                        self.graph.add_edge(
+                            parent_go,
+                            child_go,
+                            edge_type='go_clustering',
+                            cluster_type=cluster_type,
+                            relationship_type='clusters'
+                        )
+                        cluster_count += 1
+        
+        logger.info(f"Added {cluster_count} GO clustering relationships")
+    
+    def _add_gene_cross_references(self):
+        """Add gene cross-reference edges between different identifier types."""
+        logger.info("Adding gene cross-reference edges...")
+        
+        cross_ref_count = 0
+        
+        # Add symbol-entrez cross-references
+        for symbol, entrez in self.gene_id_mappings.get('symbol_to_entrez', {}).items():
+            if symbol in self.graph:
+                # Create virtual entrez node if it doesn't exist
+                entrez_node_id = f"ENTREZ:{entrez}"
+                if entrez_node_id not in self.graph:
+                    self.graph.add_node(entrez_node_id, 
+                                       node_type='gene_identifier',
+                                       identifier_type='entrez',
+                                       entrez_id=entrez,
+                                       gene_symbol=symbol)
+                
+                self.graph.add_edge(
+                    symbol,
+                    entrez_node_id,
+                    edge_type='gene_cross_reference',
+                    reference_type='symbol_to_entrez'
+                )
+                cross_ref_count += 1
+        
+        # Add symbol-uniprot cross-references
+        for symbol, uniprot in self.gene_id_mappings.get('symbol_to_uniprot', {}).items():
+            if symbol in self.graph:
+                # Create virtual uniprot node if it doesn't exist
+                uniprot_node_id = f"UNIPROT:{uniprot}"
+                if uniprot_node_id not in self.graph:
+                    self.graph.add_node(uniprot_node_id,
+                                       node_type='gene_identifier', 
+                                       identifier_type='uniprot',
+                                       uniprot_id=uniprot,
+                                       gene_symbol=symbol)
+                
+                self.graph.add_edge(
+                    symbol,
+                    uniprot_node_id,
+                    edge_type='gene_cross_reference',
+                    reference_type='symbol_to_uniprot'
+                )
+                cross_ref_count += 1
+        
+        # Add entrez-uniprot cross-references
+        for entrez, uniprot in self.gene_id_mappings.get('entrez_to_uniprot', {}).items():
+            entrez_node_id = f"ENTREZ:{entrez}"
+            uniprot_node_id = f"UNIPROT:{uniprot}"
+            
+            if entrez_node_id in self.graph and uniprot_node_id in self.graph:
+                self.graph.add_edge(
+                    entrez_node_id,
+                    uniprot_node_id,
+                    edge_type='gene_cross_reference',
+                    reference_type='entrez_to_uniprot'
+                )
+                cross_ref_count += 1
+        
+        logger.info(f"Added {cross_ref_count} gene cross-reference edges")
+    
     def _calculate_stats(self):
-        """Calculate enhanced graph statistics."""
+        """Calculate comprehensive graph statistics."""
         # Count nodes by type
         go_nodes = [n for n, d in self.graph.nodes(data=True) if d.get('node_type') == 'go_term']
         gene_nodes = [n for n, d in self.graph.nodes(data=True) if d.get('node_type') == 'gene']
+        gene_id_nodes = [n for n, d in self.graph.nodes(data=True) if d.get('node_type') == 'gene_identifier']
         
         # Count enhanced GO terms
         enhanced_go_terms = len([n for n, d in self.graph.nodes(data=True) 
@@ -241,23 +433,34 @@ class GOBPKnowledgeGraph:
         # Count edges by type
         edges = list(self.graph.edges(data=True))
         go_relationships = len([e for e in edges if e[2].get('edge_type') == 'go_hierarchy'])
+        go_clusters = len([e for e in edges if e[2].get('edge_type') == 'go_clustering'])
         gene_associations = len([e for e in edges if e[2].get('edge_type') == 'gene_annotation'])
+        gene_cross_refs = len([e for e in edges if e[2].get('edge_type') == 'gene_cross_reference'])
         alt_id_mappings = len([e for e in edges if e[2].get('edge_type') == 'alternative_id_mapping'])
+        
+        # Count gene associations by source
+        gaf_associations = len([e for e in edges if e[2].get('edge_type') == 'gene_annotation' and e[2].get('source') == 'gaf'])
+        collapsed_associations = len([e for e in edges if e[2].get('edge_type') == 'gene_annotation' and e[2].get('source', '').startswith('collapsed')])
         
         self.stats = {
             'total_nodes': self.graph.number_of_nodes(),
             'total_edges': self.graph.number_of_edges(),
             'go_terms': len(go_nodes),
             'genes': len(gene_nodes),
+            'gene_identifiers': len(gene_id_nodes),
             'enhanced_go_terms': enhanced_go_terms,
             'alternative_go_ids': alternative_go_ids,
             'go_relationships': go_relationships,
+            'go_clusters': go_clusters,
             'gene_associations': gene_associations,
+            'gaf_associations': gaf_associations,
+            'collapsed_associations': collapsed_associations,
+            'gene_cross_references': gene_cross_refs,
             'alternative_id_mappings': alt_id_mappings,
-            'gene_id_cross_refs': len(self.gene_id_mappings.get('symbol_to_uniprot', {}))
+            'total_gene_id_mappings': sum(len(m) for m in self.gene_id_mappings.values())
         }
         
-        logger.info(f"Enhanced graph statistics: {self.stats}")
+        logger.info(f"Comprehensive graph statistics: {self.stats}")
     
     def get_stats(self) -> Dict:
         """Get graph statistics."""
@@ -506,6 +709,79 @@ class GOBPKnowledgeGraph:
             })
         
         return cross_refs
+    
+    def validate_graph_integrity(self) -> Dict[str, bool]:
+        """Validate the integrity and consistency of the knowledge graph."""
+        logger.info("Validating graph integrity...")
+        
+        validation = {
+            'has_nodes': self.graph.number_of_nodes() > 0,
+            'has_edges': self.graph.number_of_edges() > 0,
+            'go_terms_valid': True,
+            'gene_nodes_valid': True,
+            'relationships_valid': True,
+            'associations_valid': True,
+            'cross_references_valid': True
+        }
+        
+        # Validate GO term nodes
+        go_nodes_with_issues = 0
+        for node_id, node_data in self.graph.nodes(data=True):
+            if node_data.get('node_type') == 'go_term':
+                if not node_data.get('name') or not node_id.startswith('GO:'):
+                    go_nodes_with_issues += 1
+        
+        validation['go_terms_valid'] = go_nodes_with_issues == 0
+        
+        # Validate gene nodes
+        gene_nodes_with_issues = 0
+        for node_id, node_data in self.graph.nodes(data=True):
+            if node_data.get('node_type') == 'gene':
+                if not node_data.get('gene_symbol'):
+                    gene_nodes_with_issues += 1
+        
+        validation['gene_nodes_valid'] = gene_nodes_with_issues == 0
+        
+        # Validate relationships
+        invalid_relationships = 0
+        for source, target, edge_data in self.graph.edges(data=True):
+            if edge_data.get('edge_type') == 'go_hierarchy':
+                if (source not in self.graph or target not in self.graph or
+                    not source.startswith('GO:') or not target.startswith('GO:')):
+                    invalid_relationships += 1
+        
+        validation['relationships_valid'] = invalid_relationships == 0
+        
+        # Validate associations
+        invalid_associations = 0
+        for source, target, edge_data in self.graph.edges(data=True):
+            if edge_data.get('edge_type') == 'gene_annotation':
+                source_data = self.graph.nodes.get(source, {})
+                target_data = self.graph.nodes.get(target, {})
+                if (source_data.get('node_type') != 'gene' or
+                    target_data.get('node_type') != 'go_term'):
+                    invalid_associations += 1
+        
+        validation['associations_valid'] = invalid_associations == 0
+        
+        # Validate cross-references
+        invalid_cross_refs = 0
+        for source, target, edge_data in self.graph.edges(data=True):
+            if edge_data.get('edge_type') == 'gene_cross_reference':
+                if source not in self.graph or target not in self.graph:
+                    invalid_cross_refs += 1
+        
+        validation['cross_references_valid'] = invalid_cross_refs == 0
+        
+        # Overall validation
+        validation['overall_valid'] = all(validation.values())
+        
+        if validation['overall_valid']:
+            logger.info("✅ Graph integrity validation passed")
+        else:
+            logger.warning(f"⚠️ Graph integrity issues found: {validation}")
+        
+        return validation
 
 
 def main():
@@ -577,6 +853,24 @@ def main():
         for key, value in cross_refs.items():
             print(f"  {key}: {value}")
     
+    # Enhanced Query 8: GO clustering relationships
+    if kg.go_clusters:
+        sample_cluster = list(kg.go_clusters.keys())[0]
+        cluster_children = kg.go_clusters[sample_cluster]
+        print(f"\n8. GO clustering example - {sample_cluster}:")
+        print(f"  Clusters {len(cluster_children)} child GO terms")
+        for child in cluster_children[:3]:
+            child_go = child['child_go']
+            child_name = kg.go_terms.get(child_go, {}).get('name', 'Unknown')
+            print(f"    -> {child_go}: {child_name}")
+    
+    # Enhanced Query 9: Validation results
+    validation = kg.validate_graph_integrity()
+    print(f"\n9. Graph validation:")
+    for check, result in validation.items():
+        status = "✓" if result else "✗"
+        print(f"  {status} {check}: {result}")
+    
     # Enhanced Query 7: Show enriched GO term example
     apoptosis_terms = [go_id for go_id, info in kg.go_terms.items() 
                       if 'apoptosis' in info['name'].lower()]
@@ -590,10 +884,10 @@ def main():
         if 'synonyms' in node_data and node_data['synonyms']:
             print(f"  Synonyms: {', '.join(node_data['synonyms'][:3])}")
     
-    # Save the enhanced graph
-    output_path = "/home/mreddy1/knowledge_graph/data/go_bp_enhanced_kg.pkl"
+    # Save the comprehensive graph
+    output_path = "/home/mreddy1/knowledge_graph/data/go_bp_comprehensive_kg.pkl"
     kg.save_graph(output_path)
-    print(f"\nEnhanced knowledge graph saved to: {output_path}")
+    print(f"\nComprehensive knowledge graph saved to: {output_path}")
 
 
 if __name__ == "__main__":

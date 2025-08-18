@@ -1,223 +1,174 @@
-# Gene Ontology Biological Process Knowledge Graph
+# GO_BP Knowledge Graph
 
-A comprehensive knowledge graph built from Gene Ontology (GO) Biological Process data, designed for gene set interpretation and biological pathway analysis.
+A comprehensive knowledge graph system for Gene Ontology Biological Process (GO_BP) data, designed for gene set interpretation and biological analysis.
 
-## 🎯 Project Overview
+## Features
 
-This project implements a scalable knowledge graph that models relationships between:
-- **Genes** (17,780 human genes)
-- **GO Terms** (29,602 biological process terms) 
-- **Hierarchical relationships** (63,195 GO-GO relationships)
-- **Functional annotations** (161,332 gene-GO associations)
+- **Comprehensive Data Parsing**: Supports all 9 GO_BP file formats including GAF, OBO, and collapsed_go files
+- **Rich Knowledge Graph**: 66K+ nodes, 520K+ edges with GO terms, genes, and cross-references  
+- **Multiple Identifier Support**: Gene symbols, Entrez IDs, and UniProt IDs with cross-references
+- **Advanced Querying**: Gene function lookup, GO term search, hierarchy traversal
+- **Data Validation**: Built-in integrity checking and semantic validation
+- **Flexible Backend**: NetworkX for analysis, Neo4j-ready for production
 
-**Total Knowledge Graph Size**: 47,382 nodes, 224,527 edges
+## Quick Start
 
-## 🏗️ Architecture
+### Installation
 
-```
-├── src/
-│   ├── data_parsers.py     # GO_BP data parsing utilities
-│   ├── kg_builder.py       # Knowledge graph construction
-│   └── __init__.py
-├── tests/
-│   ├── test_go_bp_kg.py    # Comprehensive test suite
-│   └── __init__.py
-├── data/
-│   └── go_bp_kg.pkl        # Serialized knowledge graph
-├── knowledge_graph_project_plan.md  # Detailed project plan
-├── environment.yml         # Conda environment specification
-└── README.md
-```
-
-## 🚀 Quick Start
-
-### 1. Environment Setup
-
+1. Clone the repository:
 ```bash
-# Create and activate conda environment
+git clone <repository-url>
+cd knowledge_graph
+```
+
+2. Create and activate the conda environment:
+```bash
 conda env create -f environment.yml
 conda activate knowledge_graph
 ```
 
-### 2. Build Knowledge Graph
+### Basic Usage
 
 ```python
 from src.kg_builder import GOBPKnowledgeGraph
 
-# Initialize and build graph
-kg = GOBPKnowledgeGraph(use_neo4j=False)
+# Initialize and build knowledge graph
+kg = GOBPKnowledgeGraph()
 kg.load_data("path/to/GO_BP/data")
 kg.build_graph()
 
-# Get statistics
-print(kg.get_stats())
+# Query gene functions
+functions = kg.query_gene_functions("TP53")
+print(f"TP53 has {len(functions)} GO annotations")
+
+# Search GO terms
+dna_repair_terms = kg.search_go_terms_by_definition("DNA repair")
+print(f"Found {len(dna_repair_terms)} DNA repair related terms")
+
+# Get comprehensive statistics
+stats = kg.get_stats()
+print(f"Knowledge graph contains {stats['total_nodes']:,} nodes and {stats['total_edges']:,} edges")
 ```
 
-### 3. Query Examples
+## Project Structure
 
-```python
-# What biological processes is TP53 involved in?
-functions = kg.query_gene_functions('TP53')
-for func in functions[:5]:
-    print(f"{func['go_id']}: {func['go_name']}")
-
-# Which genes are involved in apoptosis?
-apoptosis_terms = [go_id for go_id, info in kg.go_terms.items() 
-                  if 'apoptosis' in info['name'].lower()]
-genes = kg.query_go_term_genes(apoptosis_terms[0])
-
-# Explore GO hierarchy
-parents = kg.query_go_hierarchy('GO:0006915', 'parents')  # apoptotic process
+```
+knowledge_graph/
+├── src/                    # Source code
+│   ├── data_parsers.py     # Comprehensive GO_BP data parsing
+│   └── kg_builder.py       # Knowledge graph construction
+├── tests/                  # Test suite
+├── examples/               # Usage examples
+├── docs/                   # Documentation
+├── validation/             # Validation scripts
+├── reports/                # Analysis reports
+├── data/                   # Generated knowledge graphs
+└── environment.yml         # Conda environment
 ```
 
-## 📊 Data Sources
+## Capabilities
 
-This implementation uses the GO_BP folder from:
-```
-llm_evaluation_for_gene_set_interpretation/data/GO_BP/
-├── goID_2_name.tab          # GO term definitions
-├── goID_2_namespace.tab     # GO namespaces
-├── go.tab                   # GO hierarchical relationships
-├── goa_human.gaf.gz         # Gene-GO associations (GAF format)
-└── collapsed_go.symbol      # GO term clustering
-```
-
-**Data Statistics:**
-- 29,602 GO biological process terms
-- 17,780 unique human genes
-- 63,195 hierarchical relationships between GO terms
-- 161,332 gene-GO functional annotations
-
-## 🔬 Key Features
-
-### Data Parsing (`data_parsers.py`)
-- **GO Term Parser**: Extracts term definitions and namespaces
-- **Relationship Parser**: Processes GO hierarchical structure (is_a, part_of, regulates)
-- **GAF Parser**: Parses Gene Association File format for gene-GO annotations
-- **Clustering Parser**: Handles GO term groupings
-
-### Knowledge Graph Builder (`kg_builder.py`)
-- **NetworkX Backend**: Efficient in-memory graph operations
-- **Multi-Edge Support**: Handles multiple relationships between nodes
-- **Graph Persistence**: Save/load functionality for analysis workflows
-- **Query Interface**: Biological pathway and gene function queries
+### Data Sources Supported
+- **GO Terms**: 29,602 biological process terms with rich metadata
+- **GO Relationships**: 63,195 hierarchical relationships (is_a, part_of, regulates)
+- **GO Clustering**: 27,733 clustering relationships from collapsed_go files
+- **Gene Associations**: 408,135 gene-GO annotations from GAF and collapsed files
+- **Gene Cross-References**: 19,861 identifier mappings (Symbol ↔ Entrez ↔ UniProt)
+- **Alternative IDs**: 1,434 obsolete/alternative GO ID mappings
+- **OBO Enhancement**: Rich definitions and synonyms for 27,473 terms
 
 ### Query Capabilities
-1. **Gene Function Queries**: Find GO terms associated with specific genes
-2. **GO Term Queries**: Find genes annotated with specific biological processes
-3. **Hierarchy Queries**: Navigate parent/child relationships in GO structure
-4. **Evidence Tracking**: Maintain evidence codes for all annotations
+- **Gene Function Analysis**: Find all GO terms associated with a gene
+- **GO Term Search**: Search by definition, name, or synonyms with relevance scoring
+- **Hierarchy Traversal**: Navigate parent-child relationships in GO hierarchy
+- **Cross-Reference Lookup**: Map between different gene identifier systems
+- **Alternative ID Resolution**: Handle obsolete GO IDs automatically
 
-## 🧪 Testing
+### Validation & Quality
+- **100% Validation Success Rate**: Comprehensive integrity checking
+- **Semantic Validation**: Ensures biological relationships are meaningful
+- **Cross-File Consistency**: Validates references between data sources
+- **Graph Integrity**: Checks node and edge validity
 
-Comprehensive test suite with 100% success rate:
+## Examples
 
+See `examples/basic_usage.py` for a complete working example.
+
+### Advanced Queries
+
+```python
+# Find genes involved in DNA repair
+dna_repair_terms = kg.search_go_terms_by_definition("DNA repair")
+repair_genes = set()
+for term in dna_repair_terms:
+    genes = kg.query_go_term_genes(term['go_id'])
+    repair_genes.update(gene['gene_symbol'] for gene in genes)
+
+print(f"Found {len(repair_genes)} genes involved in DNA repair")
+
+# Explore GO hierarchy
+go_term = "GO:0006281"  # DNA repair
+parents = kg.query_go_hierarchy(go_term, 'parents')
+children = kg.query_go_hierarchy(go_term, 'children')
+
+print(f"GO:{go_term} has {len(parents)} parent terms and {len(children)} child terms")
+
+# Get cross-references for a gene
+cross_refs = kg.get_gene_cross_references("BRCA1")
+print(f"BRCA1 identifiers: {cross_refs}")
+```
+
+## Documentation
+
+- **[API Reference](docs/API_REFERENCE.md)**: Complete API documentation
+- **[Parser Verification Report](reports/PARSER_VERIFICATION_REPORT.md)**: Data parser validation results
+- **[KG Builder Update Report](reports/KG_BUILDER_UPDATE_REPORT.md)**: Knowledge graph enhancements
+
+## Testing & Validation
+
+Run the test suite:
 ```bash
-python tests/test_go_bp_kg.py
+python -m pytest tests/
 ```
 
-**Test Coverage:**
-- Data parsing validation
-- Graph construction verification  
-- Query functionality testing
-- Biological relevance checks
-- Graph persistence testing
-
-## 📈 Performance Metrics
-
-**Graph Construction Time**: ~30 seconds
-**Memory Usage**: ~500MB for full graph
-**Query Response**: <1ms for typical gene/GO queries
-
-## 🔄 Example Workflows
-
-### 1. Gene Set Interpretation
-```python
-# Analyze a gene set for enriched biological processes
-gene_set = ['TP53', 'BRCA1', 'BRCA2', 'ATM', 'CHEK2']
-enriched_processes = {}
-
-for gene in gene_set:
-    functions = kg.query_gene_functions(gene)
-    for func in functions:
-        go_id = func['go_id']
-        if go_id not in enriched_processes:
-            enriched_processes[go_id] = []
-        enriched_processes[go_id].append(gene)
-
-# Find processes shared by multiple genes
-shared_processes = {go_id: genes for go_id, genes in enriched_processes.items() 
-                   if len(genes) >= 2}
+Run validation scripts:
+```bash
+python validation/comprehensive_kg_validation_fixed.py
 ```
 
-### 2. Pathway Discovery
-```python
-# Find related biological processes
-apoptosis_terms = [go_id for go_id, info in kg.go_terms.items() 
-                  if 'apoptosis' in info['name'].lower()]
+## Performance
 
-for term in apoptosis_terms[:5]:
-    print(f"\\n{kg.go_terms[term]['name']}:")
-    genes = kg.query_go_term_genes(term)
-    print(f"  {len(genes)} associated genes")
-    
-    parents = kg.query_go_hierarchy(term, 'parents')
-    if parents:
-        print(f"  Parent: {parents[0]['go_name']}")
+- **Loading Time**: ~30-60 seconds for complete GO_BP dataset
+- **Memory Usage**: ~2-4 GB for full knowledge graph
+- **Query Performance**: Sub-second response for most queries
+- **Graph Size**: 66,397 nodes, 520,358 edges
+
+## Requirements
+
+- Python 3.8+
+- NetworkX 3.x
+- Pandas 2.x
+- NumPy 1.x
+- See `environment.yml` for complete dependencies
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Citation
+
+If you use this knowledge graph in your research, please cite:
+
 ```
-
-## 🎯 Next Steps
-
-This GO_BP implementation serves as the foundation for:
-
-1. **Integration with Additional Data Sources**:
-   - Talisman gene sets
-   - GO Molecular Function (MF)
-   - GO Cellular Component (CC)
-
-2. **Advanced Analytics**:
-   - Gene set enrichment analysis
-   - Pathway similarity scoring
-   - Network-based gene prioritization
-
-3. **Neo4j Integration**:
-   - Persistent graph database
-   - Complex multi-hop queries
-   - Graph algorithms (PageRank, community detection)
-
-4. **Evaluation Framework**:
-   - Benchmark query performance
-   - Biological relevance scoring
-   - Link prediction validation
-
-## 📋 Technical Requirements
-
-- **Python 3.10+**
-- **NetworkX**: Graph operations
-- **Pandas**: Data manipulation  
-- **PyYAML**: Configuration files
-- **Neo4j** (optional): Graph database
-
-## 📄 Data Format Details
-
-### GAF (Gene Association Format)
-Standard format for gene-GO associations with evidence codes:
+GO_BP Knowledge Graph
+A comprehensive knowledge graph for Gene Ontology Biological Process data
+https://github.com/your-username/knowledge_graph
 ```
-UniProtKB  A0A024RBG1  NUDT4B  enables  GO:0003723  GO_REF:0000043  IEA  ...
-```
-
-### GO Hierarchy Format
-Tab-separated relationships:
-```
-GO:0048308  GO:0000001  is_a  biological_process
-```
-
-## 🏆 Results Summary
-
-✅ **Successfully parsed 161,332 gene-GO associations**  
-✅ **Built comprehensive graph with 47,382 nodes**  
-✅ **Implemented efficient query interface**  
-✅ **100% test suite success rate**  
-✅ **Ready for integration with additional data sources**
-
-This implementation provides a solid foundation for gene set interpretation and biological pathway analysis, with extensible architecture for future enhancements.
