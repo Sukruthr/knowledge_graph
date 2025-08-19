@@ -526,6 +526,393 @@ class GODataParser:
 GOBPDataParser = GODataParser
 
 
+class OmicsDataParser:
+    """Parser for Omics data including Disease, Drug, and Viral infection associations."""
+    
+    def __init__(self, omics_data_dir: str):
+        """
+        Initialize Omics data parser.
+        
+        Args:
+            omics_data_dir: Path to Omics_data directory containing association files
+        """
+        self.omics_data_dir = Path(omics_data_dir)
+        
+        # Core data structures
+        self.disease_associations = []
+        self.drug_associations = []
+        self.viral_associations = []
+        self.cluster_relationships = []
+        self.disease_expression_matrix = {}
+        self.viral_expression_matrix = {}
+        
+        logger.info(f"Initialized Omics data parser for {omics_data_dir}")
+    
+    def parse_disease_gene_associations(self) -> List[Dict]:
+        """
+        Parse gene-disease associations from Disease__gene_attribute_edges.txt.
+        
+        Returns:
+            List of gene-disease association dictionaries
+        """
+        logger.info("Parsing gene-disease associations...")
+        
+        disease_file = self.omics_data_dir / "Disease__gene_attribute_edges.txt"
+        associations = []
+        
+        with open(disease_file, 'r') as f:
+            lines = f.readlines()
+            
+            # Skip header lines
+            for line in lines[2:]:  # Skip first 2 header lines
+                parts = line.strip().split('\t')
+                if len(parts) >= 7:
+                    association = {
+                        'gene_symbol': parts[0],
+                        'gene_id': parts[2],
+                        'disease_condition': parts[3],
+                        'disease_name': parts[4],
+                        'gse_id': parts[5],
+                        'weight': float(parts[6]),
+                        'association_type': 'disease'
+                    }
+                    associations.append(association)
+        
+        logger.info(f"Parsed {len(associations)} gene-disease associations")
+        self.disease_associations = associations
+        return associations
+    
+    def parse_drug_gene_associations(self) -> List[Dict]:
+        """
+        Parse gene-drug associations from Small_molecule__gene_attribute_edges.txt.
+        
+        Returns:
+            List of gene-drug association dictionaries
+        """
+        logger.info("Parsing gene-drug associations...")
+        
+        drug_file = self.omics_data_dir / "Small_molecule __gene_attribute_edges.txt"
+        associations = []
+        
+        with open(drug_file, 'r') as f:
+            lines = f.readlines()
+            
+            # Skip header lines
+            for line in lines[2:]:  # Skip first 2 header lines
+                parts = line.strip().split('\t')
+                if len(parts) >= 7:
+                    association = {
+                        'gene_symbol': parts[0],
+                        'gene_id': parts[2],
+                        'drug_condition': parts[3],
+                        'drug_name': parts[4],
+                        'perturbation_id': parts[5],
+                        'weight': float(parts[6]),
+                        'association_type': 'drug_perturbation'
+                    }
+                    associations.append(association)
+        
+        logger.info(f"Parsed {len(associations)} gene-drug associations")
+        self.drug_associations = associations
+        return associations
+    
+    def parse_viral_gene_associations(self) -> List[Dict]:
+        """
+        Parse gene-viral infection associations from Viral_Infections__gene_attribute_edges.txt.
+        
+        Returns:
+            List of gene-viral association dictionaries
+        """
+        logger.info("Parsing gene-viral associations...")
+        
+        viral_file = self.omics_data_dir / "Viral_Infections__gene_attribute_edges.txt"
+        associations = []
+        
+        with open(viral_file, 'r') as f:
+            lines = f.readlines()
+            
+            # Skip header lines
+            for line in lines[2:]:  # Skip first 2 header lines
+                parts = line.strip().split('\t')
+                if len(parts) >= 7:
+                    association = {
+                        'gene_symbol': parts[0],
+                        'gene_id': parts[2],
+                        'viral_condition': parts[3],
+                        'viral_perturbation': parts[4],
+                        'gse_id': parts[5],
+                        'weight': float(parts[6]),
+                        'association_type': 'viral_response'
+                    }
+                    associations.append(association)
+        
+        logger.info(f"Parsed {len(associations)} gene-viral associations")
+        self.viral_associations = associations
+        return associations
+    
+    def parse_cluster_relationships(self) -> List[Dict]:
+        """
+        Parse network cluster relationships from NeST__IAS_clixo_hidef_Nov17.edges.
+        
+        Returns:
+            List of cluster relationship dictionaries
+        """
+        logger.info("Parsing network cluster relationships...")
+        
+        cluster_file = self.omics_data_dir / "NeST__IAS_clixo_hidef_Nov17.edges"
+        relationships = []
+        
+        with open(cluster_file, 'r') as f:
+            for line in f:
+                parts = line.strip().split('\t')
+                if len(parts) >= 3:
+                    relationship = {
+                        'parent_cluster': parts[0],
+                        'child_cluster': parts[1],
+                        'relationship_type': parts[2],
+                        'association_type': 'cluster_hierarchy'
+                    }
+                    relationships.append(relationship)
+        
+        logger.info(f"Parsed {len(relationships)} cluster relationships")
+        self.cluster_relationships = relationships
+        return relationships
+    
+    def parse_disease_expression_matrix(self) -> Dict:
+        """
+        Parse disease gene expression matrix from Disease_gene_attribute_matrix_standardized.txt.
+        
+        Returns:
+            Dictionary with expression data structure
+        """
+        logger.info("Parsing disease expression matrix...")
+        
+        matrix_file = self.omics_data_dir / "Disease_gene_attribute_matrix_standardized.txt"
+        
+        # Read the matrix (large file, so we'll parse efficiently)
+        matrix_data = {}
+        condition_names = []
+        
+        with open(matrix_file, 'r') as f:
+            lines = f.readlines()
+            
+            # Parse header with condition names (line 1)
+            if len(lines) > 0:
+                header_parts = lines[0].strip().split('\t')
+                condition_names = header_parts[3:]  # Skip first 3 columns
+            
+            # Parse disease names (line 2)
+            disease_names = []
+            if len(lines) > 1:
+                disease_parts = lines[1].strip().split('\t')
+                disease_names = disease_parts[3:]  # Skip first 3 columns
+            
+            # Parse gene expression data
+            for line in lines[2:]:  # Skip first 2 header lines
+                parts = line.strip().split('\t')
+                if len(parts) > 3:
+                    gene_symbol = parts[0]
+                    gene_id = parts[2]
+                    
+                    # Store expression values for non-zero entries
+                    expressions = []
+                    for i, expr_val in enumerate(parts[3:]):
+                        if expr_val and float(expr_val) != 0.0:
+                            expressions.append({
+                                'condition': condition_names[i] if i < len(condition_names) else f"condition_{i}",
+                                'disease': disease_names[i] if i < len(disease_names) else f"disease_{i}",
+                                'expression_value': float(expr_val)
+                            })
+                    
+                    if expressions:  # Only store genes with non-zero expressions
+                        matrix_data[gene_symbol] = {
+                            'gene_id': gene_id,
+                            'expressions': expressions
+                        }
+        
+        logger.info(f"Parsed expression matrix for {len(matrix_data)} genes across {len(condition_names)} conditions")
+        self.disease_expression_matrix = matrix_data
+        return matrix_data
+    
+    def parse_viral_expression_matrix(self, expression_threshold: float = 0.5) -> Dict:
+        """
+        Parse viral gene expression matrix from Viral_Infections_gene_attribute_matrix_standardized.txt.
+        
+        Args:
+            expression_threshold: Minimum absolute expression value to include (default: 0.5)
+            
+        Returns:
+            Dictionary with viral expression data structure
+        """
+        logger.info(f"Parsing viral expression matrix (threshold: {expression_threshold})...")
+        
+        matrix_file = self.omics_data_dir / "Viral_Infections_gene_attribute_matrix_standardized.txt"
+        
+        # Read the matrix efficiently
+        matrix_data = {}
+        condition_names = []
+        viral_names = []
+        
+        with open(matrix_file, 'r') as f:
+            lines = f.readlines()
+            
+            # Parse header with condition names (line 1)
+            if len(lines) > 0:
+                header_parts = lines[0].strip().split('\t')
+                condition_names = header_parts[3:]  # Skip first 3 columns
+            
+            # Parse viral perturbation names (line 2)
+            if len(lines) > 1:
+                viral_parts = lines[1].strip().split('\t')
+                viral_names = viral_parts[3:]  # Skip first 3 columns
+            
+            # Parse gene expression data
+            for line in lines[2:]:  # Skip first 2 header lines
+                parts = line.strip().split('\t')
+                if len(parts) > 3:
+                    gene_symbol = parts[0]
+                    gene_id = parts[2]
+                    
+                    # Store expression values above threshold
+                    expressions = []
+                    for i, expr_val in enumerate(parts[3:]):
+                        if expr_val and expr_val != '0.000000':
+                            try:
+                                expr_float = float(expr_val)
+                                if abs(expr_float) >= expression_threshold:
+                                    expressions.append({
+                                        'condition': condition_names[i] if i < len(condition_names) else f"condition_{i}",
+                                        'viral_perturbation': viral_names[i] if i < len(viral_names) else f"viral_{i}",
+                                        'expression_value': expr_float,
+                                        'expression_direction': 'up' if expr_float > 0 else 'down',
+                                        'expression_magnitude': abs(expr_float)
+                                    })
+                            except ValueError:
+                                continue  # Skip invalid values
+                    
+                    if expressions:  # Only store genes with significant expressions
+                        matrix_data[gene_symbol] = {
+                            'gene_id': gene_id,
+                            'expressions': expressions,
+                            'num_significant_conditions': len(expressions)
+                        }
+        
+        logger.info(f"Parsed viral expression matrix for {len(matrix_data)} genes across {len(condition_names)} conditions")
+        logger.info(f"Found {sum(len(data['expressions']) for data in matrix_data.values())} significant expression events (threshold: {expression_threshold})")
+        
+        self.viral_expression_matrix = matrix_data
+        return matrix_data
+    
+    def get_unique_entities(self) -> Dict:
+        """
+        Extract unique entities from parsed data for node creation.
+        
+        Returns:
+            Dictionary with unique diseases, drugs, viral conditions, and clusters
+        """
+        entities = {
+            'diseases': set(),
+            'drugs': set(),
+            'viral_conditions': set(),
+            'clusters': set(),
+            'studies': set()
+        }
+        
+        # Extract unique diseases
+        for assoc in self.disease_associations:
+            entities['diseases'].add(assoc['disease_name'])
+            entities['studies'].add(assoc['gse_id'])
+        
+        # Extract unique drugs
+        for assoc in self.drug_associations:
+            entities['drugs'].add(assoc['drug_name'])
+        
+        # Extract unique viral conditions
+        for assoc in self.viral_associations:
+            entities['viral_conditions'].add(assoc['viral_perturbation'])
+            entities['studies'].add(assoc['gse_id'])
+        
+        # Extract unique clusters
+        for rel in self.cluster_relationships:
+            entities['clusters'].add(rel['parent_cluster'])
+            entities['clusters'].add(rel['child_cluster'])
+        
+        logger.info(f"Identified unique entities: "
+                   f"Diseases={len(entities['diseases'])}, "
+                   f"Drugs={len(entities['drugs'])}, "
+                   f"Viral={len(entities['viral_conditions'])}, "
+                   f"Clusters={len(entities['clusters'])}, "
+                   f"Studies={len(entities['studies'])}")
+        
+        return entities
+    
+    def validate_omics_data(self) -> Dict[str, bool]:
+        """
+        Validate the integrity of parsed Omics data.
+        
+        Returns:
+            Dictionary with validation results
+        """
+        validation = {
+            'has_disease_associations': len(self.disease_associations) > 0,
+            'has_drug_associations': len(self.drug_associations) > 0,
+            'has_viral_associations': len(self.viral_associations) > 0,
+            'has_cluster_relationships': len(self.cluster_relationships) > 0,
+            'has_expression_matrix': len(self.disease_expression_matrix) > 0,
+            'associations_valid': True,
+            'clusters_valid': True
+        }
+        
+        # Validate disease associations
+        if self.disease_associations:
+            invalid_disease = sum(1 for assoc in self.disease_associations 
+                                if not assoc.get('gene_symbol') or not assoc.get('disease_name'))
+            validation['associations_valid'] = invalid_disease == 0
+        
+        # Validate cluster relationships
+        if self.cluster_relationships:
+            invalid_clusters = sum(1 for rel in self.cluster_relationships 
+                                 if not rel.get('parent_cluster') or not rel.get('child_cluster'))
+            validation['clusters_valid'] = invalid_clusters == 0
+        
+        validation['overall_valid'] = all(validation.values())
+        
+        logger.info(f"Omics data validation: {validation}")
+        return validation
+    
+    def get_omics_summary(self) -> Dict:
+        """
+        Get summary statistics of the parsed Omics data.
+        
+        Returns:
+            Dictionary with data summary
+        """
+        unique_entities = self.get_unique_entities()
+        
+        # Count unique genes across all association types
+        all_genes = set()
+        for assoc in self.disease_associations:
+            all_genes.add(assoc['gene_symbol'])
+        for assoc in self.drug_associations:
+            all_genes.add(assoc['gene_symbol'])
+        for assoc in self.viral_associations:
+            all_genes.add(assoc['gene_symbol'])
+        
+        return {
+            'num_disease_associations': len(self.disease_associations),
+            'num_drug_associations': len(self.drug_associations),
+            'num_viral_associations': len(self.viral_associations),
+            'num_cluster_relationships': len(self.cluster_relationships),
+            'num_unique_genes': len(all_genes),
+            'num_unique_diseases': len(unique_entities['diseases']),
+            'num_unique_drugs': len(unique_entities['drugs']),
+            'num_unique_viral_conditions': len(unique_entities['viral_conditions']),
+            'num_unique_clusters': len(unique_entities['clusters']),
+            'num_studies': len(unique_entities['studies']),
+            'expression_matrix_genes': len(self.disease_expression_matrix)
+        }
+
+
 class CombinedGOParser:
     """Parser for multiple GO namespaces (GO_BP + GO_CC + GO_MF)."""
     
@@ -600,6 +987,157 @@ class CombinedGOParser:
             summary['by_namespace'][namespace] = parser.get_data_summary()
         
         return summary
+
+
+class CombinedBiomedicalParser:
+    """Parser for comprehensive biomedical data (GO + Omics integration)."""
+    
+    def __init__(self, base_data_dir: str):
+        """
+        Initialize combined biomedical parser for GO and Omics data.
+        
+        Args:
+            base_data_dir: Base directory containing GO_BP, GO_CC, GO_MF, and Omics_data subdirectories
+        """
+        self.base_data_dir = Path(base_data_dir)
+        
+        # Initialize GO parser
+        self.go_parser = CombinedGOParser(str(base_data_dir))
+        
+        # Initialize Omics parser
+        omics_dir = self.base_data_dir / "Omics_data"
+        if omics_dir.exists():
+            self.omics_parser = OmicsDataParser(str(omics_dir))
+            logger.info("Initialized Omics data parser")
+        else:
+            self.omics_parser = None
+            logger.warning(f"Omics_data directory not found: {omics_dir}")
+        
+        self.parsed_data = {}
+        
+    def parse_all_biomedical_data(self) -> Dict[str, Dict]:
+        """
+        Parse all biomedical data (GO + Omics).
+        
+        Returns:
+            Dictionary with parsed data from all sources
+        """
+        logger.info("Starting comprehensive biomedical data parsing...")
+        
+        # Parse GO data
+        go_data = self.go_parser.parse_all_namespaces()
+        self.parsed_data['go_data'] = go_data
+        
+        # Parse Omics data if available
+        if self.omics_parser:
+            omics_data = {
+                'disease_associations': self.omics_parser.parse_disease_gene_associations(),
+                'drug_associations': self.omics_parser.parse_drug_gene_associations(),
+                'viral_associations': self.omics_parser.parse_viral_gene_associations(),
+                'cluster_relationships': self.omics_parser.parse_cluster_relationships(),
+                'disease_expression_matrix': self.omics_parser.parse_disease_expression_matrix(),
+                'viral_expression_matrix': self.omics_parser.parse_viral_expression_matrix(),
+                'unique_entities': self.omics_parser.get_unique_entities(),
+                'validation': self.omics_parser.validate_omics_data(),
+                'summary': self.omics_parser.get_omics_summary()
+            }
+            self.parsed_data['omics_data'] = omics_data
+        
+        logger.info("Comprehensive biomedical data parsing complete")
+        return self.parsed_data
+    
+    def get_comprehensive_summary(self) -> Dict:
+        """
+        Get comprehensive summary across all parsed data sources.
+        
+        Returns:
+            Combined summary dictionary
+        """
+        summary = {
+            'data_sources': [],
+            'go_summary': {},
+            'omics_summary': {},
+            'integration_stats': {}
+        }
+        
+        # GO summary
+        if 'go_data' in self.parsed_data:
+            summary['data_sources'].append('GO_ontology')
+            summary['go_summary'] = self.go_parser.get_combined_summary()
+        
+        # Omics summary
+        if 'omics_data' in self.parsed_data and self.omics_parser:
+            summary['data_sources'].append('Omics_associations')
+            summary['omics_summary'] = self.omics_parser.get_omics_summary()
+        
+        # Integration statistics
+        if 'go_data' in self.parsed_data and 'omics_data' in self.parsed_data:
+            # Find gene overlaps between GO and Omics data
+            go_genes = set()
+            for namespace_data in self.parsed_data['go_data'].values():
+                for assoc in namespace_data.get('gene_associations', []):
+                    go_genes.add(assoc['gene_symbol'])
+            
+            omics_genes = set()
+            for assoc in self.parsed_data['omics_data']['disease_associations']:
+                omics_genes.add(assoc['gene_symbol'])
+            for assoc in self.parsed_data['omics_data']['drug_associations']:
+                omics_genes.add(assoc['gene_symbol'])
+            for assoc in self.parsed_data['omics_data']['viral_associations']:
+                omics_genes.add(assoc['gene_symbol'])
+            
+            overlap_genes = go_genes & omics_genes
+            
+            summary['integration_stats'] = {
+                'go_genes': len(go_genes),
+                'omics_genes': len(omics_genes),
+                'overlapping_genes': len(overlap_genes),
+                'integration_coverage': len(overlap_genes) / len(go_genes) if go_genes else 0,
+                'can_integrate': len(overlap_genes) > 0
+            }
+        
+        return summary
+    
+    def validate_comprehensive_data(self) -> Dict[str, bool]:
+        """
+        Validate all parsed biomedical data.
+        
+        Returns:
+            Comprehensive validation results
+        """
+        validation = {
+            'go_data_valid': False,
+            'omics_data_valid': False,
+            'integration_possible': False,
+            'overall_valid': False
+        }
+        
+        # Validate GO data
+        if 'go_data' in self.parsed_data:
+            go_valid = True
+            for namespace_data in self.parsed_data['go_data'].values():
+                if not namespace_data.get('go_terms') or not namespace_data.get('gene_associations'):
+                    go_valid = False
+                    break
+            validation['go_data_valid'] = go_valid
+        
+        # Validate Omics data
+        if 'omics_data' in self.parsed_data and self.omics_parser:
+            omics_validation = self.parsed_data['omics_data']['validation']
+            validation['omics_data_valid'] = omics_validation.get('overall_valid', False)
+        
+        # Check integration possibility
+        summary = self.get_comprehensive_summary()
+        integration_stats = summary.get('integration_stats', {})
+        validation['integration_possible'] = integration_stats.get('can_integrate', False)
+        
+        # Overall validation
+        validation['overall_valid'] = (validation['go_data_valid'] and 
+                                     validation['omics_data_valid'] and 
+                                     validation['integration_possible'])
+        
+        logger.info(f"Comprehensive biomedical data validation: {validation}")
+        return validation
 
 
 def main():

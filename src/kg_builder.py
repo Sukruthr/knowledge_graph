@@ -13,9 +13,9 @@ import json
 import pickle
 
 try:
-    from .data_parsers import GOBPDataParser, GODataParser, CombinedGOParser
+    from .data_parsers import GOBPDataParser, GODataParser, CombinedGOParser, OmicsDataParser, CombinedBiomedicalParser
 except ImportError:
-    from data_parsers import GOBPDataParser, GODataParser, CombinedGOParser
+    from data_parsers import GOBPDataParser, GODataParser, CombinedGOParser, OmicsDataParser, CombinedBiomedicalParser
 
 logger = logging.getLogger(__name__)
 
@@ -1522,6 +1522,503 @@ class CombinedGOKnowledgeGraph:
                 pickle.dump(self.graph, f)
         
         logger.info("Combined graph saved successfully")
+
+
+class ComprehensiveBiomedicalKnowledgeGraph:
+    """Comprehensive Knowledge Graph integrating GO ontology with Omics data."""
+    
+    def __init__(self, use_neo4j: bool = False):
+        """
+        Initialize the comprehensive biomedical knowledge graph.
+        
+        Args:
+            use_neo4j: Whether to use Neo4j database or NetworkX
+        """
+        self.use_neo4j = use_neo4j
+        self.graph = nx.MultiDiGraph()
+        self.parser = None
+        self.parsed_data = {}
+        self.stats = {}
+        
+        if use_neo4j:
+            try:
+                from neo4j import GraphDatabase
+                self.neo4j_driver = None
+                logger.info("Neo4j driver available")
+            except ImportError:
+                logger.warning("Neo4j driver not available, falling back to NetworkX")
+                self.use_neo4j = False
+    
+    def load_data(self, base_data_dir: str):
+        """
+        Load and parse comprehensive biomedical data (GO + Omics).
+        
+        Args:
+            base_data_dir: Base directory containing GO_BP, GO_CC, GO_MF, and Omics_data subdirectories
+        """
+        logger.info(f"Loading comprehensive biomedical data from {base_data_dir}")
+        
+        # Initialize comprehensive parser
+        self.parser = CombinedBiomedicalParser(base_data_dir)
+        
+        # Parse all biomedical data
+        self.parsed_data = self.parser.parse_all_biomedical_data()
+        
+        logger.info("Comprehensive biomedical data loading complete")
+    
+    def build_comprehensive_graph(self):
+        """Build the comprehensive biomedical knowledge graph."""
+        logger.info("Building comprehensive biomedical knowledge graph...")
+        
+        # Build base GO knowledge graph
+        self._build_go_component()
+        
+        # Add Omics data components
+        self._add_omics_nodes()
+        self._add_omics_associations()
+        self._add_cluster_relationships()
+        
+        # Calculate comprehensive statistics
+        self._calculate_comprehensive_stats()
+        
+        # Validate comprehensive graph
+        self._validate_comprehensive_graph()
+        
+        logger.info("Comprehensive biomedical knowledge graph construction complete")
+    
+    def _build_go_component(self):
+        """Build the GO component of the knowledge graph."""
+        logger.info("Building GO component...")
+        
+        if 'go_data' not in self.parsed_data:
+            logger.warning("No GO data available for graph construction")
+            return
+        
+        go_data = self.parsed_data['go_data']
+        
+        # Add GO term nodes from all namespaces
+        for namespace, namespace_data in go_data.items():
+            logger.info(f"Adding {namespace} GO terms...")
+            
+            # Add GO term nodes
+            for go_id, go_info in namespace_data.get('go_terms', {}).items():
+                node_attrs = {
+                    'node_type': 'go_term',
+                    'name': go_info['name'],
+                    'namespace': go_info['namespace'],
+                    'description': go_info.get('description', '')
+                }
+                
+                # Enhance with OBO data if available
+                obo_terms = namespace_data.get('obo_terms', {})
+                if go_id in obo_terms:
+                    obo_info = obo_terms[go_id]
+                    node_attrs.update({
+                        'definition': obo_info.get('definition', ''),
+                        'synonyms': obo_info.get('synonyms', []),
+                        'is_obsolete': obo_info.get('is_obsolete', False)
+                    })
+                
+                self.graph.add_node(go_id, **node_attrs)
+            
+            # Add GO relationships
+            for rel in namespace_data.get('go_relationships', []):
+                parent_id = rel['parent_id']
+                child_id = rel['child_id']
+                
+                if parent_id in self.graph and child_id in self.graph:
+                    self.graph.add_edge(
+                        child_id,
+                        parent_id,
+                        edge_type='go_hierarchy',
+                        relationship_type=rel['relationship_type'],
+                        namespace=rel['namespace']
+                    )
+            
+            # Add gene nodes and associations
+            genes_added = set()
+            for assoc in namespace_data.get('gene_associations', []):
+                gene_symbol = assoc['gene_symbol']
+                go_id = assoc['go_id']
+                
+                # Add gene node if not already added
+                if gene_symbol not in genes_added:
+                    gene_attrs = {
+                        'node_type': 'gene',
+                        'gene_symbol': gene_symbol,
+                        'uniprot_id': assoc.get('uniprot_id', ''),
+                        'gene_name': assoc.get('gene_name', ''),
+                        'gene_type': assoc.get('gene_type', ''),
+                        'taxon': assoc.get('taxon', ''),
+                        'sources': ['gaf']
+                    }
+                    self.graph.add_node(gene_symbol, **gene_attrs)
+                    genes_added.add(gene_symbol)
+                
+                # Add gene-GO association
+                if gene_symbol in self.graph and go_id in self.graph:
+                    self.graph.add_edge(
+                        gene_symbol,
+                        go_id,
+                        edge_type='gene_annotation',
+                        source='gaf',
+                        evidence_code=assoc.get('evidence_code', ''),
+                        qualifier=assoc.get('qualifier', ''),
+                        namespace=namespace
+                    )
+    
+    def _add_omics_nodes(self):
+        """Add Omics-specific nodes (diseases, drugs, viral conditions, clusters)."""
+        logger.info("Adding Omics nodes...")
+        
+        if 'omics_data' not in self.parsed_data:
+            logger.warning("No Omics data available")
+            return
+        
+        omics_data = self.parsed_data['omics_data']
+        unique_entities = omics_data.get('unique_entities', {})
+        
+        # Add disease nodes
+        for disease in unique_entities.get('diseases', []):
+            self.graph.add_node(
+                f"DISEASE:{disease}",
+                node_type='disease',
+                disease_name=disease,
+                entity_type='disease'
+            )
+        
+        # Add drug nodes
+        for drug in unique_entities.get('drugs', []):
+            self.graph.add_node(
+                f"DRUG:{drug}",
+                node_type='drug',
+                drug_name=drug,
+                entity_type='small_molecule'
+            )
+        
+        # Add viral condition nodes
+        for viral_condition in unique_entities.get('viral_conditions', []):
+            self.graph.add_node(
+                f"VIRAL:{viral_condition}",
+                node_type='viral_condition',
+                viral_condition=viral_condition,
+                entity_type='viral_perturbation'
+            )
+        
+        # Add cluster nodes
+        for cluster in unique_entities.get('clusters', []):
+            self.graph.add_node(
+                f"CLUSTER:{cluster}",
+                node_type='network_cluster',
+                cluster_id=cluster,
+                entity_type='network_module'
+            )
+        
+        # Add study context nodes
+        for study in unique_entities.get('studies', []):
+            if study != '-666':  # Filter out placeholder IDs
+                self.graph.add_node(
+                    f"STUDY:GSE{study}",
+                    node_type='study',
+                    gse_id=study,
+                    entity_type='expression_study'
+                )
+        
+        logger.info(f"Added Omics nodes: "
+                   f"Diseases={len(unique_entities.get('diseases', []))}, "
+                   f"Drugs={len(unique_entities.get('drugs', []))}, "
+                   f"Viral={len(unique_entities.get('viral_conditions', []))}, "
+                   f"Clusters={len(unique_entities.get('clusters', []))}")
+    
+    def _add_omics_associations(self):
+        """Add gene-omics associations (disease, drug, viral)."""
+        logger.info("Adding Omics associations...")
+        
+        if 'omics_data' not in self.parsed_data:
+            return
+        
+        omics_data = self.parsed_data['omics_data']
+        association_counts = {'disease': 0, 'drug': 0, 'viral': 0}
+        
+        # Add gene-disease associations
+        for assoc in omics_data.get('disease_associations', []):
+            gene_symbol = assoc['gene_symbol']
+            disease_node = f"DISEASE:{assoc['disease_name']}"
+            
+            if gene_symbol in self.graph and disease_node in self.graph:
+                self.graph.add_edge(
+                    gene_symbol,
+                    disease_node,
+                    edge_type='gene_disease_association',
+                    disease_condition=assoc['disease_condition'],
+                    gse_id=assoc['gse_id'],
+                    weight=assoc['weight'],
+                    source='omics_disease'
+                )
+                association_counts['disease'] += 1
+        
+        # Add gene-drug associations
+        for assoc in omics_data.get('drug_associations', []):
+            gene_symbol = assoc['gene_symbol']
+            drug_node = f"DRUG:{assoc['drug_name']}"
+            
+            if gene_symbol in self.graph and drug_node in self.graph:
+                self.graph.add_edge(
+                    gene_symbol,
+                    drug_node,
+                    edge_type='gene_drug_perturbation',
+                    drug_condition=assoc['drug_condition'],
+                    perturbation_id=assoc['perturbation_id'],
+                    weight=assoc['weight'],
+                    source='omics_drug'
+                )
+                association_counts['drug'] += 1
+        
+        # Add gene-viral associations
+        for assoc in omics_data.get('viral_associations', []):
+            gene_symbol = assoc['gene_symbol']
+            viral_node = f"VIRAL:{assoc['viral_perturbation']}"
+            
+            if gene_symbol in self.graph and viral_node in self.graph:
+                self.graph.add_edge(
+                    gene_symbol,
+                    viral_node,
+                    edge_type='gene_viral_response',
+                    viral_condition=assoc['viral_condition'],
+                    gse_id=assoc['gse_id'],
+                    weight=assoc['weight'],
+                    source='omics_viral'
+                )
+                association_counts['viral'] += 1
+        
+        # Add viral expression matrix data
+        viral_expression_count = 0
+        viral_expression_matrix = omics_data.get('viral_expression_matrix', {})
+        for gene_symbol, expression_data in viral_expression_matrix.items():
+            if gene_symbol in self.graph:
+                for expr in expression_data['expressions']:
+                    viral_condition = expr['viral_perturbation']
+                    viral_node = f"VIRAL:{viral_condition}"
+                    
+                    if viral_node in self.graph:
+                        self.graph.add_edge(
+                            gene_symbol,
+                            viral_node,
+                            edge_type='gene_viral_expression',
+                            condition=expr['condition'],
+                            expression_value=expr['expression_value'],
+                            expression_direction=expr['expression_direction'],
+                            expression_magnitude=expr['expression_magnitude'],
+                            weight=abs(expr['expression_value']),
+                            source='viral_expression_matrix'
+                        )
+                        viral_expression_count += 1
+        
+        association_counts['viral'] += viral_expression_count
+        
+        logger.info(f"Added Omics associations: "
+                   f"Disease={association_counts['disease']}, "
+                   f"Drug={association_counts['drug']}, "
+                   f"Viral={association_counts['viral']}")
+    
+    def _add_cluster_relationships(self):
+        """Add network cluster hierarchy relationships."""
+        logger.info("Adding cluster relationships...")
+        
+        if 'omics_data' not in self.parsed_data:
+            return
+        
+        omics_data = self.parsed_data['omics_data']
+        cluster_count = 0
+        
+        for rel in omics_data.get('cluster_relationships', []):
+            parent_cluster = f"CLUSTER:{rel['parent_cluster']}"
+            child_cluster = f"CLUSTER:{rel['child_cluster']}"
+            
+            if parent_cluster in self.graph and child_cluster in self.graph:
+                self.graph.add_edge(
+                    child_cluster,
+                    parent_cluster,
+                    edge_type='cluster_hierarchy',
+                    relationship_type=rel['relationship_type'],
+                    source='nest_network'
+                )
+                cluster_count += 1
+        
+        logger.info(f"Added {cluster_count} cluster relationships")
+    
+    def _calculate_comprehensive_stats(self):
+        """Calculate comprehensive statistics for the integrated graph."""
+        logger.info("Calculating comprehensive statistics...")
+        
+        # Count nodes by type
+        node_counts = {}
+        for node_id, node_data in self.graph.nodes(data=True):
+            node_type = node_data.get('node_type', 'unknown')
+            node_counts[node_type] = node_counts.get(node_type, 0) + 1
+        
+        # Count edges by type
+        edge_counts = {}
+        for source, target, edge_data in self.graph.edges(data=True):
+            edge_type = edge_data.get('edge_type', 'unknown')
+            edge_counts[edge_type] = edge_counts.get(edge_type, 0) + 1
+        
+        # Calculate integration metrics
+        go_genes = set()
+        omics_genes = set()
+        
+        for node_id, node_data in self.graph.nodes(data=True):
+            if node_data.get('node_type') == 'gene':
+                # Check if connected to GO terms
+                for neighbor in self.graph.neighbors(node_id):
+                    neighbor_data = self.graph.nodes.get(neighbor, {})
+                    if neighbor_data.get('node_type') == 'go_term':
+                        go_genes.add(node_id)
+                    elif neighbor_data.get('node_type') in ['disease', 'drug', 'viral_condition']:
+                        omics_genes.add(node_id)
+        
+        integrated_genes = go_genes & omics_genes
+        
+        self.stats = {
+            'total_nodes': self.graph.number_of_nodes(),
+            'total_edges': self.graph.number_of_edges(),
+            'node_counts': node_counts,
+            'edge_counts': edge_counts,
+            'integration_metrics': {
+                'go_connected_genes': len(go_genes),
+                'omics_connected_genes': len(omics_genes),
+                'integrated_genes': len(integrated_genes),
+                'integration_ratio': len(integrated_genes) / len(go_genes) if go_genes else 0
+            }
+        }
+        
+        logger.info(f"Comprehensive graph statistics calculated: {self.stats}")
+    
+    def _validate_comprehensive_graph(self):
+        """Validate the comprehensive biomedical knowledge graph."""
+        logger.info("Validating comprehensive graph...")
+        
+        validation = {
+            'has_nodes': self.graph.number_of_nodes() > 0,
+            'has_edges': self.graph.number_of_edges() > 0,
+            'has_go_component': False,
+            'has_omics_component': False,
+            'integration_successful': False
+        }
+        
+        # Check for GO component
+        go_terms = [n for n, d in self.graph.nodes(data=True) if d.get('node_type') == 'go_term']
+        validation['has_go_component'] = len(go_terms) > 0
+        
+        # Check for Omics component
+        omics_nodes = [n for n, d in self.graph.nodes(data=True) 
+                      if d.get('node_type') in ['disease', 'drug', 'viral_condition', 'network_cluster']]
+        validation['has_omics_component'] = len(omics_nodes) > 0
+        
+        # Check integration
+        integration_metrics = self.stats.get('integration_metrics', {})
+        validation['integration_successful'] = integration_metrics.get('integrated_genes', 0) > 0
+        
+        validation['overall_valid'] = all(validation.values())
+        
+        if validation['overall_valid']:
+            logger.info("✅ Comprehensive graph validation passed")
+        else:
+            logger.warning(f"⚠️ Comprehensive graph validation issues: {validation}")
+        
+        return validation
+    
+    def get_comprehensive_stats(self) -> Dict:
+        """Get comprehensive graph statistics."""
+        return self.stats.copy()
+    
+    def query_gene_comprehensive(self, gene_symbol: str) -> Dict:
+        """
+        Query all associations for a gene across GO and Omics data.
+        
+        Args:
+            gene_symbol: Gene symbol to query
+            
+        Returns:
+            Dictionary with comprehensive gene information
+        """
+        if gene_symbol not in self.graph:
+            return {}
+        
+        results = {
+            'gene_symbol': gene_symbol,
+            'go_annotations': [],
+            'disease_associations': [],
+            'drug_perturbations': [],
+            'viral_responses': [],
+            'cluster_memberships': []
+        }
+        
+        # Get all neighbors and their relationships
+        for neighbor in self.graph.neighbors(gene_symbol):
+            edge_data = self.graph[gene_symbol][neighbor]
+            neighbor_data = self.graph.nodes[neighbor]
+            
+            # Handle multiple edges between same nodes
+            for edge_key, edge_attrs in edge_data.items():
+                edge_type = edge_attrs.get('edge_type')
+                
+                if edge_type == 'gene_annotation':
+                    results['go_annotations'].append({
+                        'go_id': neighbor,
+                        'go_name': neighbor_data.get('name', ''),
+                        'namespace': neighbor_data.get('namespace', ''),
+                        'evidence_code': edge_attrs.get('evidence_code', '')
+                    })
+                
+                elif edge_type == 'gene_disease_association':
+                    results['disease_associations'].append({
+                        'disease': neighbor_data.get('disease_name', ''),
+                        'condition': edge_attrs.get('disease_condition', ''),
+                        'gse_id': edge_attrs.get('gse_id', '')
+                    })
+                
+                elif edge_type == 'gene_drug_perturbation':
+                    results['drug_perturbations'].append({
+                        'drug': neighbor_data.get('drug_name', ''),
+                        'condition': edge_attrs.get('drug_condition', ''),
+                        'perturbation_id': edge_attrs.get('perturbation_id', '')
+                    })
+                
+                elif edge_type == 'gene_viral_response':
+                    results['viral_responses'].append({
+                        'viral_condition': neighbor_data.get('viral_condition', ''),
+                        'condition': edge_attrs.get('viral_condition', ''),
+                        'gse_id': edge_attrs.get('gse_id', ''),
+                        'type': 'response'
+                    })
+                
+                elif edge_type == 'gene_viral_expression':
+                    results['viral_responses'].append({
+                        'viral_condition': neighbor_data.get('viral_condition', ''),
+                        'condition': edge_attrs.get('condition', ''),
+                        'expression_value': edge_attrs.get('expression_value', 0),
+                        'expression_direction': edge_attrs.get('expression_direction', ''),
+                        'expression_magnitude': edge_attrs.get('expression_magnitude', 0),
+                        'type': 'expression'
+                    })
+        
+        return results
+    
+    def save_comprehensive_graph(self, filepath: str):
+        """Save the comprehensive biomedical knowledge graph."""
+        logger.info(f"Saving comprehensive graph to {filepath}")
+        
+        if filepath.endswith('.graphml'):
+            nx.write_graphml(self.graph, filepath)
+        elif filepath.endswith('.pkl'):
+            with open(filepath, 'wb') as f:
+                pickle.dump(self.graph, f)
+        else:
+            with open(filepath, 'wb') as f:
+                pickle.dump(self.graph, f)
+        
+        logger.info("Comprehensive graph saved successfully")
 
 
 def main():

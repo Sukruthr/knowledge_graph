@@ -1,0 +1,42 @@
+{
+  "timestamp": 1755554086.7663393,
+  "validation_successful": true,
+  "statistics": {
+    "total_nodes": 88075,
+    "total_edges": 3011416,
+    "node_counts": {
+      "go_term": 46228,
+      "gene": 19606,
+      "disease": 163,
+      "drug": 132,
+      "viral_condition": 280,
+      "network_cluster": 21374,
+      "study": 292
+    },
+    "edge_counts": {
+      "go_hierarchy": 83444,
+      "gene_annotation": 635268,
+      "gene_viral_expression": 1633354,
+      "gene_disease_association": 128864,
+      "gene_drug_perturbation": 291407,
+      "gene_viral_response": 199616,
+      "cluster_hierarchy": 39463
+    },
+    "integration_metrics": {
+      "go_connected_genes": 19606,
+      "omics_connected_genes": 17509,
+      "integrated_genes": 17509,
+      "integration_ratio": 0.8930429460369275
+    }
+  },
+  "system_type": "comprehensive_biomedical_kg",
+  "components": [
+    "GO_BP",
+    "GO_CC",
+    "GO_MF",
+    "Disease",
+    "Drug",
+    "Viral",
+    "Clusters"
+  ]
+}
