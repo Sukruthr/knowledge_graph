@@ -1581,6 +1581,9 @@ class ComprehensiveBiomedicalKnowledgeGraph:
         # Add enhanced semantic data from Omics_data2
         self._add_semantic_enhancements()
         
+        # Add model comparison data integration
+        self._add_model_comparison_data()
+        
         # Calculate comprehensive statistics
         self._calculate_comprehensive_stats()
         
@@ -2038,6 +2041,201 @@ class ComprehensiveBiomedicalKnowledgeGraph:
         
         logger.info(f"Added experimental metadata for {metadata_count} gene sets")
     
+    def _add_model_comparison_data(self):
+        """Add model comparison data and LLM evaluation results to the knowledge graph."""
+        logger.info("Adding model comparison data...")
+        
+        if 'model_compare_data' not in self.parsed_data:
+            logger.info("No model comparison data available")
+            return
+        
+        model_data = self.parsed_data['model_compare_data']
+        
+        # Add model nodes
+        self._add_model_nodes(model_data)
+        
+        # Add model predictions and confidence scores
+        self._add_model_predictions(model_data)
+        
+        # Add similarity rankings
+        self._add_similarity_rankings(model_data)
+        
+        # Add contamination analysis
+        self._add_contamination_analysis(model_data)
+        
+        logger.info("Model comparison data integration complete")
+    
+    def _add_model_nodes(self, model_data):
+        """Add LLM model nodes to the graph."""
+        available_models = model_data.get('available_models', [])
+        
+        for model_name in available_models:
+            model_node_id = f"LLM_MODEL:{model_name}"
+            
+            # Get model statistics from evaluation metrics
+            model_metrics = model_data.get('evaluation_metrics', {}).get(model_name, {})
+            confidence_stats = model_metrics.get('confidence_stats', {})
+            similarity_stats = model_metrics.get('similarity_stats', {})
+            
+            model_attrs = {
+                'node_type': 'llm_model',
+                'model_name': model_name,
+                'entity_type': 'language_model',
+                'mean_confidence': confidence_stats.get('mean_confidence', 0.0),
+                'median_confidence': confidence_stats.get('median_confidence', 0.0),
+                'high_confidence_count': confidence_stats.get('high_confidence_count', 0),
+                'low_confidence_count': confidence_stats.get('low_confidence_count', 0),
+                'mean_similarity': similarity_stats.get('mean_similarity', 0.0),
+                'mean_percentile': similarity_stats.get('mean_percentile', 0.0),
+                'mean_rank': similarity_stats.get('mean_rank', 0),
+                'top_10_percent_count': similarity_stats.get('top_10_percent_count', 0),
+                'bottom_50_percent_count': similarity_stats.get('bottom_50_percent_count', 0)
+            }
+            
+            self.graph.add_node(model_node_id, **model_attrs)
+    
+    def _add_model_predictions(self, model_data):
+        """Add model prediction nodes and relationships."""
+        model_predictions = model_data.get('model_predictions', {})
+        prediction_count = 0
+        
+        for model_name, model_info in model_predictions.items():
+            model_node_id = f"LLM_MODEL:{model_name}"
+            go_predictions = model_info.get('go_predictions', {})
+            
+            for go_id, prediction_data in go_predictions.items():
+                if go_id in self.graph:  # Only process if GO term exists in graph
+                    # Add prediction node for each scenario
+                    scenarios = prediction_data.get('scenarios', {})
+                    
+                    for scenario, scenario_data in scenarios.items():
+                        prediction_node_id = f"PREDICTION:{model_name}:{go_id}:{scenario}"
+                        
+                        prediction_attrs = {
+                            'node_type': 'model_prediction',
+                            'model_name': model_name,
+                            'go_id': go_id,
+                            'scenario': scenario,
+                            'predicted_name': scenario_data.get('predicted_name', ''),
+                            'analysis': scenario_data.get('analysis', ''),
+                            'confidence_score': scenario_data.get('confidence_score', 0.0),
+                            'confidence_bin': scenario_data.get('confidence_bin', ''),
+                            'genes_used': scenario_data.get('genes_used', []),
+                            'true_description': prediction_data.get('true_description', ''),
+                            'gene_count': prediction_data.get('gene_count', 0)
+                        }
+                        
+                        self.graph.add_node(prediction_node_id, **prediction_attrs)
+                        
+                        # Add edges: model -> prediction
+                        self.graph.add_edge(
+                            model_node_id,
+                            prediction_node_id,
+                            edge_type='model_predicts',
+                            confidence_score=scenario_data.get('confidence_score', 0.0),
+                            scenario=scenario,
+                            prediction_type='go_term_prediction'
+                        )
+                        
+                        # Add edges: prediction -> GO term
+                        self.graph.add_edge(
+                            prediction_node_id,
+                            go_id,
+                            edge_type='predicts_go_term',
+                            confidence_score=scenario_data.get('confidence_score', 0.0),
+                            scenario=scenario,
+                            prediction_accuracy='evaluated'
+                        )
+                        
+                        # Add edges: prediction -> genes (if genes exist in graph)
+                        for gene_symbol in scenario_data.get('genes_used', []):
+                            if gene_symbol in self.graph:
+                                self.graph.add_edge(
+                                    prediction_node_id,
+                                    gene_symbol,
+                                    edge_type='prediction_uses_gene',
+                                    scenario=scenario,
+                                    usage_context='llm_analysis'
+                                )
+                        
+                        prediction_count += 1
+        
+        logger.info(f"Added {prediction_count} model predictions")
+    
+    def _add_similarity_rankings(self, model_data):
+        """Add similarity ranking data."""
+        similarity_rankings = model_data.get('similarity_rankings', {})
+        ranking_count = 0
+        
+        for model_name, ranking_info in similarity_rankings.items():
+            model_node_id = f"LLM_MODEL:{model_name}"
+            similarity_metrics = ranking_info.get('similarity_metrics', {})
+            
+            for go_id, similarity_data in similarity_metrics.items():
+                if go_id in self.graph:  # Only process if GO term exists in graph
+                    ranking_node_id = f"SIMILARITY:{model_name}:{go_id}"
+                    
+                    ranking_attrs = {
+                        'node_type': 'similarity_ranking',
+                        'model_name': model_name,
+                        'go_id': go_id,
+                        'llm_go_similarity': similarity_data.get('llm_go_similarity', 0.0),
+                        'similarity_rank': similarity_data.get('similarity_rank', 0),
+                        'true_percentile': similarity_data.get('true_percentile', 0.0),
+                        'random_go_name': similarity_data.get('random_comparison', {}).get('random_go_name', ''),
+                        'random_similarity': similarity_data.get('random_comparison', {}).get('random_similarity', 0.0),
+                        'random_rank': similarity_data.get('random_comparison', {}).get('random_rank', 0),
+                        'random_percentile': similarity_data.get('random_comparison', {}).get('random_percentile', 0.0),
+                        'top_3_hits': similarity_data.get('top_matches', {}).get('top_3_hits', []),
+                        'top_3_similarities': similarity_data.get('top_matches', {}).get('top_3_similarities', [])
+                    }
+                    
+                    self.graph.add_node(ranking_node_id, **ranking_attrs)
+                    
+                    # Add edges: model -> ranking
+                    self.graph.add_edge(
+                        model_node_id,
+                        ranking_node_id,
+                        edge_type='model_similarity_ranking',
+                        similarity_score=similarity_data.get('llm_go_similarity', 0.0),
+                        ranking_percentile=similarity_data.get('true_percentile', 0.0)
+                    )
+                    
+                    # Add edges: ranking -> GO term
+                    self.graph.add_edge(
+                        ranking_node_id,
+                        go_id,
+                        edge_type='similarity_evaluated_for',
+                        similarity_score=similarity_data.get('llm_go_similarity', 0.0),
+                        ranking_position=similarity_data.get('similarity_rank', 0),
+                        percentile_rank=similarity_data.get('true_percentile', 0.0)
+                    )
+                    
+                    ranking_count += 1
+        
+        logger.info(f"Added {ranking_count} similarity rankings")
+    
+    def _add_contamination_analysis(self, model_data):
+        """Add contamination analysis results."""
+        contamination_results = model_data.get('contamination_results', {})
+        
+        for model_name, contamination_info in contamination_results.items():
+            model_node_id = f"LLM_MODEL:{model_name}"
+            
+            if model_node_id in self.graph:
+                # Add contamination analysis metadata to model node
+                contamination_attrs = {
+                    'contamination_robustness_score': contamination_info.get('robustness_score', 0.0),
+                    'severe_drops': contamination_info.get('performance_degradation', {}).get('severe_drop', 0),
+                    'moderate_drops': contamination_info.get('performance_degradation', {}).get('moderate_drop', 0),
+                    'stable_performance': contamination_info.get('performance_degradation', {}).get('stable', 0),
+                    'performance_improvements': contamination_info.get('performance_degradation', {}).get('improvement', 0)
+                }
+                
+                self.graph.nodes[model_node_id].update(contamination_attrs)
+        
+        logger.info("Added contamination analysis results")
+    
     def _calculate_comprehensive_stats(self):
         """Calculate comprehensive statistics for the integrated graph."""
         logger.info("Calculating comprehensive statistics...")
@@ -2094,6 +2292,7 @@ class ComprehensiveBiomedicalKnowledgeGraph:
             'has_edges': self.graph.number_of_edges() > 0,
             'has_go_component': False,
             'has_omics_component': False,
+            'has_model_comparison_component': False,
             'integration_successful': False
         }
         
@@ -2105,6 +2304,11 @@ class ComprehensiveBiomedicalKnowledgeGraph:
         omics_nodes = [n for n, d in self.graph.nodes(data=True) 
                       if d.get('node_type') in ['disease', 'drug', 'viral_condition', 'network_cluster']]
         validation['has_omics_component'] = len(omics_nodes) > 0
+        
+        # Check for Model Comparison component
+        model_nodes = [n for n, d in self.graph.nodes(data=True) 
+                      if d.get('node_type') in ['llm_model', 'model_prediction', 'similarity_ranking']]
+        validation['has_model_comparison_component'] = len(model_nodes) > 0
         
         # Check integration
         integration_metrics = self.stats.get('integration_metrics', {})
@@ -2144,7 +2348,8 @@ class ComprehensiveBiomedicalKnowledgeGraph:
             'viral_responses': [],
             'cluster_memberships': [],
             'gene_set_memberships': [],
-            'semantic_annotations': []
+            'semantic_annotations': [],
+            'model_predictions': []
         }
         
         # Get all neighbors and their relationships
@@ -2215,8 +2420,122 @@ class ComprehensiveBiomedicalKnowledgeGraph:
                         'support_level': edge_attrs.get('support_level', ''),
                         'membership_type': 'high_confidence_support'
                     })
+                
+                elif edge_type == 'prediction_uses_gene':
+                    results['model_predictions'].append({
+                        'prediction_id': neighbor,
+                        'model_name': neighbor_data.get('model_name', ''),
+                        'go_id': neighbor_data.get('go_id', ''),
+                        'scenario': neighbor_data.get('scenario', ''),
+                        'predicted_name': neighbor_data.get('predicted_name', ''),
+                        'confidence_score': neighbor_data.get('confidence_score', 0.0),
+                        'confidence_bin': neighbor_data.get('confidence_bin', ''),
+                        'usage_context': edge_attrs.get('usage_context', ''),
+                        'true_description': neighbor_data.get('true_description', '')
+                    })
         
         return results
+    
+    def query_model_predictions(self, go_id: str = None, model_name: str = None) -> List[Dict]:
+        """
+        Query model predictions with optional filtering.
+        
+        Args:
+            go_id: Optional GO term ID to filter predictions
+            model_name: Optional model name to filter predictions
+            
+        Returns:
+            List of model predictions with metadata
+        """
+        results = []
+        
+        for node_id, node_data in self.graph.nodes(data=True):
+            if node_data.get('node_type') == 'model_prediction':
+                # Apply filters if provided
+                if go_id and node_data.get('go_id') != go_id:
+                    continue
+                if model_name and node_data.get('model_name') != model_name:
+                    continue
+                
+                prediction_info = {
+                    'prediction_id': node_id,
+                    'model_name': node_data.get('model_name', ''),
+                    'go_id': node_data.get('go_id', ''),
+                    'scenario': node_data.get('scenario', ''),
+                    'predicted_name': node_data.get('predicted_name', ''),
+                    'analysis': node_data.get('analysis', ''),
+                    'confidence_score': node_data.get('confidence_score', 0.0),
+                    'confidence_bin': node_data.get('confidence_bin', ''),
+                    'genes_used': node_data.get('genes_used', []),
+                    'true_description': node_data.get('true_description', ''),
+                    'gene_count': node_data.get('gene_count', 0)
+                }
+                
+                results.append(prediction_info)
+        
+        # Sort by confidence score (highest first)
+        results.sort(key=lambda x: x['confidence_score'], reverse=True)
+        return results
+    
+    def query_model_comparison_summary(self) -> Dict:
+        """
+        Get a summary of model comparison data in the knowledge graph.
+        
+        Returns:
+            Dictionary with model comparison statistics
+        """
+        summary = {
+            'total_models': 0,
+            'total_predictions': 0,
+            'total_similarity_rankings': 0,
+            'model_performance': {},
+            'scenario_coverage': {},
+            'go_term_coverage': 0
+        }
+        
+        # Count models
+        models = [n for n, d in self.graph.nodes(data=True) if d.get('node_type') == 'llm_model']
+        summary['total_models'] = len(models)
+        
+        # Count predictions and analyze by model
+        predictions = [n for n, d in self.graph.nodes(data=True) if d.get('node_type') == 'model_prediction']
+        summary['total_predictions'] = len(predictions)
+        
+        # Count similarity rankings
+        rankings = [n for n, d in self.graph.nodes(data=True) if d.get('node_type') == 'similarity_ranking']
+        summary['total_similarity_rankings'] = len(rankings)
+        
+        # Analyze model performance
+        for model_node in models:
+            model_data = self.graph.nodes[model_node]
+            model_name = model_data.get('model_name', '')
+            
+            summary['model_performance'][model_name] = {
+                'mean_confidence': model_data.get('mean_confidence', 0.0),
+                'mean_similarity': model_data.get('mean_similarity', 0.0),
+                'mean_percentile': model_data.get('mean_percentile', 0.0),
+                'contamination_robustness': model_data.get('contamination_robustness_score', 0.0),
+                'stable_performance': model_data.get('stable_performance', 0),
+                'severe_drops': model_data.get('severe_drops', 0)
+            }
+        
+        # Count scenarios
+        scenario_counts = {}
+        go_terms_with_predictions = set()
+        
+        for prediction_node in predictions:
+            prediction_data = self.graph.nodes[prediction_node]
+            scenario = prediction_data.get('scenario', '')
+            go_id = prediction_data.get('go_id', '')
+            
+            scenario_counts[scenario] = scenario_counts.get(scenario, 0) + 1
+            if go_id:
+                go_terms_with_predictions.add(go_id)
+        
+        summary['scenario_coverage'] = scenario_counts
+        summary['go_term_coverage'] = len(go_terms_with_predictions)
+        
+        return summary
     
     def save_comprehensive_graph(self, filepath: str):
         """Save the comprehensive biomedical knowledge graph."""
@@ -2318,113 +2637,6 @@ def main():
     print("\n" + "="*80)
     print("COMBINED KNOWLEDGE GRAPH DEMONSTRATION COMPLETE")
     print("="*80)
-
-
-# def main_legacy():
-#     """Legacy example usage of the GO_BP knowledge graph (for backward compatibility)."""
-    
-#     # Build knowledge graph
-#     kg = GOBPKnowledgeGraph(use_neo4j=False)
-    
-#     # Load data
-#     data_dir = "/home/mreddy1/knowledge_graph/llm_evaluation_for_gene_set_interpretation/data/GO_BP"
-#     kg.load_data(data_dir)
-    
-#     # Build graph
-#     kg.build_graph()
-    
-#     # Print enhanced statistics
-#     stats = kg.get_stats()
-#     print("Enhanced Knowledge Graph Statistics:")
-#     for key, value in stats.items():
-#         print(f"  {key}: {value:,}")
-    
-#     # Example queries
-#     print("\n" + "="*50)
-#     print("ENHANCED QUERY EXAMPLES")
-#     print("="*50)
-    
-#     # Query 1: What GO terms are associated with TP53?
-#     gene = "TP53"
-#     functions = kg.query_gene_functions(gene)
-#     print(f"\nGO terms for {gene} (showing first 5):")
-#     for func in functions[:5]:
-#         print(f"  {func['go_id']}: {func['go_name']} (Evidence: {func['evidence_code']})")
-    
-#     # Query 2: What genes are associated with apoptosis?
-#     apoptosis_terms = [go_id for go_id, info in kg.go_terms.items() 
-#                       if 'apoptosis' in info['name'].lower()]
-#     if apoptosis_terms:
-#         go_term = apoptosis_terms[0]
-#         genes = kg.query_go_term_genes(go_term)
-#         print(f"\nGenes associated with '{kg.go_terms[go_term]['name']}' (showing first 5):")
-#         for gene_info in genes[:5]:
-#             print(f"  {gene_info['gene_symbol']}: {gene_info['gene_name']}")
-    
-#     # Query 3: GO term hierarchy
-#     if apoptosis_terms:
-#         go_term = apoptosis_terms[0]
-#         parents = kg.query_go_hierarchy(go_term, 'parents')
-#         print(f"\nParent terms of '{kg.go_terms[go_term]['name']}' (showing first 3):")
-#         for parent in parents[:3]:
-#             print(f"  {parent['go_id']}: {parent['go_name']} ({parent['relationship_type']})")
-    
-#     # Enhanced Query 4: Search by definition
-#     print(f"\n4. Search GO terms containing 'DNA damage':")
-#     dna_damage_terms = kg.search_go_terms_by_definition('DNA damage')
-#     for term in dna_damage_terms[:3]:
-#         print(f"  {term['go_id']}: {term['name']} (Score: {term['score']}, Matches: {', '.join(term['match_types'])})")
-    
-#     # Enhanced Query 5: Resolve alternative GO ID
-#     if kg.go_alt_ids:
-#         alt_id = list(kg.go_alt_ids.keys())[0]
-#         primary_id = kg.resolve_alternative_go_id(alt_id)
-#         print(f"\n5. Alternative ID resolution:")
-#         print(f"  {alt_id} -> {primary_id}")
-    
-#     # Enhanced Query 6: Gene cross-references
-#     if "TP53" in kg.graph:
-#         cross_refs = kg.get_gene_cross_references("TP53")
-#         print(f"\n6. TP53 cross-references:")
-#         for key, value in cross_refs.items():
-#             print(f"  {key}: {value}")
-    
-#     # Enhanced Query 8: GO clustering relationships
-#     if kg.go_clusters:
-#         sample_cluster = list(kg.go_clusters.keys())[0]
-#         cluster_children = kg.go_clusters[sample_cluster]
-#         print(f"\n8. GO clustering example - {sample_cluster}:")
-#         print(f"  Clusters {len(cluster_children)} child GO terms")
-#         for child in cluster_children[:3]:
-#             child_go = child['child_go']
-#             child_name = kg.go_terms.get(child_go, {}).get('name', 'Unknown')
-#             print(f"    -> {child_go}: {child_name}")
-    
-#     # Enhanced Query 9: Validation results
-#     validation = kg.validate_graph_integrity()
-#     print(f"\n9. Graph validation:")
-#     for check, result in validation.items():
-#         status = "✓" if result else "✗"
-#         print(f"  {status} {check}: {result}")
-    
-#     # Enhanced Query 7: Show enriched GO term example
-#     apoptosis_terms = [go_id for go_id, info in kg.go_terms.items() 
-#                       if 'apoptosis' in info['name'].lower()]
-#     if apoptosis_terms:
-#         go_term = apoptosis_terms[0]
-#         node_data = kg.graph.nodes[go_term]
-#         print(f"\n7. Enhanced GO term example - {go_term}:")
-#         print(f"  Name: {node_data.get('name', 'N/A')}")
-#         if 'definition' in node_data:
-#             print(f"  Definition: {node_data['definition'][:150]}...")
-#         if 'synonyms' in node_data and node_data['synonyms']:
-#             print(f"  Synonyms: {', '.join(node_data['synonyms'][:3])}")
-    
-#     # Save the comprehensive graph
-#     output_path = "/home/mreddy1/knowledge_graph/data/go_bp_comprehensive_kg.pkl"
-#     kg.save_graph(output_path)
-#     print(f"\nComprehensive knowledge graph saved to: {output_path}")
-
 
 if __name__ == "__main__":
     main()

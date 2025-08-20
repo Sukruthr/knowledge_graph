@@ -1,0 +1,347 @@
+{
+  "analysis_results": {
+    "llm_files": {
+      "llama2_70b": {
+        "rows": 100,
+        "columns": 18,
+        "column_names": [
+          "GO",
+          "Genes",
+          "Gene_Count",
+          "Term_Description",
+          "50perc_contaminated_Genes",
+          "100perc_contaminated_Genes",
+          "llama2_70b_default Name",
+          "llama2_70b_default Analysis",
+          "llama2_70b_default Score",
+          "llama2_70b_50perc_contaminated Name",
+          "llama2_70b_50perc_contaminated Analysis",
+          "llama2_70b_50perc_contaminated Score",
+          "llama2_70b_100perc_contaminated Name",
+          "llama2_70b_100perc_contaminated Analysis",
+          "llama2_70b_100perc_contaminated Score",
+          "llama2_70b_default Score Bin",
+          "llama2_70b_50perc_contaminated Score Bin",
+          "llama2_70b_100perc_contaminated Score Bin"
+        ],
+        "sample_data": {
+          "GO": "GO:0014744",
+          "Genes": "PPP3CA MYMK FOXO3 MYOG TRPC3",
+          "Gene_Count": "5",
+          "Term_Description": "positive regulation of muscle adaptation",
+          "50perc_contaminated_Genes": "PPP3CA MYMK SLC2A3 RLN1 CDYL2",
+          "100perc_contaminated_Genes": "RNF17 CBLN4 EDIL3 HNF1A ARHGAP25",
+          "llama2_70b_default Name": "Muscle cell differentiation and contraction",
+          "llama2_70b_default Analysis": "1. PPP3CA is a protein phosphatase involved in the regulation of myosin light chain phosphorylation,...",
+          "llama2_70b_default Score": "0.87",
+          "llama2_70b_50perc_contaminated Name": "Cellular signaling and regulation",
+          "llama2_70b_50perc_contaminated Analysis": "1. PPP3CA is a protein phosphatase involved in regulating various cellular processes, including cell...",
+          "llama2_70b_50perc_contaminated Score": "0.85",
+          "llama2_70b_100perc_contaminated Name": "Regulation of gene expression in pancreatic development",
+          "llama2_70b_100perc_contaminated Analysis": "1. RNF17 is a ubiquitin E3 ligase that regulates the activity of transcription factors involved in p...",
+          "llama2_70b_100perc_contaminated Score": "0.87",
+          "llama2_70b_default Score Bin": "High Confidence",
+          "llama2_70b_50perc_contaminated Score Bin": "Medium Confidence",
+          "llama2_70b_100perc_contaminated Score Bin": "High Confidence"
+        },
+        "valuable_columns": {
+          "confidence_scores": [
+            "llama2_70b_default Score",
+            "llama2_70b_50perc_contaminated Score",
+            "llama2_70b_100perc_contaminated Score",
+            "llama2_70b_default Score Bin",
+            "llama2_70b_50perc_contaminated Score Bin",
+            "llama2_70b_100perc_contaminated Score Bin"
+          ],
+          "go_terms": [
+            "Term_Description"
+          ],
+          "gene_sets": [
+            "Genes",
+            "50perc_contaminated_Genes",
+            "100perc_contaminated_Genes"
+          ]
+        }
+      },
+      "gemini_pro": {
+        "rows": 100,
+        "columns": 18,
+        "column_names": [
+          "GO",
+          "Genes",
+          "Gene_Count",
+          "Term_Description",
+          "50perc_contaminated_Genes",
+          "100perc_contaminated_Genes",
+          "gemini_pro_default Name",
+          "gemini_pro_default Analysis",
+          "gemini_pro_default Score",
+          "gemini_pro_50perc_contaminated Name",
+          "gemini_pro_50perc_contaminated Analysis",
+          "gemini_pro_50perc_contaminated Score",
+          "gemini_pro_100perc_contaminated Name",
+          "gemini_pro_100perc_contaminated Analysis",
+          "gemini_pro_100perc_contaminated Score",
+          "gemini_pro_default Score Bin",
+          "gemini_pro_50perc_contaminated Score Bin",
+          "gemini_pro_100perc_contaminated Score Bin"
+        ],
+        "sample_data": {
+          "GO": "GO:0014744",
+          "Genes": "PPP3CA MYMK FOXO3 MYOG TRPC3",
+          "Gene_Count": "5",
+          "Term_Description": "positive regulation of muscle adaptation",
+          "50perc_contaminated_Genes": "PPP3CA MYMK SLC2A3 RLN1 CDYL2",
+          "100perc_contaminated_Genes": "RNF17 CBLN4 EDIL3 HNF1A ARHGAP25",
+          "gemini_pro_default Name": "Muscle development and function",
+          "gemini_pro_default Analysis": "1. PPP3CA, also known as calcineurin, is a calcium/calmodulin-dependent serine/threonine phosphatase...",
+          "gemini_pro_default Score": "0.92",
+          "gemini_pro_50perc_contaminated Name": "Regulation of cell cycle and apoptosis",
+          "gemini_pro_50perc_contaminated Analysis": "1. PPP3CA encodes a catalytic subunit of calcineurin, a calcium/calmodulin-dependent serine/threonin...",
+          "gemini_pro_50perc_contaminated Score": "0.85",
+          "gemini_pro_100perc_contaminated Name": "Regulation of cell migration and adhesion",
+          "gemini_pro_100perc_contaminated Analysis": "1. RNF17 is an E3 ubiquitin ligase that regulates cell migration and adhesion by ubiquitinating and ...",
+          "gemini_pro_100perc_contaminated Score": "0.85",
+          "gemini_pro_default Score Bin": "High Confidence",
+          "gemini_pro_50perc_contaminated Score Bin": "Medium Confidence",
+          "gemini_pro_100perc_contaminated Score Bin": "Medium Confidence"
+        },
+        "valuable_columns": {
+          "confidence_scores": [
+            "gemini_pro_default Score",
+            "gemini_pro_50perc_contaminated Score",
+            "gemini_pro_100perc_contaminated Score",
+            "gemini_pro_default Score Bin",
+            "gemini_pro_50perc_contaminated Score Bin",
+            "gemini_pro_100perc_contaminated Score Bin"
+          ],
+          "go_terms": [
+            "Term_Description"
+          ],
+          "gene_sets": [
+            "Genes",
+            "50perc_contaminated_Genes",
+            "100perc_contaminated_Genes"
+          ]
+        }
+      },
+      "gpt_4": {
+        "rows": 100,
+        "columns": 18,
+        "column_names": [
+          "GO",
+          "Genes",
+          "Gene_Count",
+          "Term_Description",
+          "50perc_contaminated_Genes",
+          "100perc_contaminated_Genes",
+          "gpt_4_default Name",
+          "gpt_4_default Analysis",
+          "gpt_4_default Score",
+          "gpt_4_50perc_contaminated Name",
+          "gpt_4_50perc_contaminated Analysis",
+          "gpt_4_50perc_contaminated Score",
+          "gpt_4_100perc_contaminated Name",
+          "gpt_4_100perc_contaminated Analysis",
+          "gpt_4_100perc_contaminated Score",
+          "gpt_4_default Score Bin",
+          "gpt_4_50perc_contaminated Score Bin",
+          "gpt_4_100perc_contaminated Score Bin"
+        ],
+        "sample_data": {
+          "GO": "GO:0014744",
+          "Genes": "PPP3CA MYMK FOXO3 MYOG TRPC3",
+          "Gene_Count": "5",
+          "Term_Description": "positive regulation of muscle adaptation",
+          "50perc_contaminated_Genes": "PPP3CA MYMK SLC2A3 RLN1 CDYL2",
+          "100perc_contaminated_Genes": "RNF17 CBLN4 EDIL3 HNF1A ARHGAP25",
+          "gpt_4_default Name": "Muscle differentiation and calcium signaling",
+          "gpt_4_default Analysis": "1. PPP3CA, also known as calcineurin A alpha, is a serine/threonine-protein phosphatase involved in ...",
+          "gpt_4_default Score": "0.85",
+          "gpt_4_50perc_contaminated Name": "System of unrelated proteins",
+          "gpt_4_50perc_contaminated Analysis": "1. PPP3CA, also known as calcineurin A alpha, is a serine/threonine-protein phosphatase involved in ...",
+          "gpt_4_50perc_contaminated Score": "0.0",
+          "gpt_4_100perc_contaminated Name": "System of unrelated proteins",
+          "gpt_4_100perc_contaminated Analysis": "1. RNF17, also known as ring finger protein 17, is a testis-specific protein that is involved in the...",
+          "gpt_4_100perc_contaminated Score": "0.0",
+          "gpt_4_default Score Bin": "Medium Confidence",
+          "gpt_4_50perc_contaminated Score Bin": "Name not assigned",
+          "gpt_4_100perc_contaminated Score Bin": "Name not assigned"
+        },
+        "valuable_columns": {
+          "confidence_scores": [
+            "gpt_4_default Score",
+            "gpt_4_50perc_contaminated Score",
+            "gpt_4_100perc_contaminated Score",
+            "gpt_4_default Score Bin",
+            "gpt_4_50perc_contaminated Score Bin",
+            "gpt_4_100perc_contaminated Score Bin"
+          ],
+          "go_terms": [
+            "Term_Description"
+          ],
+          "gene_sets": [
+            "Genes",
+            "50perc_contaminated_Genes",
+            "100perc_contaminated_Genes"
+          ]
+        }
+      }
+    },
+    "sim_rank_files": {
+      "gpt_4": {
+        "rows": 100,
+        "columns": 27,
+        "column_names": [
+          "GO",
+          "Genes",
+          "Gene_Count",
+          "Term_Description",
+          "50perc_contaminated_Genes",
+          "100perc_contaminated_Genes",
+          "gpt_4_default Name",
+          "gpt_4_default Analysis",
+          "gpt_4_default Score",
+          "gpt_4_50perc_contaminated Name",
+          "gpt_4_50perc_contaminated Analysis",
+          "gpt_4_50perc_contaminated Score",
+          "gpt_4_100perc_contaminated Name",
+          "gpt_4_100perc_contaminated Analysis",
+          "gpt_4_100perc_contaminated Score",
+          "LLM_name_GO_term_sim",
+          "sim_rank",
+          "true_GO_term_sim_percentile",
+          "random_GO_name",
+          "random_go_llm_sim",
+          "random_sim_rank",
+          "random_sim_percentile",
+          "top_3_hits",
+          "top_3_sim",
+          "gpt_4_default Score Bin",
+          "gpt_4_50perc_contaminated Score Bin",
+          "gpt_4_100perc_contaminated Score Bin"
+        ],
+        "sample_data": {
+          "GO": "GO:0014744",
+          "Genes": "PPP3CA MYMK FOXO3 MYOG TRPC3",
+          "Gene_Count": "5",
+          "Term_Description": "positive regulation of muscle adaptation",
+          "50perc_contaminated_Genes": "PPP3CA MYMK SLC2A3 RLN1 CDYL2",
+          "100perc_contaminated_Genes": "RNF17 CBLN4 EDIL3 HNF1A ARHGAP25",
+          "gpt_4_default Name": "Muscle differentiation and calcium signaling",
+          "gpt_4_default Analysis": "1. PPP3CA, also known as calcineurin A alpha, is a serine/threonine-protein phosphatase involved in ...",
+          "gpt_4_default Score": "0.85",
+          "gpt_4_50perc_contaminated Name": "System of unrelated proteins",
+          "gpt_4_50perc_contaminated Analysis": "1. PPP3CA, also known as calcineurin A alpha, is a serine/threonine-protein phosphatase involved in ...",
+          "gpt_4_50perc_contaminated Score": "0.0",
+          "gpt_4_100perc_contaminated Name": "System of unrelated proteins",
+          "gpt_4_100perc_contaminated Analysis": "1. RNF17, also known as ring finger protein 17, is a testis-specific protein that is involved in the...",
+          "gpt_4_100perc_contaminated Score": "0.0",
+          "LLM_name_GO_term_sim": "0.48366797",
+          "sim_rank": "557",
+          "true_GO_term_sim_percentile": "0.953361801892322",
+          "random_GO_name": "response to erythropoietin",
+          "random_go_llm_sim": "0.25467244",
+          "random_sim_rank": "9549",
+          "random_sim_percentile": "0.2004521477015824",
+          "top_3_hits": "skeletal muscle cell differentiation|regulation of muscle cell differentiation|regulation of skeleta...",
+          "top_3_sim": "0.7508983|0.7449068|0.7415666",
+          "gpt_4_default Score Bin": "Medium Confidence",
+          "gpt_4_50perc_contaminated Score Bin": "Name not assigned",
+          "gpt_4_100perc_contaminated Score Bin": "Name not assigned"
+        }
+      },
+      "gpt_35": {
+        "rows": 100,
+        "columns": 30,
+        "column_names": [
+          "GO",
+          "Genes",
+          "Gene_Count",
+          "Term_Description",
+          "50perc_contaminated_Genes",
+          "100perc_contaminated_Genes",
+          "gpt_3.5_default Name",
+          "gpt_3.5_default Analysis",
+          "gpt_3.5_default Score",
+          "gpt_3.5_default Score bins",
+          "gpt_3.5_50perc_contaminated Name",
+          "gpt_3.5_50perc_contaminated Analysis",
+          "gpt_3.5_50perc_contaminated Score",
+          "gpt_3.5_50perc_contaminated Score bins",
+          "gpt_3.5_100perc_contaminated Name",
+          "gpt_3.5_100perc_contaminated Analysis",
+          "gpt_3.5_100perc_contaminated Score",
+          "gpt_3.5_100perc_contaminated Score bins",
+          "LLM_name_GO_term_sim",
+          "sim_rank",
+          "true_GO_term_sim_percentile",
+          "random_GO_name",
+          "random_go_llm_sim",
+          "random_sim_rank",
+          "random_sim_percentile",
+          "top_3_hits",
+          "top_3_sim",
+          "gpt_3.5_default Score Bin",
+          "gpt_3.5_50perc_contaminated Score Bin",
+          "gpt_3.5_100perc_contaminated Score Bin"
+        ],
+        "sample_data": {
+          "GO": "GO:0061740",
+          "Genes": "HSPA8 LAMP2 CLU",
+          "Gene_Count": "3",
+          "Term_Description": "protein targeting to lysosome involved in chaperone-mediated autophagy",
+          "50perc_contaminated_Genes": "CLU RAB28 PRAMEF19",
+          "100perc_contaminated_Genes": "VEZT TERF1 TTC3",
+          "gpt_3.5_default Name": "Chaperone-mediated autophagy",
+          "gpt_3.5_default Analysis": "1. HSPA8, also known as HSC70, is a heat shock protein involved in chaperone-mediated autophagy (CMA...",
+          "gpt_3.5_default Score": "0.9",
+          "gpt_3.5_default Score bins": "High Score",
+          "gpt_3.5_50perc_contaminated Name": "Intracellular trafficking and vesicle transport",
+          "gpt_3.5_50perc_contaminated Analysis": "1. CLU, also known as Clusterin, is involved in intracellular trafficking and vesicle transport. It ...",
+          "gpt_3.5_50perc_contaminated Score": "0.85",
+          "gpt_3.5_50perc_contaminated Score bins": "Medium Score",
+          "gpt_3.5_100perc_contaminated Name": "Telomere maintenance and regulation",
+          "gpt_3.5_100perc_contaminated Analysis": "1. TERF1, also known as telomeric repeat binding factor 1, is a key component of the shelterin compl...",
+          "gpt_3.5_100perc_contaminated Score": "0.9",
+          "gpt_3.5_100perc_contaminated Score bins": "High Score",
+          "LLM_name_GO_term_sim": "0.82990515",
+          "sim_rank": "3",
+          "true_GO_term_sim_percentile": "0.9997488068324542",
+          "random_GO_name": "regulation of NAD(P)H oxidase activity",
+          "random_go_llm_sim": "0.20850962",
+          "random_sim_rank": "9990",
+          "random_sim_percentile": "0.1635267520723436",
+          "top_3_hits": "chaperone-mediated autophagy|regulation of chaperone-mediated autophagy|protein targeting to lysosom...",
+          "top_3_sim": "1.0|0.83418345|0.82990515",
+          "gpt_3.5_default Score Bin": "High Confidence",
+          "gpt_3.5_50perc_contaminated Score Bin": "Medium Confidence",
+          "gpt_3.5_100perc_contaminated Score Bin": "High Confidence"
+        }
+      }
+    },
+    "models_covered": [
+      "gemini_pro",
+      "llama2_70b",
+      "gpt_4",
+      "gpt_35",
+      "mixtral_instruct"
+    ]
+  },
+  "integration_value": {
+    "score": 105,
+    "recommendation": "HIGH VALUE - Recommend integration",
+    "reasons": [
+      "Multiple model comparisons (5 models)",
+      "Confidence scores available",
+      "GO term data available",
+      "Confidence scores available",
+      "GO term data available",
+      "Confidence scores available",
+      "GO term data available",
+      "Similarity rankings available"
+    ],
+    "should_integrate": true
+  },
+  "should_integrate": true
+}

@@ -19,6 +19,16 @@ import logging
 # Configure logging
 logger = logging.getLogger(__name__)
 
+# Import model comparison parser
+try:
+    from .model_compare_parser import ModelCompareParser
+except ImportError:
+    try:
+        from model_compare_parser import ModelCompareParser
+    except ImportError:
+        ModelCompareParser = None
+        logger.warning("ModelCompareParser not available")
+
 
 class GODataParser:
     """Parser for Gene Ontology data (supports GO_BP, GO_CC, GO_MF)."""
@@ -1252,7 +1262,7 @@ class CombinedBiomedicalParser:
         Initialize combined biomedical parser for GO and Omics data.
         
         Args:
-            base_data_dir: Base directory containing GO_BP, GO_CC, GO_MF, Omics_data, and Omics_data2 subdirectories
+            base_data_dir: Base directory containing GO_BP, GO_CC, GO_MF, Omics_data, Omics_data2, and GO_term_analysis subdirectories
         """
         self.base_data_dir = Path(base_data_dir)
         
@@ -1272,6 +1282,18 @@ class CombinedBiomedicalParser:
         else:
             self.omics_parser = None
             logger.warning(f"Omics_data directory not found: {omics_dir}")
+        
+        # Initialize Model Comparison parser
+        model_compare_dir = self.base_data_dir / "GO_term_analysis" / "model_compare"
+        if model_compare_dir.exists() and ModelCompareParser is not None:
+            self.model_compare_parser = ModelCompareParser(str(model_compare_dir))
+            logger.info("Initialized Model Comparison parser")
+        else:
+            self.model_compare_parser = None
+            if model_compare_dir.exists():
+                logger.warning("Model comparison data found but parser not available")
+            else:
+                logger.info("No model comparison data directory found")
         
         self.parsed_data = {}
         
@@ -1309,6 +1331,12 @@ class CombinedBiomedicalParser:
                 logger.info("Enhanced semantic data integrated successfully")
             
             self.parsed_data['omics_data'] = omics_data
+        
+        # Parse Model Comparison data if available
+        if self.model_compare_parser:
+            model_compare_data = self.model_compare_parser.parse_all_model_data()
+            self.parsed_data['model_compare_data'] = model_compare_data
+            logger.info("Model comparison data integrated successfully")
         
         logger.info("Comprehensive biomedical data parsing complete")
         return self.parsed_data
