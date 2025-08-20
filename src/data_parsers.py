@@ -529,14 +529,16 @@ GOBPDataParser = GODataParser
 class OmicsDataParser:
     """Parser for Omics data including Disease, Drug, and Viral infection associations."""
     
-    def __init__(self, omics_data_dir: str):
+    def __init__(self, omics_data_dir: str, omics_data2_dir: str = None):
         """
         Initialize Omics data parser.
         
         Args:
             omics_data_dir: Path to Omics_data directory containing association files
+            omics_data2_dir: Path to Omics_data2 directory containing enhanced semantic data
         """
         self.omics_data_dir = Path(omics_data_dir)
+        self.omics_data2_dir = Path(omics_data2_dir) if omics_data2_dir else None
         
         # Core data structures
         self.disease_associations = []
@@ -546,7 +548,16 @@ class OmicsDataParser:
         self.disease_expression_matrix = {}
         self.viral_expression_matrix = {}
         
+        # Enhanced data structures for Omics_data2
+        self.gene_set_annotations = {}
+        self.literature_references = {}
+        self.go_term_validations = {}
+        self.experimental_metadata = {}
+        self.functional_enrichments = {}
+        
         logger.info(f"Initialized Omics data parser for {omics_data_dir}")
+        if self.omics_data2_dir:
+            logger.info(f"Enhanced semantic data from {omics_data2_dir}")
     
     def parse_disease_gene_associations(self) -> List[Dict]:
         """
@@ -909,8 +920,252 @@ class OmicsDataParser:
             'num_unique_viral_conditions': len(unique_entities['viral_conditions']),
             'num_unique_clusters': len(unique_entities['clusters']),
             'num_studies': len(unique_entities['studies']),
-            'expression_matrix_genes': len(self.disease_expression_matrix)
+            'expression_matrix_genes': len(self.disease_expression_matrix),
+            'gene_set_annotations': len(self.gene_set_annotations),
+            'literature_references': len(self.literature_references),
+            'go_term_validations': len(self.go_term_validations)
         }
+    
+    def parse_gene_set_annotations(self) -> Dict[str, Dict]:
+        """
+        Parse LLM-enhanced gene set annotations from omics_revamped_LLM_DF.tsv.
+        
+        Returns:
+            Dictionary mapping gene set IDs to semantic annotations
+        """
+        if not self.omics_data2_dir:
+            logger.warning("No Omics_data2 directory provided, skipping gene set annotations")
+            return {}
+        
+        logger.info("Parsing LLM-enhanced gene set annotations...")
+        
+        annotation_file = self.omics_data2_dir / "omics_revamped_LLM_DF.tsv"
+        if not annotation_file.exists():
+            logger.warning(f"Gene set annotation file not found: {annotation_file}")
+            return {}
+        
+        annotations = {}
+        try:
+            df = pd.read_csv(annotation_file, sep='\t')
+            
+            for _, row in df.iterrows():
+                if pd.notna(row.get('GeneSetID')):
+                    gene_set_id = str(row['GeneSetID'])
+                    
+                    annotations[gene_set_id] = {
+                        'source': row.get('Source', ''),
+                        'gene_set_name': row.get('GeneSetName', ''),
+                        'gene_list': str(row.get('GeneList', '')).split(),
+                        'n_genes': int(row.get('n_Genes', 0)) if pd.notna(row.get('n_Genes')) else 0,
+                        'llm_name': row.get('LLM Name', ''),
+                        'llm_analysis': row.get('LLM Analysis', ''),
+                        'score': float(row.get('Score', 0.0)) if pd.notna(row.get('Score')) else 0.0,
+                        'supporting_genes': str(row.get('Supporting Genes', '')).split(),
+                        'supporting_count': int(row.get('Supporting Count', 0)) if pd.notna(row.get('Supporting Count')) else 0,
+                        'llm_support_analysis': row.get('LLM Support Analysis', ''),
+                        'genes_mentioned_in_text': int(row.get('GenesMentionedInText', 0)) if pd.notna(row.get('GenesMentionedInText')) else 0,
+                        'llm_coverage': float(row.get('LLM_coverage', 0.0)) if pd.notna(row.get('LLM_coverage')) else 0.0
+                    }
+        
+        except Exception as e:
+            logger.error(f"Error parsing gene set annotations: {e}")
+            return {}
+        
+        logger.info(f"Parsed {len(annotations)} gene set annotations")
+        self.gene_set_annotations = annotations
+        return annotations
+    
+    def parse_literature_references(self) -> Dict[str, List]:
+        """
+        Parse literature references and keywords from omics_paragraph_keywords_dict.json.
+        
+        Returns:
+            Dictionary mapping gene set IDs to literature references
+        """
+        if not self.omics_data2_dir:
+            logger.warning("No Omics_data2 directory provided, skipping literature references")
+            return {}
+        
+        logger.info("Parsing literature references...")
+        
+        import json
+        literature_file = self.omics_data2_dir / "omics_paragraph_keywords_dict.json"
+        if not literature_file.exists():
+            logger.warning(f"Literature reference file not found: {literature_file}")
+            return {}
+        
+        references = {}
+        try:
+            with open(literature_file, 'r') as f:
+                data = json.load(f)
+            
+            for gene_set_id, paragraphs in data.items():
+                if paragraphs and isinstance(paragraphs, list):
+                    references[gene_set_id] = []
+                    
+                    for paragraph_data in paragraphs:
+                        if paragraph_data and isinstance(paragraph_data, dict):
+                            ref_entry = {
+                                'paragraph': paragraph_data.get('paragraph', ''),
+                                'keyword': paragraph_data.get('keyword', ''),
+                                'references': paragraph_data.get('references', [])
+                            }
+                            references[gene_set_id].append(ref_entry)
+        
+        except Exception as e:
+            logger.error(f"Error parsing literature references: {e}")
+            return {}
+        
+        logger.info(f"Parsed literature references for {len(references)} gene sets")
+        self.literature_references = references
+        return references
+    
+    def parse_go_term_validations(self) -> Dict[str, Dict]:
+        """
+        Parse GO term validations from omics_revamped_LLM_gprofiler_new_gene_name_DF_APV_only.tsv.
+        
+        Returns:
+            Dictionary mapping gene set IDs to GO term validation data
+        """
+        if not self.omics_data2_dir:
+            logger.warning("No Omics_data2 directory provided, skipping GO term validations")
+            return {}
+        
+        logger.info("Parsing GO term validations...")
+        
+        validation_file = self.omics_data2_dir / "omics_revamped_LLM_gprofiler_new_gene_name_DF_APV_only.tsv"
+        if not validation_file.exists():
+            logger.warning(f"GO validation file not found: {validation_file}")
+            return {}
+        
+        validations = {}
+        try:
+            df = pd.read_csv(validation_file, sep='\t')
+            
+            for _, row in df.iterrows():
+                if pd.notna(row.get('GeneSetID')):
+                    gene_set_id = str(row['GeneSetID'])
+                    
+                    validations[gene_set_id] = {
+                        'go_term': row.get('Term', ''),
+                        'go_id': row.get('GO ID', ''),
+                        'adjusted_p_value': float(row.get('Adjusted P-value', 1.0)) if pd.notna(row.get('Adjusted P-value')) else 1.0,
+                        'intersection_size': int(row.get('intersection_size', 0)) if pd.notna(row.get('intersection_size')) else 0,
+                        'term_size': int(row.get('term_size', 0)) if pd.notna(row.get('term_size')) else 0,
+                        'query_size': int(row.get('query_size', 0)) if pd.notna(row.get('query_size')) else 0,
+                        'intersections': str(row.get('intersections', '')).split(',') if pd.notna(row.get('intersections')) else [],
+                        'gprofiler_ji': float(row.get('gprofiler_JI', 0.0)) if pd.notna(row.get('gprofiler_JI')) else 0.0,
+                        'gprofiler_coverage': float(row.get('gprofiler_coverage', 0.0)) if pd.notna(row.get('gprofiler_coverage')) else 0.0,
+                        'llm_best_matching_go': row.get('LLM_best_matching_GO', ''),
+                        'best_matching_go_id': row.get('best_matching_GO_ID', ''),
+                        'llm_ji': float(row.get('LLM_JI', 0.0)) if pd.notna(row.get('LLM_JI')) else 0.0,
+                        'llm_success_tf': row.get('LLM_success_TF', False),
+                        'gprofiler_success_tf': row.get('gprofiler_success_TF', False)
+                    }
+        
+        except Exception as e:
+            logger.error(f"Error parsing GO term validations: {e}")
+            return {}
+        
+        logger.info(f"Parsed GO validations for {len(validations)} gene sets")
+        self.go_term_validations = validations
+        return validations
+    
+    def parse_experimental_metadata(self) -> Dict[str, Dict]:
+        """
+        Parse enhanced experimental metadata from gene count and reference files.
+        
+        Returns:
+            Dictionary mapping gene set IDs to experimental metadata
+        """
+        if not self.omics_data2_dir:
+            logger.warning("No Omics_data2 directory provided, skipping experimental metadata")
+            return {}
+        
+        logger.info("Parsing experimental metadata...")
+        
+        metadata = {}
+        
+        # Parse gene count data
+        genecounts_file = self.omics_data2_dir / "omics_revamped_LLM_genecounts_DF.tsv"
+        if genecounts_file.exists():
+            try:
+                df = pd.read_csv(genecounts_file, sep='\t')
+                for _, row in df.iterrows():
+                    if pd.notna(row.get('GeneSetID')):
+                        gene_set_id = str(row['GeneSetID'])
+                        if gene_set_id not in metadata:
+                            metadata[gene_set_id] = {}
+                        
+                        metadata[gene_set_id].update({
+                            'supporting_genes': str(row.get('Supporting Genes', '')).split(),
+                            'supporting_count': int(row.get('Supporting Count', 0)) if pd.notna(row.get('Supporting Count')) else 0,
+                            'llm_support_analysis': row.get('LLM Support Analysis', ''),
+                            'genes_mentioned_in_text': int(row.get('GenesMentionedInText', 0)) if pd.notna(row.get('GenesMentionedInText')) else 0,
+                            'llm_coverage': float(row.get('LLM_coverage', 0.0)) if pd.notna(row.get('LLM_coverage')) else 0.0
+                        })
+            except Exception as e:
+                logger.error(f"Error parsing gene counts metadata: {e}")
+        
+        # Parse reference data
+        ref_file = self.omics_data2_dir / "omics_revamped_LLM_ref_DF.tsv"
+        if ref_file.exists():
+            try:
+                df = pd.read_csv(ref_file, sep='\t')
+                for _, row in df.iterrows():
+                    if pd.notna(row.get('GeneSetID')):
+                        gene_set_id = str(row['GeneSetID'])
+                        if gene_set_id not in metadata:
+                            metadata[gene_set_id] = {}
+                        
+                        metadata[gene_set_id].update({
+                            'referenced_analysis': row.get('referenced_analysis', ''),
+                            'overlap': int(row.get('Overlap', 0)) if pd.notna(row.get('Overlap')) else 0,
+                            'p_value': float(row.get('P-value', 1.0)) if pd.notna(row.get('P-value')) else 1.0,
+                            'adjusted_p_value': float(row.get('Adjusted P-value', 1.0)) if pd.notna(row.get('Adjusted P-value')) else 1.0,
+                            'genes': str(row.get('Genes', '')).split(',') if pd.notna(row.get('Genes')) else [],
+                            'go_term_genes': str(row.get('GO_term_genes', '')).split() if pd.notna(row.get('GO_term_genes')) else [],
+                            'llm_name_go_term_sim': float(row.get('LLM_name_GO_term_sim', 0.0)) if pd.notna(row.get('LLM_name_GO_term_sim')) else 0.0
+                        })
+            except Exception as e:
+                logger.error(f"Error parsing reference metadata: {e}")
+        
+        logger.info(f"Parsed experimental metadata for {len(metadata)} gene sets")
+        self.experimental_metadata = metadata
+        return metadata
+    
+    def parse_all_enhanced_data(self) -> Dict[str, Dict]:
+        """
+        Parse all enhanced semantic data from Omics_data2.
+        
+        Returns:
+            Dictionary containing all enhanced data structures
+        """
+        if not self.omics_data2_dir:
+            logger.warning("No Omics_data2 directory provided, skipping enhanced data parsing")
+            return {}
+        
+        logger.info("Parsing all enhanced semantic data...")
+        
+        enhanced_data = {
+            'gene_set_annotations': self.parse_gene_set_annotations(),
+            'literature_references': self.parse_literature_references(),
+            'go_term_validations': self.parse_go_term_validations(),
+            'experimental_metadata': self.parse_experimental_metadata()
+        }
+        
+        # Compute integration statistics
+        enhanced_data['integration_stats'] = {
+            'total_annotated_sets': len(self.gene_set_annotations),
+            'sets_with_literature': len(self.literature_references),
+            'sets_with_go_validation': len(self.go_term_validations),
+            'sets_with_metadata': len(self.experimental_metadata),
+            'average_llm_score': sum(ann.get('score', 0) for ann in self.gene_set_annotations.values()) / max(len(self.gene_set_annotations), 1),
+            'average_llm_coverage': sum(ann.get('llm_coverage', 0) for ann in self.gene_set_annotations.values()) / max(len(self.gene_set_annotations), 1)
+        }
+        
+        logger.info("Enhanced semantic data parsing complete")
+        return enhanced_data
 
 
 class CombinedGOParser:
@@ -997,18 +1252,23 @@ class CombinedBiomedicalParser:
         Initialize combined biomedical parser for GO and Omics data.
         
         Args:
-            base_data_dir: Base directory containing GO_BP, GO_CC, GO_MF, and Omics_data subdirectories
+            base_data_dir: Base directory containing GO_BP, GO_CC, GO_MF, Omics_data, and Omics_data2 subdirectories
         """
         self.base_data_dir = Path(base_data_dir)
         
         # Initialize GO parser
         self.go_parser = CombinedGOParser(str(base_data_dir))
         
-        # Initialize Omics parser
+        # Initialize Omics parser with both Omics_data and Omics_data2
         omics_dir = self.base_data_dir / "Omics_data"
+        omics_data2_dir = self.base_data_dir / "Omics_data2"
+        
         if omics_dir.exists():
-            self.omics_parser = OmicsDataParser(str(omics_dir))
+            omics_data2_path = str(omics_data2_dir) if omics_data2_dir.exists() else None
+            self.omics_parser = OmicsDataParser(str(omics_dir), omics_data2_path)
             logger.info("Initialized Omics data parser")
+            if omics_data2_path:
+                logger.info("Enhanced semantic data integration enabled")
         else:
             self.omics_parser = None
             logger.warning(f"Omics_data directory not found: {omics_dir}")
@@ -1041,6 +1301,13 @@ class CombinedBiomedicalParser:
                 'validation': self.omics_parser.validate_omics_data(),
                 'summary': self.omics_parser.get_omics_summary()
             }
+            
+            # Parse enhanced semantic data from Omics_data2 if available
+            if self.omics_parser.omics_data2_dir:
+                enhanced_data = self.omics_parser.parse_all_enhanced_data()
+                omics_data['enhanced_data'] = enhanced_data
+                logger.info("Enhanced semantic data integrated successfully")
+            
             self.parsed_data['omics_data'] = omics_data
         
         logger.info("Comprehensive biomedical data parsing complete")

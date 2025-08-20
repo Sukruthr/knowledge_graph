@@ -1578,6 +1578,9 @@ class ComprehensiveBiomedicalKnowledgeGraph:
         self._add_omics_associations()
         self._add_cluster_relationships()
         
+        # Add enhanced semantic data from Omics_data2
+        self._add_semantic_enhancements()
+        
         # Calculate comprehensive statistics
         self._calculate_comprehensive_stats()
         
@@ -1847,6 +1850,194 @@ class ComprehensiveBiomedicalKnowledgeGraph:
         
         logger.info(f"Added {cluster_count} cluster relationships")
     
+    def _add_semantic_enhancements(self):
+        """Add enhanced semantic data from Omics_data2."""
+        logger.info("Adding semantic enhancements...")
+        
+        if 'omics_data' not in self.parsed_data:
+            logger.warning("No Omics data available for semantic enhancements")
+            return
+            
+        omics_data = self.parsed_data['omics_data']
+        enhanced_data = omics_data.get('enhanced_data', {})
+        
+        if not enhanced_data:
+            logger.info("No enhanced semantic data available, skipping")
+            return
+        
+        # Add gene set annotations
+        self._add_gene_set_annotations(enhanced_data)
+        
+        # Add literature references
+        self._add_literature_references(enhanced_data)
+        
+        # Add GO term validations
+        self._add_go_term_validations(enhanced_data)
+        
+        # Add experimental metadata
+        self._add_experimental_metadata(enhanced_data)
+        
+        logger.info("Semantic enhancements integration complete")
+    
+    def _add_gene_set_annotations(self, enhanced_data):
+        """Add LLM-enhanced gene set annotations to the graph."""
+        annotations = enhanced_data.get('gene_set_annotations', {})
+        if not annotations:
+            return
+        
+        logger.info(f"Adding {len(annotations)} gene set annotations...")
+        
+        annotation_count = 0
+        for gene_set_id, annotation in annotations.items():
+            # Create or update gene set node
+            gene_set_node = f"GENESET:{gene_set_id}"
+            
+            # Add enhanced attributes to the gene set node
+            node_attrs = {
+                'node_type': 'gene_set',
+                'gene_set_id': gene_set_id,
+                'source': annotation.get('source', ''),
+                'gene_set_name': annotation.get('gene_set_name', ''),
+                'llm_name': annotation.get('llm_name', ''),
+                'llm_analysis': annotation.get('llm_analysis', ''),
+                'llm_score': annotation.get('score', 0.0),
+                'n_genes': annotation.get('n_genes', 0),
+                'supporting_count': annotation.get('supporting_count', 0),
+                'llm_coverage': annotation.get('llm_coverage', 0.0)
+            }
+            
+            if gene_set_node in self.graph:
+                # Update existing node
+                self.graph.nodes[gene_set_node].update(node_attrs)
+            else:
+                # Add new node
+                self.graph.add_node(gene_set_node, **node_attrs)
+            
+            # Add edges to genes in the set
+            for gene_symbol in annotation.get('gene_list', []):
+                if gene_symbol in self.graph:
+                    self.graph.add_edge(
+                        gene_symbol,
+                        gene_set_node,
+                        edge_type='gene_in_set',
+                        support_level='annotated',
+                        source='llm_annotation'
+                    )
+            
+            # Add edges to supporting genes with higher confidence
+            for gene_symbol in annotation.get('supporting_genes', []):
+                if gene_symbol in self.graph:
+                    self.graph.add_edge(
+                        gene_symbol,
+                        gene_set_node,
+                        edge_type='gene_supports_set',
+                        support_level='high_confidence',
+                        source='llm_validation'
+                    )
+            
+            annotation_count += 1
+        
+        logger.info(f"Added {annotation_count} gene set annotations")
+    
+    def _add_literature_references(self, enhanced_data):
+        """Add literature references to gene sets."""
+        references = enhanced_data.get('literature_references', {})
+        if not references:
+            return
+        
+        logger.info(f"Adding literature references for {len(references)} gene sets...")
+        
+        ref_count = 0
+        for gene_set_id, ref_list in references.items():
+            gene_set_node = f"GENESET:{gene_set_id}"
+            
+            if gene_set_node in self.graph:
+                # Add literature metadata to gene set node
+                literature_data = {
+                    'has_literature': True,
+                    'num_references': len([ref for ref_entry in ref_list 
+                                         for ref in ref_entry.get('references', [])]),
+                    'keywords': [ref_entry.get('keyword', '') for ref_entry in ref_list],
+                    'paragraphs': [ref_entry.get('paragraph', '') for ref_entry in ref_list]
+                }
+                
+                self.graph.nodes[gene_set_node].update(literature_data)
+                ref_count += 1
+        
+        logger.info(f"Added literature references for {ref_count} gene sets")
+    
+    def _add_go_term_validations(self, enhanced_data):
+        """Add GO term validation data."""
+        validations = enhanced_data.get('go_term_validations', {})
+        if not validations:
+            return
+        
+        logger.info(f"Adding GO term validations for {len(validations)} gene sets...")
+        
+        validation_count = 0
+        for gene_set_id, validation in validations.items():
+            gene_set_node = f"GENESET:{gene_set_id}"
+            
+            if gene_set_node in self.graph:
+                # Add GO validation metadata
+                go_validation = {
+                    'validated_go_term': validation.get('go_term', ''),
+                    'validated_go_id': validation.get('go_id', ''),
+                    'go_p_value': validation.get('adjusted_p_value', 1.0),
+                    'go_intersection_size': validation.get('intersection_size', 0),
+                    'go_term_size': validation.get('term_size', 0),
+                    'gprofiler_ji': validation.get('gprofiler_ji', 0.0),
+                    'llm_go_match': validation.get('llm_best_matching_go', ''),
+                    'llm_ji': validation.get('llm_ji', 0.0),
+                    'llm_validation_success': validation.get('llm_success_tf', False),
+                    'gprofiler_validation_success': validation.get('gprofiler_success_tf', False)
+                }
+                
+                self.graph.nodes[gene_set_node].update(go_validation)
+                
+                # If there's a validated GO term, create connection
+                go_id = validation.get('go_id', '')
+                if go_id and go_id in self.graph:
+                    self.graph.add_edge(
+                        gene_set_node,
+                        go_id,
+                        edge_type='validated_by_go_term',
+                        p_value=validation.get('adjusted_p_value', 1.0),
+                        intersection_size=validation.get('intersection_size', 0),
+                        validation_source='gprofiler'
+                    )
+                
+                validation_count += 1
+        
+        logger.info(f"Added GO validations for {validation_count} gene sets")
+    
+    def _add_experimental_metadata(self, enhanced_data):
+        """Add experimental metadata to gene sets."""
+        metadata = enhanced_data.get('experimental_metadata', {})
+        if not metadata:
+            return
+        
+        logger.info(f"Adding experimental metadata for {len(metadata)} gene sets...")
+        
+        metadata_count = 0
+        for gene_set_id, meta in metadata.items():
+            gene_set_node = f"GENESET:{gene_set_id}"
+            
+            if gene_set_node in self.graph:
+                # Add experimental metadata
+                experimental_data = {
+                    'experimental_overlap': meta.get('overlap', 0),
+                    'experimental_p_value': meta.get('p_value', 1.0),
+                    'experimental_genes': meta.get('genes', []),
+                    'go_term_similarity': meta.get('llm_name_go_term_sim', 0.0),
+                    'referenced_analysis': meta.get('referenced_analysis', '')
+                }
+                
+                self.graph.nodes[gene_set_node].update(experimental_data)
+                metadata_count += 1
+        
+        logger.info(f"Added experimental metadata for {metadata_count} gene sets")
+    
     def _calculate_comprehensive_stats(self):
         """Calculate comprehensive statistics for the integrated graph."""
         logger.info("Calculating comprehensive statistics...")
@@ -1951,7 +2142,9 @@ class ComprehensiveBiomedicalKnowledgeGraph:
             'disease_associations': [],
             'drug_perturbations': [],
             'viral_responses': [],
-            'cluster_memberships': []
+            'cluster_memberships': [],
+            'gene_set_memberships': [],
+            'semantic_annotations': []
         }
         
         # Get all neighbors and their relationships
@@ -2001,6 +2194,26 @@ class ComprehensiveBiomedicalKnowledgeGraph:
                         'expression_direction': edge_attrs.get('expression_direction', ''),
                         'expression_magnitude': edge_attrs.get('expression_magnitude', 0),
                         'type': 'expression'
+                    })
+                
+                elif edge_type == 'gene_in_set':
+                    results['gene_set_memberships'].append({
+                        'gene_set_id': neighbor_data.get('gene_set_id', ''),
+                        'gene_set_name': neighbor_data.get('gene_set_name', ''),
+                        'llm_name': neighbor_data.get('llm_name', ''),
+                        'llm_score': neighbor_data.get('llm_score', 0.0),
+                        'support_level': edge_attrs.get('support_level', ''),
+                        'membership_type': 'annotated'
+                    })
+                
+                elif edge_type == 'gene_supports_set':
+                    results['gene_set_memberships'].append({
+                        'gene_set_id': neighbor_data.get('gene_set_id', ''),
+                        'gene_set_name': neighbor_data.get('gene_set_name', ''),
+                        'llm_name': neighbor_data.get('llm_name', ''),
+                        'llm_score': neighbor_data.get('llm_score', 0.0),
+                        'support_level': edge_attrs.get('support_level', ''),
+                        'membership_type': 'high_confidence_support'
                     })
         
         return results
@@ -2107,110 +2320,110 @@ def main():
     print("="*80)
 
 
-def main_legacy():
-    """Legacy example usage of the GO_BP knowledge graph (for backward compatibility)."""
+# def main_legacy():
+#     """Legacy example usage of the GO_BP knowledge graph (for backward compatibility)."""
     
-    # Build knowledge graph
-    kg = GOBPKnowledgeGraph(use_neo4j=False)
+#     # Build knowledge graph
+#     kg = GOBPKnowledgeGraph(use_neo4j=False)
     
-    # Load data
-    data_dir = "/home/mreddy1/knowledge_graph/llm_evaluation_for_gene_set_interpretation/data/GO_BP"
-    kg.load_data(data_dir)
+#     # Load data
+#     data_dir = "/home/mreddy1/knowledge_graph/llm_evaluation_for_gene_set_interpretation/data/GO_BP"
+#     kg.load_data(data_dir)
     
-    # Build graph
-    kg.build_graph()
+#     # Build graph
+#     kg.build_graph()
     
-    # Print enhanced statistics
-    stats = kg.get_stats()
-    print("Enhanced Knowledge Graph Statistics:")
-    for key, value in stats.items():
-        print(f"  {key}: {value:,}")
+#     # Print enhanced statistics
+#     stats = kg.get_stats()
+#     print("Enhanced Knowledge Graph Statistics:")
+#     for key, value in stats.items():
+#         print(f"  {key}: {value:,}")
     
-    # Example queries
-    print("\n" + "="*50)
-    print("ENHANCED QUERY EXAMPLES")
-    print("="*50)
+#     # Example queries
+#     print("\n" + "="*50)
+#     print("ENHANCED QUERY EXAMPLES")
+#     print("="*50)
     
-    # Query 1: What GO terms are associated with TP53?
-    gene = "TP53"
-    functions = kg.query_gene_functions(gene)
-    print(f"\nGO terms for {gene} (showing first 5):")
-    for func in functions[:5]:
-        print(f"  {func['go_id']}: {func['go_name']} (Evidence: {func['evidence_code']})")
+#     # Query 1: What GO terms are associated with TP53?
+#     gene = "TP53"
+#     functions = kg.query_gene_functions(gene)
+#     print(f"\nGO terms for {gene} (showing first 5):")
+#     for func in functions[:5]:
+#         print(f"  {func['go_id']}: {func['go_name']} (Evidence: {func['evidence_code']})")
     
-    # Query 2: What genes are associated with apoptosis?
-    apoptosis_terms = [go_id for go_id, info in kg.go_terms.items() 
-                      if 'apoptosis' in info['name'].lower()]
-    if apoptosis_terms:
-        go_term = apoptosis_terms[0]
-        genes = kg.query_go_term_genes(go_term)
-        print(f"\nGenes associated with '{kg.go_terms[go_term]['name']}' (showing first 5):")
-        for gene_info in genes[:5]:
-            print(f"  {gene_info['gene_symbol']}: {gene_info['gene_name']}")
+#     # Query 2: What genes are associated with apoptosis?
+#     apoptosis_terms = [go_id for go_id, info in kg.go_terms.items() 
+#                       if 'apoptosis' in info['name'].lower()]
+#     if apoptosis_terms:
+#         go_term = apoptosis_terms[0]
+#         genes = kg.query_go_term_genes(go_term)
+#         print(f"\nGenes associated with '{kg.go_terms[go_term]['name']}' (showing first 5):")
+#         for gene_info in genes[:5]:
+#             print(f"  {gene_info['gene_symbol']}: {gene_info['gene_name']}")
     
-    # Query 3: GO term hierarchy
-    if apoptosis_terms:
-        go_term = apoptosis_terms[0]
-        parents = kg.query_go_hierarchy(go_term, 'parents')
-        print(f"\nParent terms of '{kg.go_terms[go_term]['name']}' (showing first 3):")
-        for parent in parents[:3]:
-            print(f"  {parent['go_id']}: {parent['go_name']} ({parent['relationship_type']})")
+#     # Query 3: GO term hierarchy
+#     if apoptosis_terms:
+#         go_term = apoptosis_terms[0]
+#         parents = kg.query_go_hierarchy(go_term, 'parents')
+#         print(f"\nParent terms of '{kg.go_terms[go_term]['name']}' (showing first 3):")
+#         for parent in parents[:3]:
+#             print(f"  {parent['go_id']}: {parent['go_name']} ({parent['relationship_type']})")
     
-    # Enhanced Query 4: Search by definition
-    print(f"\n4. Search GO terms containing 'DNA damage':")
-    dna_damage_terms = kg.search_go_terms_by_definition('DNA damage')
-    for term in dna_damage_terms[:3]:
-        print(f"  {term['go_id']}: {term['name']} (Score: {term['score']}, Matches: {', '.join(term['match_types'])})")
+#     # Enhanced Query 4: Search by definition
+#     print(f"\n4. Search GO terms containing 'DNA damage':")
+#     dna_damage_terms = kg.search_go_terms_by_definition('DNA damage')
+#     for term in dna_damage_terms[:3]:
+#         print(f"  {term['go_id']}: {term['name']} (Score: {term['score']}, Matches: {', '.join(term['match_types'])})")
     
-    # Enhanced Query 5: Resolve alternative GO ID
-    if kg.go_alt_ids:
-        alt_id = list(kg.go_alt_ids.keys())[0]
-        primary_id = kg.resolve_alternative_go_id(alt_id)
-        print(f"\n5. Alternative ID resolution:")
-        print(f"  {alt_id} -> {primary_id}")
+#     # Enhanced Query 5: Resolve alternative GO ID
+#     if kg.go_alt_ids:
+#         alt_id = list(kg.go_alt_ids.keys())[0]
+#         primary_id = kg.resolve_alternative_go_id(alt_id)
+#         print(f"\n5. Alternative ID resolution:")
+#         print(f"  {alt_id} -> {primary_id}")
     
-    # Enhanced Query 6: Gene cross-references
-    if "TP53" in kg.graph:
-        cross_refs = kg.get_gene_cross_references("TP53")
-        print(f"\n6. TP53 cross-references:")
-        for key, value in cross_refs.items():
-            print(f"  {key}: {value}")
+#     # Enhanced Query 6: Gene cross-references
+#     if "TP53" in kg.graph:
+#         cross_refs = kg.get_gene_cross_references("TP53")
+#         print(f"\n6. TP53 cross-references:")
+#         for key, value in cross_refs.items():
+#             print(f"  {key}: {value}")
     
-    # Enhanced Query 8: GO clustering relationships
-    if kg.go_clusters:
-        sample_cluster = list(kg.go_clusters.keys())[0]
-        cluster_children = kg.go_clusters[sample_cluster]
-        print(f"\n8. GO clustering example - {sample_cluster}:")
-        print(f"  Clusters {len(cluster_children)} child GO terms")
-        for child in cluster_children[:3]:
-            child_go = child['child_go']
-            child_name = kg.go_terms.get(child_go, {}).get('name', 'Unknown')
-            print(f"    -> {child_go}: {child_name}")
+#     # Enhanced Query 8: GO clustering relationships
+#     if kg.go_clusters:
+#         sample_cluster = list(kg.go_clusters.keys())[0]
+#         cluster_children = kg.go_clusters[sample_cluster]
+#         print(f"\n8. GO clustering example - {sample_cluster}:")
+#         print(f"  Clusters {len(cluster_children)} child GO terms")
+#         for child in cluster_children[:3]:
+#             child_go = child['child_go']
+#             child_name = kg.go_terms.get(child_go, {}).get('name', 'Unknown')
+#             print(f"    -> {child_go}: {child_name}")
     
-    # Enhanced Query 9: Validation results
-    validation = kg.validate_graph_integrity()
-    print(f"\n9. Graph validation:")
-    for check, result in validation.items():
-        status = "✓" if result else "✗"
-        print(f"  {status} {check}: {result}")
+#     # Enhanced Query 9: Validation results
+#     validation = kg.validate_graph_integrity()
+#     print(f"\n9. Graph validation:")
+#     for check, result in validation.items():
+#         status = "✓" if result else "✗"
+#         print(f"  {status} {check}: {result}")
     
-    # Enhanced Query 7: Show enriched GO term example
-    apoptosis_terms = [go_id for go_id, info in kg.go_terms.items() 
-                      if 'apoptosis' in info['name'].lower()]
-    if apoptosis_terms:
-        go_term = apoptosis_terms[0]
-        node_data = kg.graph.nodes[go_term]
-        print(f"\n7. Enhanced GO term example - {go_term}:")
-        print(f"  Name: {node_data.get('name', 'N/A')}")
-        if 'definition' in node_data:
-            print(f"  Definition: {node_data['definition'][:150]}...")
-        if 'synonyms' in node_data and node_data['synonyms']:
-            print(f"  Synonyms: {', '.join(node_data['synonyms'][:3])}")
+#     # Enhanced Query 7: Show enriched GO term example
+#     apoptosis_terms = [go_id for go_id, info in kg.go_terms.items() 
+#                       if 'apoptosis' in info['name'].lower()]
+#     if apoptosis_terms:
+#         go_term = apoptosis_terms[0]
+#         node_data = kg.graph.nodes[go_term]
+#         print(f"\n7. Enhanced GO term example - {go_term}:")
+#         print(f"  Name: {node_data.get('name', 'N/A')}")
+#         if 'definition' in node_data:
+#             print(f"  Definition: {node_data['definition'][:150]}...")
+#         if 'synonyms' in node_data and node_data['synonyms']:
+#             print(f"  Synonyms: {', '.join(node_data['synonyms'][:3])}")
     
-    # Save the comprehensive graph
-    output_path = "/home/mreddy1/knowledge_graph/data/go_bp_comprehensive_kg.pkl"
-    kg.save_graph(output_path)
-    print(f"\nComprehensive knowledge graph saved to: {output_path}")
+#     # Save the comprehensive graph
+#     output_path = "/home/mreddy1/knowledge_graph/data/go_bp_comprehensive_kg.pkl"
+#     kg.save_graph(output_path)
+#     print(f"\nComprehensive knowledge graph saved to: {output_path}")
 
 
 if __name__ == "__main__":
