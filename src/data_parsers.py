@@ -49,6 +49,16 @@ except ImportError:
         LLMProcessedParser = None
         logger.warning("LLMProcessedParser not available")
 
+# Import GO Analysis Data parser
+try:
+    from .go_analysis_data_parser import GOAnalysisDataParser
+except ImportError:
+    try:
+        from go_analysis_data_parser import GOAnalysisDataParser
+    except ImportError:
+        GOAnalysisDataParser = None
+        logger.warning("GOAnalysisDataParser not available")
+
 
 class GODataParser:
     """Parser for Gene Ontology data (supports GO_BP, GO_CC, GO_MF)."""
@@ -1339,6 +1349,18 @@ class CombinedBiomedicalParser:
             else:
                 logger.info("No LLM_processed data directory found")
         
+        # Initialize GO Analysis Data parser
+        go_analysis_data_dir = self.base_data_dir / "GO_term_analysis" / "data_files"
+        if go_analysis_data_dir.exists() and GOAnalysisDataParser is not None:
+            self.go_analysis_data_parser = GOAnalysisDataParser(str(go_analysis_data_dir))
+            logger.info("Initialized GO Analysis Data parser")
+        else:
+            self.go_analysis_data_parser = None
+            if go_analysis_data_dir.exists():
+                logger.warning("GO Analysis Data found but parser not available")
+            else:
+                logger.info("No GO Analysis Data directory found")
+        
         self.parsed_data = {}
         
     def parse_all_biomedical_data(self) -> Dict[str, Dict]:
@@ -1393,6 +1415,12 @@ class CombinedBiomedicalParser:
             llm_processed_data = self.llm_processed_parser.parse_all_llm_processed_data()
             self.parsed_data['llm_processed_data'] = llm_processed_data
             logger.info("LLM_processed data integrated successfully")
+        
+        # Parse GO Analysis Data if available
+        if self.go_analysis_data_parser:
+            go_analysis_data = self.go_analysis_data_parser.parse_all_go_analysis_data()
+            self.parsed_data['go_analysis_data'] = go_analysis_data
+            logger.info("GO Analysis Data integrated successfully")
         
         logger.info("Comprehensive biomedical data parsing complete")
         return self.parsed_data

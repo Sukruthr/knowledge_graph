@@ -1590,6 +1590,9 @@ class ComprehensiveBiomedicalKnowledgeGraph:
         # Add LLM_processed data integration
         self._add_llm_processed_data()
         
+        # Add GO Analysis Data integration
+        self._add_go_analysis_data()
+        
         # Calculate comprehensive statistics
         self._calculate_comprehensive_stats()
         
@@ -3225,6 +3228,262 @@ class ComprehensiveBiomedicalKnowledgeGraph:
         
         logger.info(f"LLM data covers {len(genes_in_llm)} unique genes")
     
+    # ============= GO ANALYSIS DATA INTEGRATION =============
+    
+    def _add_go_analysis_data(self):
+        """Add GO Analysis Data (core terms, contamination, confidence evaluations, hierarchy) to the knowledge graph."""
+        logger.info("Adding GO Analysis Data...")
+        
+        if 'go_analysis_data' not in self.parsed_data:
+            logger.info("No GO Analysis Data available")
+            return
+        
+        analysis_data = self.parsed_data['go_analysis_data']
+        
+        # Add core GO term analysis nodes
+        self._add_core_go_analysis_nodes(analysis_data)
+        
+        # Add contamination dataset nodes
+        self._add_contamination_dataset_nodes(analysis_data)
+        
+        # Add confidence evaluation nodes
+        self._add_confidence_evaluation_nodes(analysis_data)
+        
+        # Add hierarchy relationship nodes
+        self._add_hierarchy_relationship_nodes(analysis_data)
+        
+        # Add similarity score nodes
+        self._add_similarity_score_nodes(analysis_data)
+        
+        # Connect GO analysis data to existing graph elements
+        self._connect_go_analysis_to_graph(analysis_data)
+        
+        logger.info("GO Analysis Data integration complete")
+    
+    def _add_core_go_analysis_nodes(self, analysis_data):
+        """Add core GO term analysis nodes to the graph."""
+        core_terms = analysis_data.get('core_go_terms', {})
+        
+        for dataset_name, terms in core_terms.items():
+            for go_id, term_data in terms.items():
+                # Create core analysis node
+                analysis_id = f"go_analysis_{dataset_name}_{go_id}"
+                
+                node_attrs = {
+                    'node_type': 'go_core_analysis',
+                    'source': 'GO_Analysis_Data',
+                    'dataset': dataset_name,
+                    'dataset_type': term_data.get('dataset_type', 'core_terms'),
+                    'go_term_id': go_id,
+                    'gene_count': term_data.get('gene_count', 0),
+                    'term_description': term_data.get('term_description', ''),
+                    'genes': term_data.get('genes', [])
+                }
+                
+                # Add enrichment analysis data if available
+                if 'enrichment_analysis' in term_data:
+                    node_attrs['enrichment_analysis'] = term_data['enrichment_analysis']
+                    node_attrs['has_enrichment_data'] = True
+                else:
+                    node_attrs['has_enrichment_data'] = False
+                
+                self.graph.add_node(analysis_id, **node_attrs)
+                
+                # Connect to GO term if it exists
+                if go_id in self.graph:
+                    self.graph.add_edge(analysis_id, go_id, 
+                                      edge_type='analyzes_go_term',
+                                      source='GO_Analysis_Data')
+                
+                # Connect to genes if they exist
+                for gene in term_data.get('genes', []):
+                    gene_nodes = [n for n, attrs in self.graph.nodes(data=True) 
+                                if attrs.get('node_type') == 'gene' and 
+                                   (attrs.get('symbol') == gene or attrs.get('gene_id') == gene)]
+                    
+                    for gene_node in gene_nodes:
+                        self.graph.add_edge(analysis_id, gene_node,
+                                          edge_type='analyzes_gene',
+                                          source='GO_Analysis_Data',
+                                          dataset=dataset_name)
+        
+        logger.info(f"Added {sum(len(terms) for terms in core_terms.values())} core GO analysis nodes")
+    
+    def _add_contamination_dataset_nodes(self, analysis_data):
+        """Add contamination dataset nodes to the graph."""
+        contamination_datasets = analysis_data.get('contamination_datasets', {})
+        
+        for dataset_name, terms in contamination_datasets.items():
+            for go_id, term_data in terms.items():
+                # Create contamination analysis node
+                contam_id = f"go_contamination_{dataset_name}_{go_id}"
+                
+                node_attrs = {
+                    'node_type': 'go_contamination_analysis',
+                    'source': 'GO_Analysis_Data',
+                    'dataset': dataset_name,
+                    'dataset_type': term_data.get('dataset_type', 'contamination_analysis'),
+                    'go_term_id': go_id,
+                    'gene_count': term_data.get('gene_count', 0),
+                    'term_description': term_data.get('term_description', ''),
+                    'original_genes': term_data.get('genes', []),
+                    'contaminated_50perc': term_data.get('contaminated_50perc', []),
+                    'contaminated_100perc': term_data.get('contaminated_100perc', []),
+                    'contamination_levels': len([x for x in [term_data.get('contaminated_50perc'), term_data.get('contaminated_100perc')] if x])
+                }
+                
+                self.graph.add_node(contam_id, **node_attrs)
+                
+                # Connect to GO term if it exists
+                if go_id in self.graph:
+                    self.graph.add_edge(contam_id, go_id, 
+                                      edge_type='contamination_study_of_go_term',
+                                      source='GO_Analysis_Data')
+                
+                # Connect to genes (original and contaminated)
+                all_genes = set(term_data.get('genes', []))
+                all_genes.update(term_data.get('contaminated_50perc', []))
+                all_genes.update(term_data.get('contaminated_100perc', []))
+                
+                for gene in all_genes:
+                    gene_nodes = [n for n, attrs in self.graph.nodes(data=True) 
+                                if attrs.get('node_type') == 'gene' and 
+                                   (attrs.get('symbol') == gene or attrs.get('gene_id') == gene)]
+                    
+                    for gene_node in gene_nodes:
+                        # Determine contamination status
+                        if gene in term_data.get('genes', []):
+                            contamination_status = 'original'
+                        elif gene in term_data.get('contaminated_50perc', []):
+                            contamination_status = '50perc_contaminated'
+                        elif gene in term_data.get('contaminated_100perc', []):
+                            contamination_status = '100perc_contaminated'
+                        else:
+                            contamination_status = 'unknown'
+                        
+                        self.graph.add_edge(contam_id, gene_node,
+                                          edge_type='contamination_gene_association',
+                                          source='GO_Analysis_Data',
+                                          dataset=dataset_name,
+                                          contamination_status=contamination_status)
+        
+        logger.info(f"Added {sum(len(terms) for terms in contamination_datasets.values())} contamination analysis nodes")
+    
+    def _add_confidence_evaluation_nodes(self, analysis_data):
+        """Add confidence evaluation nodes to the graph."""
+        confidence_evaluations = analysis_data.get('confidence_evaluations', {})
+        
+        for dataset_name, evaluations in confidence_evaluations.items():
+            for go_id, eval_data in evaluations.items():
+                # Create confidence evaluation node
+                conf_id = f"go_confidence_{dataset_name}_{go_id}"
+                
+                node_attrs = {
+                    'node_type': 'go_confidence_evaluation',
+                    'source': 'GO_Analysis_Data',
+                    'dataset': dataset_name,
+                    'dataset_type': eval_data.get('dataset_type', 'human_evaluation'),
+                    'go_term_id': go_id,
+                    'gene_count': eval_data.get('gene_count', 0),
+                    'llm_name': eval_data.get('llm_name', ''),
+                    'llm_analysis': eval_data.get('llm_analysis', ''),
+                    'reviewer_score_bin': eval_data.get('reviewer_score_bin', ''),
+                    'raw_score': eval_data.get('raw_score', 0),
+                    'notes': eval_data.get('notes', ''),
+                    'reviewer_score_bin_final': eval_data.get('reviewer_score_bin_final', ''),
+                    'has_human_review': True
+                }
+                
+                self.graph.add_node(conf_id, **node_attrs)
+                
+                # Connect to GO term if it exists
+                if go_id in self.graph:
+                    self.graph.add_edge(conf_id, go_id, 
+                                      edge_type='confidence_evaluation_of_go_term',
+                                      source='GO_Analysis_Data')
+                
+                # Connect to genes
+                for gene in eval_data.get('genes', []):
+                    gene_nodes = [n for n, attrs in self.graph.nodes(data=True) 
+                                if attrs.get('node_type') == 'gene' and 
+                                   (attrs.get('symbol') == gene or attrs.get('gene_id') == gene)]
+                    
+                    for gene_node in gene_nodes:
+                        self.graph.add_edge(conf_id, gene_node,
+                                          edge_type='confidence_gene_association',
+                                          source='GO_Analysis_Data',
+                                          dataset=dataset_name)
+        
+        logger.info(f"Added {sum(len(evals) for evals in confidence_evaluations.values())} confidence evaluation nodes")
+    
+    def _add_hierarchy_relationship_nodes(self, analysis_data):
+        """Add hierarchy relationship nodes to the graph."""
+        hierarchy_data = analysis_data.get('hierarchy_data', {})
+        relationships = hierarchy_data.get('relationships', [])
+        
+        for rel in relationships:
+            # Create hierarchy relationship edge between GO terms
+            child_id = rel.get('child')
+            parent_id = rel.get('parent')
+            
+            # Add hierarchy edge if both nodes exist
+            if child_id in self.graph and parent_id in self.graph:
+                self.graph.add_edge(child_id, parent_id,
+                                  edge_type='go_hierarchy_relationship',
+                                  source='GO_Analysis_Data',
+                                  relationship_type=rel.get('relationship_type', 'parent_child'))
+        
+        logger.info(f"Added {len(relationships)} GO hierarchy relationships")
+    
+    def _add_similarity_score_nodes(self, analysis_data):
+        """Add similarity score data to the graph."""
+        similarity_scores = analysis_data.get('similarity_scores', {})
+        
+        for score_type, score_data in similarity_scores.items():
+            # Create a single node representing the similarity score dataset
+            sim_id = f"similarity_scores_{score_type}"
+            
+            node_attrs = {
+                'node_type': 'similarity_scores',
+                'source': 'GO_Analysis_Data',
+                'score_type': score_type,
+                'sample_count': score_data.get('sample_count', 0),
+                'total_lines': score_data.get('total_lines', 0),
+                'file_size': score_data.get('file_size', 0),
+                'score_range': score_data.get('score_range', {}),
+                'sample_scores': score_data.get('sample_scores', [])
+            }
+            
+            self.graph.add_node(sim_id, **node_attrs)
+        
+        logger.info(f"Added {len(similarity_scores)} similarity score datasets")
+    
+    def _connect_go_analysis_to_graph(self, analysis_data):
+        """Create additional connections between GO analysis data and existing graph elements."""
+        logger.info("Creating additional GO analysis data connections...")
+        
+        # Count genes mentioned in GO analysis data
+        genes_in_analysis = set()
+        
+        # Count from core terms
+        for dataset in analysis_data.get('core_go_terms', {}).values():
+            for term in dataset.values():
+                genes_in_analysis.update(term.get('genes', []))
+        
+        # Count from contamination datasets
+        for dataset in analysis_data.get('contamination_datasets', {}).values():
+            for term in dataset.values():
+                genes_in_analysis.update(term.get('genes', []))
+                genes_in_analysis.update(term.get('contaminated_50perc', []))
+                genes_in_analysis.update(term.get('contaminated_100perc', []))
+        
+        # Count from confidence evaluations
+        for dataset in analysis_data.get('confidence_evaluations', {}).values():
+            for eval_data in dataset.values():
+                genes_in_analysis.update(eval_data.get('genes', []))
+        
+        logger.info(f"GO analysis data covers {len(genes_in_analysis)} unique genes")
+    
     # ============= LLM_PROCESSED QUERY METHODS =============
     
     def query_llm_interpretations(self, dataset: str = None, go_id: str = None, model: str = None) -> List[Dict]:
@@ -3400,6 +3659,212 @@ class ComprehensiveBiomedicalKnowledgeGraph:
         
         # Convert sets to counts
         stats['models_analyzed'] = len(stats['models_analyzed'])
+        stats['datasets_analyzed'] = len(stats['datasets_analyzed'])
+        stats['unique_go_terms'] = len(stats['unique_go_terms'])
+        stats['unique_genes'] = len(stats['unique_genes'])
+        
+        return stats
+    
+    # ============= GO ANALYSIS DATA QUERY METHODS =============
+    
+    def query_go_core_analysis(self, dataset: str = None, go_id: str = None) -> List[Dict]:
+        """Query GO core analysis data with optional filtering."""
+        results = []
+        
+        for node_id, attrs in self.graph.nodes(data=True):
+            if attrs.get('node_type') == 'go_core_analysis' and attrs.get('source') == 'GO_Analysis_Data':
+                # Apply filters
+                if dataset and attrs.get('dataset') != dataset:
+                    continue
+                if go_id and attrs.get('go_term_id') != go_id:
+                    continue
+                
+                results.append({
+                    'node_id': node_id,
+                    'dataset': attrs.get('dataset'),
+                    'go_term_id': attrs.get('go_term_id'),
+                    'gene_count': attrs.get('gene_count'),
+                    'term_description': attrs.get('term_description'),
+                    'genes': attrs.get('genes'),
+                    'has_enrichment_data': attrs.get('has_enrichment_data'),
+                    'enrichment_analysis': attrs.get('enrichment_analysis')
+                })
+        
+        return results
+    
+    def query_go_contamination_analysis(self, dataset: str = None, go_id: str = None) -> List[Dict]:
+        """Query GO contamination analysis data with optional filtering."""
+        results = []
+        
+        for node_id, attrs in self.graph.nodes(data=True):
+            if attrs.get('node_type') == 'go_contamination_analysis' and attrs.get('source') == 'GO_Analysis_Data':
+                # Apply filters
+                if dataset and attrs.get('dataset') != dataset:
+                    continue
+                if go_id and attrs.get('go_term_id') != go_id:
+                    continue
+                
+                results.append({
+                    'node_id': node_id,
+                    'dataset': attrs.get('dataset'),
+                    'go_term_id': attrs.get('go_term_id'),
+                    'gene_count': attrs.get('gene_count'),
+                    'term_description': attrs.get('term_description'),
+                    'original_genes': attrs.get('original_genes'),
+                    'contaminated_50perc': attrs.get('contaminated_50perc'),
+                    'contaminated_100perc': attrs.get('contaminated_100perc'),
+                    'contamination_levels': attrs.get('contamination_levels')
+                })
+        
+        return results
+    
+    def query_go_confidence_evaluations(self, dataset: str = None, go_id: str = None) -> List[Dict]:
+        """Query GO confidence evaluation data with optional filtering."""
+        results = []
+        
+        for node_id, attrs in self.graph.nodes(data=True):
+            if attrs.get('node_type') == 'go_confidence_evaluation' and attrs.get('source') == 'GO_Analysis_Data':
+                # Apply filters
+                if dataset and attrs.get('dataset') != dataset:
+                    continue
+                if go_id and attrs.get('go_term_id') != go_id:
+                    continue
+                
+                results.append({
+                    'node_id': node_id,
+                    'dataset': attrs.get('dataset'),
+                    'go_term_id': attrs.get('go_term_id'),
+                    'gene_count': attrs.get('gene_count'),
+                    'llm_name': attrs.get('llm_name'),
+                    'llm_analysis': attrs.get('llm_analysis'),
+                    'reviewer_score_bin': attrs.get('reviewer_score_bin'),
+                    'raw_score': attrs.get('raw_score'),
+                    'notes': attrs.get('notes'),
+                    'reviewer_score_bin_final': attrs.get('reviewer_score_bin_final')
+                })
+        
+        return results
+    
+    def query_gene_go_analysis_profile(self, gene_symbol: str) -> Dict[str, Any]:
+        """Get comprehensive GO analysis profile for a gene."""
+        profile = {
+            'gene_symbol': gene_symbol,
+            'core_analyses': [],
+            'contamination_analyses': [],
+            'confidence_evaluations': [],
+            'total_analyses': 0
+        }
+        
+        # Find gene node
+        gene_nodes = [n for n, attrs in self.graph.nodes(data=True) 
+                     if attrs.get('node_type') == 'gene' and 
+                        (attrs.get('symbol') == gene_symbol or attrs.get('gene_id') == gene_symbol)]
+        
+        if not gene_nodes:
+            return profile
+        
+        gene_node = gene_nodes[0]
+        
+        # Find connected GO analysis nodes
+        for neighbor in self.graph.neighbors(gene_node):
+            neighbor_attrs = self.graph.nodes[neighbor]
+            
+            if neighbor_attrs.get('source') == 'GO_Analysis_Data':
+                edge_attrs = self.graph.edges[neighbor, gene_node]
+                
+                if neighbor_attrs.get('node_type') == 'go_core_analysis':
+                    profile['core_analyses'].append({
+                        'node_id': neighbor,
+                        'dataset': neighbor_attrs.get('dataset'),
+                        'go_term_id': neighbor_attrs.get('go_term_id'),
+                        'term_description': neighbor_attrs.get('term_description'),
+                        'gene_count': neighbor_attrs.get('gene_count')
+                    })
+                
+                elif neighbor_attrs.get('node_type') == 'go_contamination_analysis':
+                    contamination_status = edge_attrs.get('contamination_status', 'unknown')
+                    profile['contamination_analyses'].append({
+                        'node_id': neighbor,
+                        'dataset': neighbor_attrs.get('dataset'),
+                        'go_term_id': neighbor_attrs.get('go_term_id'),
+                        'term_description': neighbor_attrs.get('term_description'),
+                        'contamination_status': contamination_status,
+                        'contamination_levels': neighbor_attrs.get('contamination_levels')
+                    })
+                
+                elif neighbor_attrs.get('node_type') == 'go_confidence_evaluation':
+                    profile['confidence_evaluations'].append({
+                        'node_id': neighbor,
+                        'dataset': neighbor_attrs.get('dataset'),
+                        'go_term_id': neighbor_attrs.get('go_term_id'),
+                        'llm_name': neighbor_attrs.get('llm_name'),
+                        'reviewer_score_bin': neighbor_attrs.get('reviewer_score_bin'),
+                        'raw_score': neighbor_attrs.get('raw_score')
+                    })
+        
+        profile['total_analyses'] = len(profile['core_analyses']) + len(profile['contamination_analyses']) + len(profile['confidence_evaluations'])
+        return profile
+    
+    def get_go_analysis_stats(self) -> Dict[str, Any]:
+        """Get comprehensive statistics for GO Analysis Data integration."""
+        stats = {
+            'core_analyses': 0,
+            'contamination_analyses': 0,
+            'confidence_evaluations': 0,
+            'hierarchy_relationships': 0,
+            'similarity_datasets': 0,
+            'datasets_analyzed': set(),
+            'unique_go_terms': set(),
+            'unique_genes': set(),
+            'enrichment_analyses': 0,
+            'human_reviewed': 0
+        }
+        
+        for node_id, attrs in self.graph.nodes(data=True):
+            source = attrs.get('source')
+            node_type = attrs.get('node_type')
+            
+            if source == 'GO_Analysis_Data':
+                if node_type == 'go_core_analysis':
+                    stats['core_analyses'] += 1
+                    stats['datasets_analyzed'].add(attrs.get('dataset'))
+                    stats['unique_go_terms'].add(attrs.get('go_term_id'))
+                    if attrs.get('has_enrichment_data'):
+                        stats['enrichment_analyses'] += 1
+                
+                elif node_type == 'go_contamination_analysis':
+                    stats['contamination_analyses'] += 1
+                    stats['datasets_analyzed'].add(attrs.get('dataset'))
+                    stats['unique_go_terms'].add(attrs.get('go_term_id'))
+                
+                elif node_type == 'go_confidence_evaluation':
+                    stats['confidence_evaluations'] += 1
+                    stats['datasets_analyzed'].add(attrs.get('dataset'))
+                    stats['unique_go_terms'].add(attrs.get('go_term_id'))
+                    if attrs.get('has_human_review'):
+                        stats['human_reviewed'] += 1
+                
+                elif node_type == 'similarity_scores':
+                    stats['similarity_datasets'] += 1
+        
+        # Count hierarchy relationships
+        for u, v, attrs in self.graph.edges(data=True):
+            if attrs.get('edge_type') == 'go_hierarchy_relationship' and attrs.get('source') == 'GO_Analysis_Data':
+                stats['hierarchy_relationships'] += 1
+        
+        # Count genes from edges
+        for u, v, attrs in self.graph.edges(data=True):
+            if attrs.get('source') == 'GO_Analysis_Data':
+                # Check if one node is a gene
+                u_attrs = self.graph.nodes[u]
+                v_attrs = self.graph.nodes[v]
+                
+                if u_attrs.get('node_type') == 'gene':
+                    stats['unique_genes'].add(u_attrs.get('symbol', u_attrs.get('gene_id', u)))
+                elif v_attrs.get('node_type') == 'gene':
+                    stats['unique_genes'].add(v_attrs.get('symbol', v_attrs.get('gene_id', v)))
+        
+        # Convert sets to counts
         stats['datasets_analyzed'] = len(stats['datasets_analyzed'])
         stats['unique_go_terms'] = len(stats['unique_go_terms'])
         stats['unique_genes'] = len(stats['unique_genes'])
