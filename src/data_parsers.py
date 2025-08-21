@@ -59,6 +59,16 @@ except ImportError:
         GOAnalysisDataParser = None
         logger.warning("GOAnalysisDataParser not available")
 
+# Import Remaining Data parser
+try:
+    from .remaining_data_parser import RemainingDataParser
+except ImportError:
+    try:
+        from remaining_data_parser import RemainingDataParser
+    except ImportError:
+        RemainingDataParser = None
+        logger.warning("RemainingDataParser not available")
+
 
 class GODataParser:
     """Parser for Gene Ontology data (supports GO_BP, GO_CC, GO_MF)."""
@@ -1361,6 +1371,18 @@ class CombinedBiomedicalParser:
             else:
                 logger.info("No GO Analysis Data directory found")
         
+        # Initialize Remaining Data parser
+        remaining_data_dir = self.base_data_dir / "remaining_data_files"
+        if remaining_data_dir.exists() and RemainingDataParser is not None:
+            self.remaining_data_parser = RemainingDataParser(str(self.base_data_dir))
+            logger.info("Initialized Remaining Data parser")
+        else:
+            self.remaining_data_parser = None
+            if remaining_data_dir.exists():
+                logger.warning("Remaining Data found but parser not available")
+            else:
+                logger.info("No Remaining Data directory found")
+        
         self.parsed_data = {}
         
     def parse_all_biomedical_data(self) -> Dict[str, Dict]:
@@ -1421,6 +1443,12 @@ class CombinedBiomedicalParser:
             go_analysis_data = self.go_analysis_data_parser.parse_all_go_analysis_data()
             self.parsed_data['go_analysis_data'] = go_analysis_data
             logger.info("GO Analysis Data integrated successfully")
+        
+        # Parse Remaining Data if available
+        if self.remaining_data_parser:
+            remaining_data = self.remaining_data_parser.parse_all_remaining_data()
+            self.parsed_data['remaining_data'] = remaining_data
+            logger.info("Remaining Data integrated successfully")
         
         logger.info("Comprehensive biomedical data parsing complete")
         return self.parsed_data

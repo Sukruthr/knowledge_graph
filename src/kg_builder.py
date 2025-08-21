@@ -1593,6 +1593,9 @@ class ComprehensiveBiomedicalKnowledgeGraph:
         # Add GO Analysis Data integration
         self._add_go_analysis_data()
         
+        # Add Remaining Data integration
+        self._add_remaining_data()
+        
         # Calculate comprehensive statistics
         self._calculate_comprehensive_stats()
         
@@ -3483,6 +3486,309 @@ class ComprehensiveBiomedicalKnowledgeGraph:
                 genes_in_analysis.update(eval_data.get('genes', []))
         
         logger.info(f"GO analysis data covers {len(genes_in_analysis)} unique genes")
+    
+    def _add_remaining_data(self):
+        """Add remaining data files integration (GMT, reference evaluation, L1000, embeddings, supplement table)."""
+        
+        if 'remaining_data' not in self.parsed_data:
+            logger.info("No remaining data available for integration")
+            return
+        
+        logger.info("Adding remaining data integration...")
+        remaining_data = self.parsed_data['remaining_data']
+        
+        # Add GMT data (GO gene sets)
+        self._add_gmt_data(remaining_data.get('gmt_data', {}))
+        
+        # Add reference evaluation data (literature support)
+        self._add_reference_evaluation_data(remaining_data.get('reference_evaluation_data', {}))
+        
+        # Add L1000 data (perturbation experiments)  
+        self._add_l1000_data(remaining_data.get('l1000_data', {}))
+        
+        # Add GO term embeddings data
+        self._add_embeddings_data(remaining_data.get('embeddings_data', {}))
+        
+        # Add supplement table data (additional LLM evaluations)
+        self._add_supplement_table_data(remaining_data.get('supplement_table_data', {}))
+        
+        logger.info("Remaining data integration complete")
+    
+    def _add_gmt_data(self, gmt_data):
+        """Add GMT file data (GO gene sets) to the knowledge graph."""
+        if not gmt_data:
+            logger.info("No GMT data to add")
+            return
+        
+        logger.info("Adding GMT data (GO gene sets)...")
+        
+        # Add gene sets as nodes
+        gene_sets = gmt_data.get('gene_sets', [])
+        go_terms = gmt_data.get('go_terms', {})
+        genes_to_go_terms = gmt_data.get('genes_to_go_terms', {})
+        
+        # Add GMT gene set nodes
+        for gene_set in gene_sets:
+            go_id = gene_set['go_id']
+            node_id = f"gmt_{go_id}"
+            
+            node_attrs = {
+                'go_id': go_id,
+                'node_type': 'gmt_gene_set',
+                'source': 'GMT_File',
+                'description': gene_set['description'],
+                'gene_count': gene_set['gene_count'],
+                'genes': gene_set['genes'],
+                'url_or_desc': gene_set.get('url_or_desc', '')
+            }
+            
+            self.graph.add_node(node_id, **node_attrs)
+            
+            # Connect genes to this gene set
+            for gene in gene_set['genes']:
+                gene_node_id = f"gene_{gene}"
+                
+                # Add gene node if not exists
+                if gene_node_id not in self.graph:
+                    self.graph.add_node(gene_node_id, 
+                                      gene_symbol=gene, 
+                                      node_type='gene',
+                                      source='GMT_File')
+                
+                # Add association edge
+                self.graph.add_edge(gene_node_id, node_id, 
+                                  relationship='associated_with_gmt_gene_set',
+                                  source='GMT_File',
+                                  go_id=go_id)
+        
+        logger.info(f"Added {len(gene_sets)} GMT gene sets with {len(genes_to_go_terms)} gene associations")
+    
+    def _add_reference_evaluation_data(self, ref_eval_data):
+        """Add reference evaluation data (literature support) to the knowledge graph."""
+        if not ref_eval_data:
+            logger.info("No reference evaluation data to add")
+            return
+        
+        logger.info("Adding reference evaluation data...")
+        
+        references = ref_eval_data.get('references', {})
+        gene_sets = ref_eval_data.get('gene_sets', {})
+        paragraphs = ref_eval_data.get('paragraphs', {})
+        
+        # Add reference nodes
+        for ref_id, ref_data in references.items():
+            node_attrs = {
+                'node_type': 'literature_reference',
+                'source': 'Reference_Evaluation',
+                'reference': ref_data['reference'],
+                'paragraph': ref_data['paragraph'],
+                'comment': ref_data['comment'],
+                'gene_set_name': ref_data['gene_set_name'],
+                'dataset': ref_data['dataset'],
+                'title_supports': ref_data.get('title_supports'),
+                'abstract_supports': ref_data.get('abstract_supports')
+            }
+            
+            self.graph.add_node(ref_id, **node_attrs)
+        
+        # Add gene set evaluation nodes
+        for gene_set_name, gene_set_data in gene_sets.items():
+            eval_node_id = f"gene_set_eval_{gene_set_name.replace(' ', '_')}"
+            
+            node_attrs = {
+                'node_type': 'gene_set_evaluation',
+                'source': 'Reference_Evaluation',
+                'gene_set_name': gene_set_name,
+                'total_references': len(gene_set_data['references']),
+                'datasets': gene_set_data['datasets'],
+                'evaluation_count': len(gene_set_data['evaluations'])
+            }
+            
+            self.graph.add_node(eval_node_id, **node_attrs)
+            
+            # Connect references to gene set evaluations
+            for reference in gene_set_data['references']:
+                # Find matching reference node
+                for ref_id, ref_data in references.items():
+                    if ref_data['reference'] == reference:
+                        self.graph.add_edge(ref_id, eval_node_id,
+                                          relationship='supports_gene_set',
+                                          source='Reference_Evaluation')
+        
+        logger.info(f"Added {len(references)} references and {len(gene_sets)} gene set evaluations")
+    
+    def _add_l1000_data(self, l1000_data):
+        """Add L1000 perturbation data to the knowledge graph."""
+        if not l1000_data:
+            logger.info("No L1000 data to add")
+            return
+        
+        logger.info("Adding L1000 perturbation data...")
+        
+        perturbations = l1000_data.get('perturbations', {})
+        cell_lines = l1000_data.get('cell_lines', {})
+        reagents = l1000_data.get('reagents', {})
+        
+        # Add perturbation nodes
+        for pert_id, pert_data in perturbations.items():
+            node_attrs = {
+                'node_type': 'l1000_perturbation',
+                'source': 'L1000',
+                'reagent': pert_data['reagent'],
+                'cell_line': pert_data['cell_line'],
+                'duration': pert_data['duration'],
+                'duration_unit': pert_data['duration_unit'],
+                'dosage': pert_data['dosage'],
+                'dosage_unit': pert_data['dosage_unit'],
+                'n_genesets': pert_data['n_genesets']
+            }
+            
+            self.graph.add_node(pert_id, **node_attrs)
+        
+        # Add cell line nodes
+        for cell_line, cell_data in cell_lines.items():
+            cell_node_id = f"cell_line_{cell_line}"
+            
+            node_attrs = {
+                'node_type': 'cell_line',
+                'source': 'L1000',
+                'cell_line_name': cell_line,
+                'perturbation_count': len(cell_data['perturbations']),
+                'unique_reagents': len(cell_data['reagents']),
+                'total_genesets': cell_data['total_genesets']
+            }
+            
+            self.graph.add_node(cell_node_id, **node_attrs)
+            
+            # Connect perturbations to cell lines
+            for pert_id in cell_data['perturbations']:
+                if pert_id in perturbations:
+                    self.graph.add_edge(pert_id, cell_node_id,
+                                      relationship='performed_in_cell_line',
+                                      source='L1000')
+        
+        # Add reagent nodes
+        for reagent, reagent_data in reagents.items():
+            reagent_node_id = f"reagent_{reagent.replace('-', '_')}"
+            
+            node_attrs = {
+                'node_type': 'l1000_reagent',
+                'source': 'L1000',
+                'reagent_name': reagent,
+                'perturbation_count': len(reagent_data['perturbations']),
+                'unique_cell_lines': len(reagent_data['cell_lines']),
+                'total_genesets': reagent_data['total_genesets']
+            }
+            
+            self.graph.add_node(reagent_node_id, **node_attrs)
+            
+            # Connect perturbations to reagents
+            for pert_id in reagent_data['perturbations']:
+                if pert_id in perturbations:
+                    self.graph.add_edge(pert_id, reagent_node_id,
+                                      relationship='uses_reagent',
+                                      source='L1000')
+        
+        logger.info(f"Added {len(perturbations)} perturbations, {len(cell_lines)} cell lines, {len(reagents)} reagents")
+    
+    def _add_embeddings_data(self, embeddings_data):
+        """Add GO term embeddings data to the knowledge graph."""
+        if not embeddings_data:
+            logger.info("No embeddings data to add") 
+            return
+        
+        logger.info("Adding GO term embeddings...")
+        
+        embeddings = embeddings_data.get('embeddings', {})
+        
+        # Add embedding nodes and connect to existing GO terms
+        embedding_count = 0
+        connected_count = 0
+        
+        for go_term, embedding_info in embeddings.items():
+            embedding_node_id = f"embedding_{go_term}"
+            
+            node_attrs = {
+                'node_type': 'go_term_embedding',
+                'source': 'Embeddings',
+                'go_term': go_term,
+                'embedding_dimension': embedding_info['dimension'],
+                'has_embedding_vector': True
+                # Note: Not storing the actual vector in node attributes for performance
+            }
+            
+            self.graph.add_node(embedding_node_id, **node_attrs)
+            embedding_count += 1
+            
+            # Try to connect to existing GO term nodes
+            for node_id, node_attrs in self.graph.nodes(data=True):
+                if (node_attrs.get('node_type') in ['go_term', 'gmt_gene_set'] and 
+                    node_attrs.get('go_id') == go_term):
+                    
+                    self.graph.add_edge(node_id, embedding_node_id,
+                                      relationship='has_embedding',
+                                      source='Embeddings')
+                    connected_count += 1
+                    break
+        
+        logger.info(f"Added {embedding_count} GO term embeddings, {connected_count} connected to existing GO terms")
+    
+    def _add_supplement_table_data(self, supp_data):
+        """Add supplementary LLM evaluation data to the knowledge graph.""" 
+        if not supp_data:
+            logger.info("No supplement table data to add")
+            return
+        
+        logger.info("Adding supplement table LLM evaluation data...")
+        
+        evaluations = supp_data.get('evaluations', {})
+        gene_sets = supp_data.get('gene_sets', {})
+        llm_analyses = supp_data.get('llm_analyses', {})
+        
+        # Add evaluation nodes
+        for eval_id, eval_data in evaluations.items():
+            node_attrs = {
+                'node_type': 'supplement_llm_evaluation',
+                'source': 'Supplement_Table',
+                'data_source': eval_data['source'],
+                'gene_set_name': eval_data['gene_set_name'],
+                'gene_list': eval_data['gene_list'],
+                'n_genes': eval_data['n_genes'],
+                'llm_name': eval_data['llm_name'],
+                'referenced_analysis': eval_data['referenced_analysis'],
+                'score': eval_data.get('score')
+            }
+            
+            # Add other metadata columns
+            for key, value in eval_data.items():
+                if key not in node_attrs:
+                    node_attrs[key] = value
+            
+            self.graph.add_node(eval_id, **node_attrs)
+        
+        # Add LLM analysis summary nodes
+        for llm_name, llm_data in llm_analyses.items():
+            llm_node_id = f"supplement_llm_{llm_name.replace(' ', '_')[:50]}"
+            
+            node_attrs = {
+                'node_type': 'supplement_llm_analysis',
+                'source': 'Supplement_Table',
+                'llm_name': llm_name,
+                'total_evaluations': len(llm_data['evaluations']),
+                'unique_analyses': len(llm_data['analyses']),
+                'unique_gene_sets': len(llm_data['gene_sets'])
+            }
+            
+            self.graph.add_node(llm_node_id, **node_attrs)
+            
+            # Connect evaluations to LLM analysis
+            for eval_id in llm_data['evaluations']:
+                if eval_id in evaluations:
+                    self.graph.add_edge(eval_id, llm_node_id,
+                                      relationship='analyzed_by_llm',
+                                      source='Supplement_Table')
+        
+        logger.info(f"Added {len(evaluations)} supplement evaluations and {len(llm_analyses)} LLM analyses")
     
     # ============= LLM_PROCESSED QUERY METHODS =============
     

@@ -1,0 +1,73 @@
+# REMAINING DATA FILES ANALYSIS REPORT
+==================================================
+
+## SUMMARY STATISTICS
+Total files analyzed: 10
+High-value files: 2
+Medium-value files: 5
+Low-value files: 3
+Files with duplication risk: 1
+Overall integration score: 34.00/100
+
+## HIGH-VALUE FILES (Score ≥ 50)
+### GO_BP_20231115.gmt (Score: 50)
+Reasons: Contains GO/gene set data, May duplicate existing GO_BP data, Significant data size, Good data quality
+⚠️  DUPLICATE RISK: May overlap with existing data
+Content: GO Gene Sets (GMT format)
+Size: 8.48 MB
+Structure: {'total_gene_sets': 11943, 'unique_go_terms': 5, 'unique_genes': 91, 'format': 'GO_TERM<tab>DESCRIPTION<tab>GENE1<tab>GENE2...'}
+
+### reference_evaluation.tsv (Score: 65)
+Reasons: Contains LLM evaluation data, Contains reference/citation data, Substantial data volume, Significant data size, Good data quality
+Content: Tabular Data (TSV)
+Size: 1.05 MB
+Structure: {'total_rows': 1817, 'total_columns': 7, 'columns': ['Reference', 'Paragraph', 'Comment', 'Title Supports', 'Abstract Supports', 'Data Set', 'Gene Set Name'], 'column_types': {'Reference': dtype('O'), 'Paragraph': dtype('O'), 'Comment': dtype('float64'), 'Title Supports': dtype('float64'), 'Abstract Supports': dtype('float64'), 'Data Set': dtype('O'), 'Gene Set Name': dtype('O')}}
+
+## MEDIUM-VALUE FILES (Score 25-49)
+### L1000_sep_count_DF.txt (Score: 45)
+Reasons: Contains expression/perturbation data, Substantial data volume, Good data quality
+Content: Structured Text Data (Tab-separated)
+Size: 0.33 MB
+
+### SupplementTable3_0715.tsv (Score: 30)
+Reasons: Substantial data volume, Significant data size, Good data quality
+Content: Tabular Data (TSV)
+Size: 2.99 MB
+
+### all_go_terms_embeddings_dict.pkl (Score: 45)
+Reasons: Contains embedding/vector data, Substantial data volume, Significant data size, Good data quality
+Content: Pickled Dictionary
+Size: 35.80 MB
+
+### go_terms.csv (Score: 30)
+Reasons: Substantial data volume, Significant data size, Good data quality
+Content: Tabular Data (CSV)
+Size: 8.54 MB
+
+### num_citations_per_paragraph.json (Score: 30)
+Reasons: Contains reference/citation data, Good data quality
+Content: JSON Array
+Size: 0.01 MB
+
+## INTEGRATION RECOMMENDATIONS
+### GO_BP_20231115.gmt
+**Action**: compare_then_integrate
+**Priority**: medium
+**Type**: go_gene_sets_comparison
+**Description**: Compare with existing GO_BP data, integrate if newer/more comprehensive
+**Expected nodes**: Additional GO terms, genes
+**Expected edges**: Additional gene-GO associations
+
+### L1000_sep_count_DF.txt
+**Action**: integrate
+**Priority**: medium
+**Type**: expression_data
+**Description**: Integrate L1000 expression data - provides perturbation-gene expression relationships
+**Expected nodes**: compounds, cell lines, experimental conditions
+**Expected edges**: perturbation-expression relationships
+
+## LOW-VALUE FILES (Score < 25)
+These files have limited integration value:
+- MarkedParagraphs.pickle (Score: 15)
+- NeST_table_All.csv (Score: 15)
+- supporting_gene_log.json (Score: 15)

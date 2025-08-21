@@ -1,0 +1,54 @@
+# DUPLICATION RISK ANALYSIS REPORT
+==================================================
+
+## EXISTING KNOWLEDGE GRAPH COVERAGE
+GO Namespaces: GO_BP, GO_CC, GO_MF
+Omics Data Types: 6 files
+Model Comparison Data: No
+LLM Processed Data: No
+GO Analysis Data: Yes
+
+## GO_BP GMT FILE OVERLAP ANALYSIS
+### Data Sizes
+Existing GO_BP data: 15770 terms, 11943 genes
+New GMT data: 11943 terms, 17023 genes
+
+### Overlap Statistics
+Overlapping GO terms: 9075 (76.0% of new data)
+Overlapping genes: 0 (0.0% of new data)
+Overlapping term-gene pairs: 0 (0.0% of new data)
+
+### New Value Assessment
+New GO terms: 2868 (24.0% of new data)
+New genes: 17023 (100.0% of new data)
+New term-gene pairs: 1349032 (100.0% of new data)
+
+### RECOMMENDATION: INTEGRATE
+The GMT file provides 100.0% new gene-term associations.
+This represents significant new value and should be integrated.
+
+## INTEGRATION RECOMMENDATIONS FOR REMAINING FILES
+### reference_evaluation.tsv
+**Risk Level**: LOW
+**Reason**: Literature evaluation data - complements existing gene-GO associations with citation context
+**Recommendation**: INTEGRATE - Adds new dimension of literature support
+
+### L1000_sep_count_DF.txt
+**Risk Level**: LOW
+**Reason**: Expression perturbation data - different from existing GO associations
+**Recommendation**: INTEGRATE - Adds experimental perturbation context
+
+### all_go_terms_embeddings_dict.pkl
+**Risk Level**: LOW
+**Reason**: Embedding vectors - computational representation of GO terms
+**Recommendation**: INTEGRATE - Enables similarity computations and ML applications
+
+### SupplementTable3_0715.tsv
+**Risk Level**: MEDIUM
+**Reason**: Large supplementary table - need to examine content for overlap
+**Recommendation**: EXAMINE FIRST - Check for overlap with existing LLM evaluation data
+
+### go_terms.csv
+**Risk Level**: HIGH
+**Reason**: GO terms data - likely overlaps with existing GO ontology data
+**Recommendation**: COMPARE FIRST - May duplicate existing GO term information
