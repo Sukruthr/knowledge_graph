@@ -39,6 +39,16 @@ except ImportError:
         CCMFBranchParser = None
         logger.warning("CCMFBranchParser not available")
 
+# Import LLM_processed parser
+try:
+    from .llm_processed_parser import LLMProcessedParser
+except ImportError:
+    try:
+        from llm_processed_parser import LLMProcessedParser
+    except ImportError:
+        LLMProcessedParser = None
+        logger.warning("LLMProcessedParser not available")
+
 
 class GODataParser:
     """Parser for Gene Ontology data (supports GO_BP, GO_CC, GO_MF)."""
@@ -1317,6 +1327,18 @@ class CombinedBiomedicalParser:
             else:
                 logger.info("No CC_MF_Branch data directory found")
         
+        # Initialize LLM_processed parser
+        llm_processed_dir = self.base_data_dir / "GO_term_analysis" / "LLM_processed"
+        if llm_processed_dir.exists() and LLMProcessedParser is not None:
+            self.llm_processed_parser = LLMProcessedParser(str(llm_processed_dir))
+            logger.info("Initialized LLM_processed parser")
+        else:
+            self.llm_processed_parser = None
+            if llm_processed_dir.exists():
+                logger.warning("LLM_processed data found but parser not available")
+            else:
+                logger.info("No LLM_processed data directory found")
+        
         self.parsed_data = {}
         
     def parse_all_biomedical_data(self) -> Dict[str, Dict]:
@@ -1365,6 +1387,12 @@ class CombinedBiomedicalParser:
             cc_mf_branch_data = self.cc_mf_branch_parser.parse_all_cc_mf_data()
             self.parsed_data['cc_mf_branch_data'] = cc_mf_branch_data
             logger.info("CC_MF_Branch data integrated successfully")
+        
+        # Parse LLM_processed data if available
+        if self.llm_processed_parser:
+            llm_processed_data = self.llm_processed_parser.parse_all_llm_processed_data()
+            self.parsed_data['llm_processed_data'] = llm_processed_data
+            logger.info("LLM_processed data integrated successfully")
         
         logger.info("Comprehensive biomedical data parsing complete")
         return self.parsed_data

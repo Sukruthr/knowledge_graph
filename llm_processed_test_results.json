@@ -1,0 +1,142 @@
+{
+  "performance": {
+    "load_time": 21.653088569641113,
+    "build_time": 20.055919647216797,
+    "total_time": 41.70900821685791
+  },
+  "tests": {
+    "basic_structure": {
+      "status": "PASS",
+      "nodes": 116100,
+      "edges": 3687395
+    },
+    "llm_processed_integration": {
+      "status": "PASS",
+      "llm_stats": {
+        "llm_interpretations": 1000,
+        "contamination_analyses": 88,
+        "similarity_rankings": 1011,
+        "similarity_pvalues": 1000,
+        "model_comparisons": 89,
+        "models_analyzed": 8,
+        "datasets_analyzed": 2,
+        "unique_go_terms": 1000,
+        "unique_genes": 7452
+      }
+    },
+    "interpretation_queries": {
+      "status": "PASS",
+      "all_interpretations_count": 1000,
+      "selected_interpretations_count": 1000,
+      "gpt4_interpretations_count": 1000
+    },
+    "contamination_queries": {
+      "status": "PASS",
+      "all_contamination_count": 88,
+      "gpt4_contamination_count": 11,
+      "gemini_contamination_count": 11
+    },
+    "ranking_queries": {
+      "status": "PASS",
+      "all_rankings_count": 1011,
+      "selected_rankings_count": 1000
+    },
+    "gene_llm_profile_queries": {
+      "status": "PASS",
+      "successful_profiles": 0,
+      "total_tested": 3
+    },
+    "cross_integration": {
+      "status": "PASS",
+      "detected_sources": [
+        "CC_MF_branch",
+        "NeST",
+        "L1000",
+        "LLM_processed",
+        "unknown",
+        "Viral_Infections"
+      ],
+      "stats": {
+        "total_nodes": 116100,
+        "total_edges": 3687395,
+        "node_counts": {
+          "go_term": 46228,
+          "gene": 38138,
+          "disease": 163,
+          "drug": 132,
+          "viral_condition": 280,
+          "network_cluster": 21374,
+          "study": 292,
+          "gene_set": 300,
+          "llm_model": 5,
+          "model_prediction": 1500,
+          "similarity_ranking": 3511,
+          "llm_interpretation": 3000,
+          "contamination_analysis": 88,
+          "similarity_pvalues": 1000,
+          "model_comparison": 89
+        },
+        "edge_counts": {
+          "go_hierarchy": 83444,
+          "gene_annotation": 635268,
+          "gene_viral_expression": 1633354,
+          "gene_disease_association": 128864,
+          "gene_drug_perturbation": 291407,
+          "gene_viral_response": 199616,
+          "gene_in_set": 10589,
+          "cluster_hierarchy": 39463,
+          "validated_by_go_term": 300,
+          "model_predicts": 1500,
+          "model_similarity_ranking": 500,
+          "predicts_go_term": 1500,
+          "prediction_uses_gene": 34630,
+          "similarity_evaluated_for": 500,
+          "gene_go_association": 596421,
+          "interprets_go_term": 2000,
+          "similarity_ranking_for": 2000,
+          "interprets": 1000,
+          "interprets_gene": 20299,
+          "contamination_analysis": 88,
+          "contamination_analysis_gene": 2552,
+          "similarity_ranking": 1011,
+          "similarity_pvalues": 1000,
+          "model_comparison": 89
+        },
+        "integration_metrics": {
+          "go_connected_genes": 38138,
+          "omics_connected_genes": 17509,
+          "integrated_genes": 17509,
+          "integration_ratio": 0.45909591483559703
+        }
+      }
+    },
+    "performance": {
+      "status": "PASS",
+      "total_build_time": 41.70900821685791,
+      "average_query_time": 0.015837383270263673
+    },
+    "regression": {
+      "status": "PASS",
+      "comprehensive_stats_available": true
+    },
+    "llm_data_quality": {
+      "status": "PASS",
+      "quality_metrics": {
+        "llm_interpretations": 1000,
+        "contamination_analyses": 88,
+        "similarity_rankings": 1011,
+        "similarity_pvalues": 1000,
+        "model_comparisons": 89,
+        "models_analyzed": 8,
+        "datasets_analyzed": 2,
+        "unique_go_terms": 1000,
+        "unique_genes": 7452
+      }
+    }
+  },
+  "summary": {
+    "total_tests": 10,
+    "passed_tests": 10,
+    "success_rate": 100.0
+  }
+}

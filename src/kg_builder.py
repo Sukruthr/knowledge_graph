@@ -1587,6 +1587,9 @@ class ComprehensiveBiomedicalKnowledgeGraph:
         # Add CC_MF_Branch data integration
         self._add_cc_mf_branch_data()
         
+        # Add LLM_processed data integration
+        self._add_llm_processed_data()
+        
         # Calculate comprehensive statistics
         self._calculate_comprehensive_stats()
         
@@ -2999,6 +3002,407 @@ class ComprehensiveBiomedicalKnowledgeGraph:
         stats['total_cc_mf_terms'] = stats['cc_go_terms'] + stats['mf_go_terms']
         stats['total_cc_mf_interpretations'] = stats['cc_interpretations'] + stats['mf_interpretations']
         stats['total_cc_mf_rankings'] = stats['cc_similarity_rankings'] + stats['mf_similarity_rankings']
+        
+        return stats
+    
+    # ============= LLM_PROCESSED DATA INTEGRATION METHODS =============
+    
+    def _add_llm_processed_data(self):
+        """Add LLM_processed data (multi-model interpretations, contamination analysis, similarity rankings) to the knowledge graph."""
+        logger.info("Adding LLM_processed data...")
+        
+        if 'llm_processed_data' not in self.parsed_data:
+            logger.info("No LLM_processed data available")
+            return
+        
+        llm_data = self.parsed_data['llm_processed_data']
+        
+        # Add main LLM interpretation nodes
+        self._add_llm_interpretation_nodes(llm_data)
+        
+        # Add contamination analysis nodes for multiple models
+        self._add_contamination_analysis_nodes(llm_data)
+        
+        # Add similarity ranking nodes
+        self._add_llm_similarity_ranking_nodes(llm_data)
+        
+        # Add similarity p-value nodes
+        self._add_similarity_pvalue_nodes(llm_data)
+        
+        # Add model comparison nodes
+        self._add_model_comparison_nodes(llm_data)
+        
+        # Connect LLM data to existing GO terms and genes
+        self._connect_llm_data_to_graph(llm_data)
+        
+        logger.info("LLM_processed data integration complete")
+    
+    def _add_llm_interpretation_nodes(self, llm_data):
+        """Add main LLM interpretation nodes to the graph."""
+        main_interpretations = llm_data.get('main_interpretations', {})
+        
+        for dataset_name, interpretations in main_interpretations.items():
+            for go_id, interp_data in interpretations.items():
+                # Create interpretation node
+                interp_id = f"llm_interp_{dataset_name}_{go_id}"
+                
+                node_attrs = {
+                    'node_type': 'llm_interpretation',
+                    'source': 'LLM_processed',
+                    'dataset': dataset_name,
+                    'go_term_id': go_id,
+                    'model': interp_data.get('model', 'gpt_4'),
+                    'llm_name': interp_data.get('llm_name', ''),
+                    'llm_analysis': interp_data.get('llm_analysis', ''),
+                    'llm_score': interp_data.get('llm_score', 0.0),
+                    'gene_count': interp_data.get('gene_count', 0),
+                    'term_description': interp_data.get('term_description', '')
+                }
+                
+                self.graph.add_node(interp_id, **node_attrs)
+                
+                # Connect to GO term if it exists
+                if go_id in self.graph.nodes:
+                    self.graph.add_edge(interp_id, go_id, 
+                                      edge_type='interprets',
+                                      source='LLM_processed',
+                                      model=node_attrs['model'])
+                
+                # Connect to genes if they exist
+                for gene_symbol in interp_data.get('genes', []):
+                    if gene_symbol in self.graph.nodes:
+                        self.graph.add_edge(interp_id, gene_symbol,
+                                          edge_type='interprets_gene',
+                                          source='LLM_processed',
+                                          model=node_attrs['model'])
+    
+    def _add_contamination_analysis_nodes(self, llm_data):
+        """Add contamination analysis nodes for multiple models to the graph."""
+        contamination_analysis = llm_data.get('contamination_analysis', {})
+        
+        for model_name, model_analysis in contamination_analysis.items():
+            for go_id, analysis_data in model_analysis.items():
+                # Create contamination analysis node for each model
+                contam_id = f"contam_analysis_{model_name}_{go_id}"
+                
+                node_attrs = {
+                    'node_type': 'contamination_analysis',
+                    'source': 'LLM_processed',
+                    'model': model_name,
+                    'go_term_id': go_id,
+                    'gene_count': analysis_data.get('gene_count', 0),
+                    'term_description': analysis_data.get('term_description', ''),
+                    'scenarios': len(analysis_data.get('scenarios', {}))
+                }
+                
+                # Add scenario-specific data
+                scenarios = analysis_data.get('scenarios', {})
+                for scenario, scenario_data in scenarios.items():
+                    node_attrs[f'{scenario}_name'] = scenario_data.get('name', '')
+                    node_attrs[f'{scenario}_score'] = scenario_data.get('score', 0.0)
+                    node_attrs[f'{scenario}_analysis'] = scenario_data.get('analysis', '')
+                
+                self.graph.add_node(contam_id, **node_attrs)
+                
+                # Connect to GO term if it exists
+                if go_id in self.graph.nodes:
+                    self.graph.add_edge(contam_id, go_id,
+                                      edge_type='contamination_analysis',
+                                      source='LLM_processed',
+                                      model=model_name)
+                
+                # Connect to genes
+                for gene_symbol in analysis_data.get('genes', []):
+                    if gene_symbol in self.graph.nodes:
+                        self.graph.add_edge(contam_id, gene_symbol,
+                                          edge_type='contamination_analysis_gene',
+                                          source='LLM_processed',
+                                          model=model_name)
+    
+    def _add_llm_similarity_ranking_nodes(self, llm_data):
+        """Add LLM similarity ranking nodes to the graph."""
+        similarity_rankings = llm_data.get('similarity_rankings', {})
+        
+        for dataset_name, rankings in similarity_rankings.items():
+            for go_id, ranking_data in rankings.items():
+                # Create similarity ranking node
+                ranking_id = f"sim_rank_{dataset_name}_{go_id}"
+                
+                node_attrs = {
+                    'node_type': 'similarity_ranking',
+                    'source': 'LLM_processed',
+                    'dataset': dataset_name,
+                    'go_term_id': go_id,
+                    'llm_name': ranking_data.get('llm_name', ''),
+                    'llm_score': ranking_data.get('llm_score', 0.0),
+                    'score_bin': ranking_data.get('score_bin', ''),
+                    'llm_go_similarity': ranking_data.get('llm_go_similarity', 0.0),
+                    'similarity_rank': ranking_data.get('similarity_rank', 0),
+                    'similarity_percentile': ranking_data.get('similarity_percentile', 0.0),
+                    'random_go_name': ranking_data.get('random_go_name', ''),
+                    'random_go_similarity': ranking_data.get('random_go_similarity', 0.0),
+                    'random_similarity_rank': ranking_data.get('random_similarity_rank', 0),
+                    'random_similarity_percentile': ranking_data.get('random_similarity_percentile', 0.0),
+                    'top_3_hits': str(ranking_data.get('top_3_hits', [])),
+                    'top_3_similarities': str(ranking_data.get('top_3_similarities', []))
+                }
+                
+                self.graph.add_node(ranking_id, **node_attrs)
+                
+                # Connect to GO term if it exists
+                if go_id in self.graph.nodes:
+                    self.graph.add_edge(ranking_id, go_id,
+                                      edge_type='similarity_ranking',
+                                      source='LLM_processed',
+                                      similarity_percentile=node_attrs['similarity_percentile'])
+    
+    def _add_similarity_pvalue_nodes(self, llm_data):
+        """Add similarity p-value nodes to the graph."""
+        similarity_pvalues = llm_data.get('similarity_pvalues', {})
+        
+        for go_id, pval_data in similarity_pvalues.items():
+            # Create p-value node
+            pval_id = f"sim_pval_{go_id}"
+            
+            node_attrs = {
+                'node_type': 'similarity_pvalues',
+                'source': 'LLM_processed',
+                'go_term_id': go_id,
+                'gene_count': pval_data.get('gene_count', 0),
+                'term_description': pval_data.get('term_description', '')
+            }
+            
+            # Add p-value data
+            pvalues = pval_data.get('pvalues', {})
+            for pval_key, pval_value in pvalues.items():
+                node_attrs[pval_key] = pval_value
+            
+            self.graph.add_node(pval_id, **node_attrs)
+            
+            # Connect to GO term if it exists
+            if go_id in self.graph.nodes:
+                self.graph.add_edge(pval_id, go_id,
+                                  edge_type='similarity_pvalues',
+                                  source='LLM_processed')
+    
+    def _add_model_comparison_nodes(self, llm_data):
+        """Add model comparison nodes to the graph."""
+        model_comparison = llm_data.get('model_comparison', {})
+        
+        for go_id, comp_data in model_comparison.items():
+            # Create model comparison node
+            comp_id = f"model_comp_{go_id}"
+            
+            node_attrs = {
+                'node_type': 'model_comparison',
+                'source': 'LLM_processed',
+                'go_term_id': go_id,
+                'gene_count': comp_data.get('gene_count', 0),
+                'term_description': comp_data.get('term_description', ''),
+                'contaminated_genes_50perc_count': len(comp_data.get('contaminated_genes_50perc', [])),
+                'contaminated_genes_100perc_count': len(comp_data.get('contaminated_genes_100perc', []))
+            }
+            
+            self.graph.add_node(comp_id, **node_attrs)
+            
+            # Connect to GO term if it exists
+            if go_id in self.graph.nodes:
+                self.graph.add_edge(comp_id, go_id,
+                                  edge_type='model_comparison',
+                                  source='LLM_processed')
+    
+    def _connect_llm_data_to_graph(self, llm_data):
+        """Create additional connections between LLM data and existing graph elements."""
+        # This method can be used for creating more complex relationships
+        # between LLM interpretations, contamination analysis, and existing nodes
+        logger.info("Creating additional LLM data connections...")
+        
+        # Count genes mentioned in LLM data
+        genes_in_llm = set()
+        for dataset in llm_data.get('main_interpretations', {}).values():
+            for interp in dataset.values():
+                genes_in_llm.update(interp.get('genes', []))
+        
+        logger.info(f"LLM data covers {len(genes_in_llm)} unique genes")
+    
+    # ============= LLM_PROCESSED QUERY METHODS =============
+    
+    def query_llm_interpretations(self, dataset: str = None, go_id: str = None, model: str = None) -> List[Dict]:
+        """Query LLM interpretations with optional filtering."""
+        results = []
+        
+        for node_id, attrs in self.graph.nodes(data=True):
+            if attrs.get('node_type') == 'llm_interpretation' and attrs.get('source') == 'LLM_processed':
+                # Apply filters
+                if dataset and attrs.get('dataset') != dataset:
+                    continue
+                if go_id and attrs.get('go_term_id') != go_id:
+                    continue
+                if model and attrs.get('model') != model:
+                    continue
+                
+                # Format result
+                result = {
+                    'interpretation_id': node_id,
+                    'dataset': attrs.get('dataset'),
+                    'go_term_id': attrs.get('go_term_id'),
+                    'model': attrs.get('model'),
+                    'llm_name': attrs.get('llm_name'),
+                    'llm_analysis': attrs.get('llm_analysis'),
+                    'llm_score': attrs.get('llm_score'),
+                    'gene_count': attrs.get('gene_count'),
+                    'term_description': attrs.get('term_description')
+                }
+                results.append(result)
+        
+        return results
+    
+    def query_contamination_analysis(self, model: str = None, go_id: str = None) -> List[Dict]:
+        """Query contamination analysis with optional filtering."""
+        results = []
+        
+        for node_id, attrs in self.graph.nodes(data=True):
+            if attrs.get('node_type') == 'contamination_analysis' and attrs.get('source') == 'LLM_processed':
+                # Apply filters
+                if model and attrs.get('model') != model:
+                    continue
+                if go_id and attrs.get('go_term_id') != go_id:
+                    continue
+                
+                # Format result
+                result = {
+                    'analysis_id': node_id,
+                    'model': attrs.get('model'),
+                    'go_term_id': attrs.get('go_term_id'),
+                    'gene_count': attrs.get('gene_count'),
+                    'term_description': attrs.get('term_description'),
+                    'scenarios': attrs.get('scenarios'),
+                    'default_score': attrs.get('default_score'),
+                    '50perc_contaminated_score': attrs.get('50perc_contaminated_score'),
+                    '100perc_contaminated_score': attrs.get('100perc_contaminated_score')
+                }
+                results.append(result)
+        
+        return results
+    
+    def query_llm_similarity_rankings(self, dataset: str = None, go_id: str = None) -> List[Dict]:
+        """Query LLM similarity rankings with optional filtering."""
+        results = []
+        
+        for node_id, attrs in self.graph.nodes(data=True):
+            if attrs.get('node_type') == 'similarity_ranking' and attrs.get('source') == 'LLM_processed':
+                # Apply filters
+                if dataset and attrs.get('dataset') != dataset:
+                    continue
+                if go_id and attrs.get('go_term_id') != go_id:
+                    continue
+                
+                # Format result
+                result = {
+                    'ranking_id': node_id,
+                    'dataset': attrs.get('dataset'),
+                    'go_term_id': attrs.get('go_term_id'),
+                    'llm_name': attrs.get('llm_name'),
+                    'llm_score': attrs.get('llm_score'),
+                    'similarity_rank': attrs.get('similarity_rank'),
+                    'similarity_percentile': attrs.get('similarity_percentile'),
+                    'random_similarity_percentile': attrs.get('random_similarity_percentile'),
+                    'top_3_hits': attrs.get('top_3_hits'),
+                    'top_3_similarities': attrs.get('top_3_similarities')
+                }
+                results.append(result)
+        
+        return results
+    
+    def query_gene_llm_profile(self, gene_symbol: str) -> Dict[str, Any]:
+        """Get comprehensive LLM profile for a specific gene."""
+        profile = {
+            'gene_symbol': gene_symbol,
+            'llm_interpretations': [],
+            'contamination_analyses': [],
+            'similarity_rankings': [],
+            'model_comparisons': []
+        }
+        
+        # Find all LLM data connected to this gene
+        if gene_symbol in self.graph.nodes:
+            for neighbor in self.graph.neighbors(gene_symbol):
+                neighbor_attrs = self.graph.nodes[neighbor]
+                neighbor_type = neighbor_attrs.get('node_type')
+                source = neighbor_attrs.get('source')
+                
+                if source == 'LLM_processed':
+                    if neighbor_type == 'llm_interpretation':
+                        profile['llm_interpretations'].append({
+                            'interpretation_id': neighbor,
+                            'dataset': neighbor_attrs.get('dataset'),
+                            'model': neighbor_attrs.get('model'),
+                            'llm_name': neighbor_attrs.get('llm_name'),
+                            'llm_score': neighbor_attrs.get('llm_score')
+                        })
+                    elif neighbor_type == 'contamination_analysis':
+                        profile['contamination_analyses'].append({
+                            'analysis_id': neighbor,
+                            'model': neighbor_attrs.get('model'),
+                            'default_score': neighbor_attrs.get('default_score'),
+                            '50perc_contaminated_score': neighbor_attrs.get('50perc_contaminated_score'),
+                            '100perc_contaminated_score': neighbor_attrs.get('100perc_contaminated_score')
+                        })
+        
+        return profile
+    
+    def get_llm_processed_stats(self) -> Dict[str, Any]:
+        """Get comprehensive statistics for LLM_processed data integration."""
+        stats = {
+            'llm_interpretations': 0,
+            'contamination_analyses': 0,
+            'similarity_rankings': 0,
+            'similarity_pvalues': 0,
+            'model_comparisons': 0,
+            'models_analyzed': set(),
+            'datasets_analyzed': set(),
+            'unique_go_terms': set(),
+            'unique_genes': set()
+        }
+        
+        for node_id, attrs in self.graph.nodes(data=True):
+            source = attrs.get('source')
+            node_type = attrs.get('node_type')
+            
+            if source == 'LLM_processed':
+                if node_type == 'llm_interpretation':
+                    stats['llm_interpretations'] += 1
+                    stats['datasets_analyzed'].add(attrs.get('dataset'))
+                    stats['models_analyzed'].add(attrs.get('model'))
+                    stats['unique_go_terms'].add(attrs.get('go_term_id'))
+                elif node_type == 'contamination_analysis':
+                    stats['contamination_analyses'] += 1
+                    stats['models_analyzed'].add(attrs.get('model'))
+                    stats['unique_go_terms'].add(attrs.get('go_term_id'))
+                elif node_type == 'similarity_ranking':
+                    stats['similarity_rankings'] += 1
+                    stats['datasets_analyzed'].add(attrs.get('dataset'))
+                    stats['unique_go_terms'].add(attrs.get('go_term_id'))
+                elif node_type == 'similarity_pvalues':
+                    stats['similarity_pvalues'] += 1
+                    stats['unique_go_terms'].add(attrs.get('go_term_id'))
+                elif node_type == 'model_comparison':
+                    stats['model_comparisons'] += 1
+                    stats['unique_go_terms'].add(attrs.get('go_term_id'))
+        
+        # Count edges to genes
+        for u, v, edge_attrs in self.graph.edges(data=True):
+            if (edge_attrs.get('source') == 'LLM_processed' and 
+                'gene' in edge_attrs.get('edge_type', '')):
+                # v should be the gene
+                if self.graph.nodes[v].get('node_type') == 'gene':
+                    stats['unique_genes'].add(v)
+        
+        # Convert sets to counts
+        stats['models_analyzed'] = len(stats['models_analyzed'])
+        stats['datasets_analyzed'] = len(stats['datasets_analyzed'])
+        stats['unique_go_terms'] = len(stats['unique_go_terms'])
+        stats['unique_genes'] = len(stats['unique_genes'])
         
         return stats
     
