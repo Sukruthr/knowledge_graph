@@ -1596,6 +1596,9 @@ class ComprehensiveBiomedicalKnowledgeGraph:
         # Add Remaining Data integration
         self._add_remaining_data()
         
+        # Add Talisman Gene Sets integration
+        self._add_talisman_gene_sets()
+        
         # Calculate comprehensive statistics
         self._calculate_comprehensive_stats()
         
@@ -3513,6 +3516,281 @@ class ComprehensiveBiomedicalKnowledgeGraph:
         self._add_supplement_table_data(remaining_data.get('supplement_table_data', {}))
         
         logger.info("Remaining data integration complete")
+    
+    def _add_talisman_gene_sets(self):
+        """Add talisman gene sets integration (HALLMARK, bicluster, pathways, GO custom, disease sets)."""
+        
+        if 'talisman_gene_sets' not in self.parsed_data:
+            logger.info("No talisman gene sets available for integration")
+            return
+        
+        logger.info("Adding talisman gene sets integration...")
+        talisman_data = self.parsed_data['talisman_gene_sets']
+        
+        # Add HALLMARK gene sets
+        self._add_hallmark_gene_sets(talisman_data.get('hallmark_sets', {}))
+        
+        # Add bicluster gene sets
+        self._add_bicluster_gene_sets(talisman_data.get('bicluster_sets', {}))
+        
+        # Add pathway gene sets
+        self._add_pathway_gene_sets(talisman_data.get('pathway_sets', {}))
+        
+        # Add GO custom gene sets
+        self._add_go_custom_gene_sets(talisman_data.get('go_custom_sets', {}))
+        
+        # Add disease gene sets
+        self._add_disease_gene_sets(talisman_data.get('disease_sets', {}))
+        
+        # Add other gene sets
+        self._add_other_gene_sets(talisman_data.get('other_sets', {}))
+        
+        logger.info("Talisman gene sets integration complete")
+    
+    def _add_hallmark_gene_sets(self, hallmark_sets):
+        """Add HALLMARK pathway gene sets to the knowledge graph."""
+        if not hallmark_sets:
+            logger.info("No HALLMARK gene sets to add")
+            return
+        
+        logger.info(f"Adding {len(hallmark_sets)} HALLMARK gene sets...")
+        
+        for gene_set_id, gene_set_data in hallmark_sets.items():
+            # Create HALLMARK gene set node
+            node_id = f"hallmark_{gene_set_id}"
+            self.graph.add_node(node_id,
+                node_type='hallmark_gene_set',
+                gene_set_id=gene_set_id,
+                name=gene_set_data['name'],
+                description=gene_set_data.get('description', ''),
+                gene_count=gene_set_data['gene_count'],
+                source='talisman_hallmark',
+                systematic_name=gene_set_data['metadata'].get('systematic_name'),
+                pmid=gene_set_data['metadata'].get('pmid'),
+                collection=gene_set_data['metadata'].get('collection'),
+                msigdb_url=gene_set_data['metadata'].get('msigdb_url')
+            )
+            
+            # Add gene associations
+            for gene_symbol in gene_set_data['genes']:
+                gene_node_id = f"gene_{gene_symbol}"
+                
+                # Ensure gene node exists
+                if gene_node_id not in self.graph:
+                    self._add_gene_node_if_missing(gene_symbol, 'talisman_hallmark')
+                
+                # Add association edge
+                self.graph.add_edge(gene_node_id, node_id,
+                    relationship='member_of_hallmark_pathway',
+                    source='talisman_hallmark',
+                    pathway_type='hallmark',
+                    evidence='literature_curated'
+                )
+        
+        logger.info(f"Added {len(hallmark_sets)} HALLMARK gene sets")
+    
+    def _add_bicluster_gene_sets(self, bicluster_sets):
+        """Add bicluster gene sets to the knowledge graph."""
+        if not bicluster_sets:
+            logger.info("No bicluster gene sets to add")
+            return
+        
+        logger.info(f"Adding {len(bicluster_sets)} bicluster gene sets...")
+        
+        for gene_set_id, gene_set_data in bicluster_sets.items():
+            # Create bicluster gene set node
+            node_id = f"bicluster_{gene_set_id}"
+            self.graph.add_node(node_id,
+                node_type='bicluster_gene_set',
+                gene_set_id=gene_set_id,
+                name=gene_set_data['name'],
+                description=gene_set_data.get('description', ''),
+                gene_count=gene_set_data['gene_count'],
+                source='talisman_bicluster'
+            )
+            
+            # Add gene associations
+            for gene_symbol in gene_set_data['genes']:
+                gene_node_id = f"gene_{gene_symbol}"
+                
+                # Ensure gene node exists
+                if gene_node_id not in self.graph:
+                    self._add_gene_node_if_missing(gene_symbol, 'talisman_bicluster')
+                
+                # Add association edge
+                self.graph.add_edge(gene_node_id, node_id,
+                    relationship='member_of_bicluster',
+                    source='talisman_bicluster',
+                    cluster_type='expression_based',
+                    evidence='computational'
+                )
+        
+        logger.info(f"Added {len(bicluster_sets)} bicluster gene sets")
+    
+    def _add_pathway_gene_sets(self, pathway_sets):
+        """Add custom pathway gene sets to the knowledge graph."""
+        if not pathway_sets:
+            logger.info("No pathway gene sets to add")
+            return
+        
+        logger.info(f"Adding {len(pathway_sets)} pathway gene sets...")
+        
+        for gene_set_id, gene_set_data in pathway_sets.items():
+            # Create pathway gene set node
+            node_id = f"pathway_{gene_set_id}"
+            self.graph.add_node(node_id,
+                node_type='custom_pathway_gene_set',
+                gene_set_id=gene_set_id,
+                name=gene_set_data['name'],
+                description=gene_set_data.get('description', ''),
+                gene_count=gene_set_data['gene_count'],
+                source='talisman_pathway'
+            )
+            
+            # Add gene associations
+            for gene_symbol in gene_set_data['genes']:
+                gene_node_id = f"gene_{gene_symbol}"
+                
+                # Ensure gene node exists
+                if gene_node_id not in self.graph:
+                    self._add_gene_node_if_missing(gene_symbol, 'talisman_pathway')
+                
+                # Add association edge
+                self.graph.add_edge(gene_node_id, node_id,
+                    relationship='member_of_custom_pathway',
+                    source='talisman_pathway',
+                    pathway_type='custom',
+                    evidence='literature_derived'
+                )
+        
+        logger.info(f"Added {len(pathway_sets)} pathway gene sets")
+    
+    def _add_go_custom_gene_sets(self, go_custom_sets):
+        """Add GO custom gene sets to the knowledge graph."""
+        if not go_custom_sets:
+            logger.info("No GO custom gene sets to add")
+            return
+        
+        logger.info(f"Adding {len(go_custom_sets)} GO custom gene sets...")
+        
+        for gene_set_id, gene_set_data in go_custom_sets.items():
+            # Create GO custom gene set node
+            node_id = f"go_custom_{gene_set_id}"
+            self.graph.add_node(node_id,
+                node_type='go_custom_gene_set',
+                gene_set_id=gene_set_id,
+                name=gene_set_data['name'],
+                description=gene_set_data.get('description', ''),
+                gene_count=gene_set_data['gene_count'],
+                source='talisman_go_custom'
+            )
+            
+            # Add gene associations
+            for gene_symbol in gene_set_data['genes']:
+                gene_node_id = f"gene_{gene_symbol}"
+                
+                # Ensure gene node exists
+                if gene_node_id not in self.graph:
+                    self._add_gene_node_if_missing(gene_symbol, 'talisman_go_custom')
+                
+                # Add association edge
+                self.graph.add_edge(gene_node_id, node_id,
+                    relationship='member_of_go_custom_set',
+                    source='talisman_go_custom',
+                    set_type='go_derived',
+                    evidence='ontology_based'
+                )
+        
+        logger.info(f"Added {len(go_custom_sets)} GO custom gene sets")
+    
+    def _add_disease_gene_sets(self, disease_sets):
+        """Add disease-specific gene sets to the knowledge graph."""
+        if not disease_sets:
+            logger.info("No disease gene sets to add")
+            return
+        
+        logger.info(f"Adding {len(disease_sets)} disease gene sets...")
+        
+        for gene_set_id, gene_set_data in disease_sets.items():
+            # Create disease gene set node
+            node_id = f"disease_{gene_set_id}"
+            self.graph.add_node(node_id,
+                node_type='disease_gene_set',
+                gene_set_id=gene_set_id,
+                name=gene_set_data['name'],
+                description=gene_set_data.get('description', ''),
+                gene_count=gene_set_data['gene_count'],
+                source='talisman_disease'
+            )
+            
+            # Add gene associations
+            for gene_symbol in gene_set_data['genes']:
+                gene_node_id = f"gene_{gene_symbol}"
+                
+                # Ensure gene node exists
+                if gene_node_id not in self.graph:
+                    self._add_gene_node_if_missing(gene_symbol, 'talisman_disease')
+                
+                # Add association edge
+                self.graph.add_edge(gene_node_id, node_id,
+                    relationship='associated_with_disease_set',
+                    source='talisman_disease',
+                    association_type='disease_related',
+                    evidence='literature_curated'
+                )
+        
+        logger.info(f"Added {len(disease_sets)} disease gene sets")
+    
+    def _add_other_gene_sets(self, other_sets):
+        """Add other specialized gene sets to the knowledge graph."""
+        if not other_sets:
+            logger.info("No other gene sets to add")
+            return
+        
+        logger.info(f"Adding {len(other_sets)} other gene sets...")
+        
+        for gene_set_id, gene_set_data in other_sets.items():
+            # Create other gene set node
+            node_id = f"other_{gene_set_id}"
+            self.graph.add_node(node_id,
+                node_type='specialized_gene_set',
+                gene_set_id=gene_set_id,
+                name=gene_set_data['name'],
+                description=gene_set_data.get('description', ''),
+                gene_count=gene_set_data['gene_count'],
+                source='talisman_other'
+            )
+            
+            # Add gene associations
+            for gene_symbol in gene_set_data['genes']:
+                gene_node_id = f"gene_{gene_symbol}"
+                
+                # Ensure gene node exists
+                if gene_node_id not in self.graph:
+                    self._add_gene_node_if_missing(gene_symbol, 'talisman_other')
+                
+                # Add association edge
+                self.graph.add_edge(gene_node_id, node_id,
+                    relationship='member_of_specialized_set',
+                    source='talisman_other',
+                    set_type='specialized',
+                    evidence='curated'
+                )
+        
+        logger.info(f"Added {len(other_sets)} other gene sets")
+    
+    def _add_gene_node_if_missing(self, gene_symbol, source):
+        """Add a gene node if it doesn't exist in the graph."""
+        gene_node_id = f"gene_{gene_symbol}"
+        
+        if gene_node_id not in self.graph:
+            self.graph.add_node(gene_node_id,
+                node_type='gene',
+                gene_symbol=gene_symbol,
+                source=source,
+                name=gene_symbol,
+                added_from_talisman=True
+            )
     
     def _add_gmt_data(self, gmt_data):
         """Add GMT file data (GO gene sets) to the knowledge graph."""

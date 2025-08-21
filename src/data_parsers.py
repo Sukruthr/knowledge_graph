@@ -69,6 +69,16 @@ except ImportError:
         RemainingDataParser = None
         logger.warning("RemainingDataParser not available")
 
+# Import Talisman Gene Sets parser
+try:
+    from .talisman_gene_sets_parser import TalismanGeneSetsParser
+except ImportError:
+    try:
+        from talisman_gene_sets_parser import TalismanGeneSetsParser
+    except ImportError:
+        TalismanGeneSetsParser = None
+        logger.warning("TalismanGeneSetsParser not available")
+
 
 class GODataParser:
     """Parser for Gene Ontology data (supports GO_BP, GO_CC, GO_MF)."""
@@ -1383,6 +1393,29 @@ class CombinedBiomedicalParser:
             else:
                 logger.info("No Remaining Data directory found")
         
+        # Initialize Talisman Gene Sets parser
+        # Try multiple possible locations for talisman data
+        possible_talisman_dirs = [
+            self.base_data_dir / "talisman-paper" / "genesets" / "human",
+            Path("talisman-paper") / "genesets" / "human"
+        ]
+        
+        talisman_dir = None
+        for candidate_dir in possible_talisman_dirs:
+            if candidate_dir.exists():
+                talisman_dir = candidate_dir
+                break
+        
+        if talisman_dir and TalismanGeneSetsParser is not None:
+            self.talisman_gene_sets_parser = TalismanGeneSetsParser(str(talisman_dir))
+            logger.info(f"Initialized Talisman Gene Sets parser with directory: {talisman_dir}")
+        else:
+            self.talisman_gene_sets_parser = None
+            if talisman_dir:
+                logger.warning("Talisman Gene Sets found but parser not available")
+            else:
+                logger.info("No Talisman Gene Sets directory found in expected locations")
+        
         self.parsed_data = {}
         
     def parse_all_biomedical_data(self) -> Dict[str, Dict]:
@@ -1449,6 +1482,12 @@ class CombinedBiomedicalParser:
             remaining_data = self.remaining_data_parser.parse_all_remaining_data()
             self.parsed_data['remaining_data'] = remaining_data
             logger.info("Remaining Data integrated successfully")
+        
+        # Parse Talisman Gene Sets if available
+        if self.talisman_gene_sets_parser:
+            talisman_data = self.talisman_gene_sets_parser.parse_all_gene_sets()
+            self.parsed_data['talisman_gene_sets'] = talisman_data
+            logger.info("Talisman Gene Sets integrated successfully")
         
         logger.info("Comprehensive biomedical data parsing complete")
         return self.parsed_data
