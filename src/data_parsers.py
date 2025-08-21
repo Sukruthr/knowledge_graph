@@ -29,6 +29,16 @@ except ImportError:
         ModelCompareParser = None
         logger.warning("ModelCompareParser not available")
 
+# Import CC_MF_Branch parser  
+try:
+    from .cc_mf_branch_parser import CCMFBranchParser
+except ImportError:
+    try:
+        from cc_mf_branch_parser import CCMFBranchParser
+    except ImportError:
+        CCMFBranchParser = None
+        logger.warning("CCMFBranchParser not available")
+
 
 class GODataParser:
     """Parser for Gene Ontology data (supports GO_BP, GO_CC, GO_MF)."""
@@ -1295,6 +1305,18 @@ class CombinedBiomedicalParser:
             else:
                 logger.info("No model comparison data directory found")
         
+        # Initialize CC_MF_Branch parser
+        cc_mf_branch_dir = self.base_data_dir / "GO_term_analysis" / "CC_MF_branch"
+        if cc_mf_branch_dir.exists() and CCMFBranchParser is not None:
+            self.cc_mf_branch_parser = CCMFBranchParser(str(self.base_data_dir))
+            logger.info("Initialized CC_MF_Branch parser")
+        else:
+            self.cc_mf_branch_parser = None
+            if cc_mf_branch_dir.exists():
+                logger.warning("CC_MF_Branch data found but parser not available")
+            else:
+                logger.info("No CC_MF_Branch data directory found")
+        
         self.parsed_data = {}
         
     def parse_all_biomedical_data(self) -> Dict[str, Dict]:
@@ -1338,6 +1360,12 @@ class CombinedBiomedicalParser:
             self.parsed_data['model_compare_data'] = model_compare_data
             logger.info("Model comparison data integrated successfully")
         
+        # Parse CC_MF_Branch data if available
+        if self.cc_mf_branch_parser:
+            cc_mf_branch_data = self.cc_mf_branch_parser.parse_all_cc_mf_data()
+            self.parsed_data['cc_mf_branch_data'] = cc_mf_branch_data
+            logger.info("CC_MF_Branch data integrated successfully")
+        
         logger.info("Comprehensive biomedical data parsing complete")
         return self.parsed_data
     
@@ -1364,6 +1392,16 @@ class CombinedBiomedicalParser:
         if 'omics_data' in self.parsed_data and self.omics_parser:
             summary['data_sources'].append('Omics_associations')
             summary['omics_summary'] = self.omics_parser.get_omics_summary()
+        
+        # Model comparison summary
+        if 'model_compare_data' in self.parsed_data and self.model_compare_parser:
+            summary['data_sources'].append('Model_comparison')
+            summary['model_compare_summary'] = self.model_compare_parser.get_stats()
+        
+        # CC_MF_Branch summary  
+        if 'cc_mf_branch_data' in self.parsed_data and self.cc_mf_branch_parser:
+            summary['data_sources'].append('CC_MF_Branch')
+            summary['cc_mf_branch_summary'] = self.cc_mf_branch_parser.get_stats()
         
         # Integration statistics
         if 'go_data' in self.parsed_data and 'omics_data' in self.parsed_data:

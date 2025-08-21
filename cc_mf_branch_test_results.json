@@ -1,0 +1,119 @@
+{
+  "performance": {
+    "load_time": 20.99839425086975,
+    "build_time": 20.024460792541504,
+    "total_time": 41.022855043411255
+  },
+  "tests": {
+    "basic_structure": {
+      "status": "PASS",
+      "nodes": 112912,
+      "edges": 3661356
+    },
+    "cc_mf_integration": {
+      "status": "PASS",
+      "cc_mf_stats": {
+        "cc_go_terms": 1677,
+        "mf_go_terms": 3399,
+        "cc_interpretations": 1000,
+        "mf_interpretations": 1000,
+        "cc_similarity_rankings": 1000,
+        "mf_similarity_rankings": 1000,
+        "cc_mf_gene_associations": 596421,
+        "unique_cc_mf_genes": 18532,
+        "total_cc_mf_terms": 5076,
+        "total_cc_mf_interpretations": 2000,
+        "total_cc_mf_rankings": 2000
+      }
+    },
+    "term_queries": {
+      "status": "PASS",
+      "cc_terms_count": 1677,
+      "mf_terms_count": 3399,
+      "total_terms_count": 5076
+    },
+    "interpretation_queries": {
+      "status": "PASS",
+      "cc_interpretations_count": 1000,
+      "mf_interpretations_count": 1000,
+      "total_interpretations_count": 2000
+    },
+    "ranking_queries": {
+      "status": "PASS",
+      "cc_rankings_count": 1000,
+      "mf_rankings_count": 1000
+    },
+    "gene_profile_queries": {
+      "status": "PASS",
+      "successful_profiles": 3,
+      "total_tested": 3
+    },
+    "cross_integration": {
+      "status": "PASS",
+      "detected_sources": [
+        "CC_MF_branch",
+        "L1000",
+        "Viral_Infections",
+        "NeST",
+        "unknown"
+      ],
+      "stats": {
+        "total_nodes": 112912,
+        "total_edges": 3661356,
+        "node_counts": {
+          "go_term": 46228,
+          "gene": 38138,
+          "disease": 163,
+          "drug": 132,
+          "viral_condition": 280,
+          "network_cluster": 21374,
+          "study": 292,
+          "gene_set": 300,
+          "llm_model": 5,
+          "model_prediction": 1500,
+          "similarity_ranking": 2500,
+          "llm_interpretation": 2000
+        },
+        "edge_counts": {
+          "go_hierarchy": 83444,
+          "gene_annotation": 635268,
+          "gene_viral_expression": 1633354,
+          "gene_disease_association": 128864,
+          "gene_drug_perturbation": 291407,
+          "gene_viral_response": 199616,
+          "gene_in_set": 10589,
+          "cluster_hierarchy": 39463,
+          "validated_by_go_term": 300,
+          "model_predicts": 1500,
+          "model_similarity_ranking": 500,
+          "predicts_go_term": 1500,
+          "prediction_uses_gene": 34630,
+          "similarity_evaluated_for": 500,
+          "gene_go_association": 596421,
+          "interprets_go_term": 2000,
+          "similarity_ranking_for": 2000
+        },
+        "integration_metrics": {
+          "go_connected_genes": 38138,
+          "omics_connected_genes": 17509,
+          "integrated_genes": 17509,
+          "integration_ratio": 0.45909591483559703
+        }
+      }
+    },
+    "performance": {
+      "status": "PASS",
+      "total_build_time": 41.022855043411255,
+      "average_query_time": 0.019820046424865723
+    },
+    "regression": {
+      "status": "PASS",
+      "comprehensive_stats_available": true
+    }
+  },
+  "summary": {
+    "total_tests": 9,
+    "passed_tests": 9,
+    "success_rate": 100.0
+  }
+}

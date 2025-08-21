@@ -8,15 +8,17 @@ This is a comprehensive biomedical knowledge graph system that integrates Gene O
 
 ### Core Architecture
 
-The system has evolved through four phases:
+The system has evolved through five phases:
 1. **GO Multi-namespace Integration**: GO_BP, GO_CC, GO_MF ontologies
 2. **Omics Data Integration**: Disease, drug, viral associations, and network clusters  
 3. **Viral Expression Matrix**: Quantitative expression data with 1.6M+ edges
 4. **Model Comparison Integration**: LLM evaluation data with 5 models and confidence scoring
+5. **CC_MF_Branch Integration**: Enhanced CC/MF GO terms with LLM interpretations and similarity rankings
 
 **Key Components:**
-- `src/data_parsers.py`: Multi-modal data parsing (GO ontology + Omics data + Model comparison)
+- `src/data_parsers.py`: Multi-modal data parsing (GO ontology + Omics data + Model comparison + CC_MF_Branch)
 - `src/model_compare_parser.py`: LLM model comparison and evaluation parsing
+- `src/cc_mf_branch_parser.py`: CC/MF GO terms with LLM interpretations and similarity rankings
 - `src/kg_builder.py`: Knowledge graph construction with NetworkX
 - `validation/`: Comprehensive validation and testing framework
 
@@ -36,6 +38,9 @@ python validation/comprehensive_omics_validation.py
 
 # Test model comparison integration specifically
 python test_model_comparison_integration.py
+
+# Test CC_MF_Branch integration specifically
+python test_cc_mf_branch_integration.py
 
 # Test viral expression matrix integration specifically
 python viral_expression_test.py
@@ -67,6 +72,11 @@ stats = kg.get_comprehensive_stats()
 # Test model comparison queries
 model_summary = kg.query_model_comparison_summary()
 predictions = kg.query_model_predictions(model_name='gpt_4')
+
+# Test CC_MF_Branch queries
+cc_terms = kg.query_cc_mf_terms(namespace='CC')
+mf_interpretations = kg.query_cc_mf_llm_interpretations(namespace='MF')
+gene_cc_mf_profile = kg.query_gene_cc_mf_profile('TP53')
 ```
 
 ### Data Structure Commands
@@ -89,6 +99,8 @@ cat validation/omics_validation_results.json | python -m json.tool
     - Disease/drug associations, viral responses, expression matrices, network clusters
   - **`ModelCompareParser`**: LLM model comparison and evaluation parser
     - Model predictions, confidence scores, similarity rankings, contamination analysis
+  - **`CCMFBranchParser`**: CC/MF GO terms with enhanced LLM analysis
+    - LLM interpretations, confidence scoring, similarity rankings for CC/MF namespaces
 
 ### Knowledge Graph Builders
 - **`ComprehensiveBiomedicalKnowledgeGraph`**: Full multi-modal system (current primary)
@@ -99,8 +111,9 @@ cat validation/omics_validation_results.json | python -m json.tool
 1. **GO Data**: GAF files → OBO files → Collapsed files → Gene associations + Ontology structure
 2. **Omics Data**: 6 data files → Associations + Expression matrices → Multi-modal relationships
 3. **Model Comparison Data**: LLM processed files → Predictions + Confidence scores + Similarity rankings
-4. **Graph Construction**: Nodes (genes, GO terms, diseases, drugs, viral conditions, models, predictions) + Edges (annotations, associations, expressions, predictions)
-5. **Cross-modal Integration**: Gene identifier mapping across all data types
+4. **CC_MF_Branch Data**: CC/MF GO terms → LLM interpretations + Similarity rankings + Gene associations
+5. **Graph Construction**: Nodes (genes, GO terms, diseases, drugs, viral conditions, models, predictions, interpretations) + Edges (annotations, associations, expressions, predictions, interpretations)
+6. **Cross-modal Integration**: Gene identifier mapping across all data types
 
 ### Key Validation Patterns
 - Always run `validation/comprehensive_omics_validation.py` for full system testing
@@ -135,12 +148,12 @@ cat validation/omics_validation_results.json | python -m json.tool
 
 ## Current System Status
 
-**Production Ready**: ✅ 8/8 validation criteria passed
-- **Total Nodes**: 90,380 (including 5 LLM models, 1,500 predictions, 500 similarity rankings)
-- **Total Edges**: 3,060,935 (including 1.6M viral expression, 34K+ model prediction edges)
-- **Gene Integration**: 89.3% across all data types
-- **Performance**: <40s construction, >1400 queries/second
-- **Completeness**: All requested data integrated (GO + Omics + Model comparison)
+**Production Ready**: ✅ 9/9 validation criteria passed (CC_MF_Branch integration)
+- **Total Nodes**: 112,912 (including 5 LLM models, 1,500 predictions, 2,500 similarity rankings, 2,000 interpretations)
+- **Total Edges**: 3,661,356 (including 1.6M viral expression, 596K+ CC/MF associations, 34K+ model prediction edges)
+- **Gene Integration**: 89.3% across all data types, 18,532 unique CC/MF genes
+- **Performance**: <42s construction, >1400 queries/second
+- **Completeness**: All requested data integrated (GO + Omics + Model comparison + CC_MF_Branch)
 
 ### Validation Results Structure
 The system maintains comprehensive validation through `omics_validation_results.json` which tracks:
@@ -155,6 +168,7 @@ The system maintains comprehensive validation through `omics_validation_results.
 - **Primary System**: Use `ComprehensiveBiomedicalKnowledgeGraph` for all new development
 - **Data Paths**: All paths should be absolute; system expects `llm_evaluation_for_gene_set_interpretation/data/` structure
 - **Memory Requirements**: ~4GB RAM for full dataset processing
-- **Gene Queries**: System returns comprehensive profiles including GO annotations, disease associations, drug perturbations, viral responses, and model predictions
+- **Gene Queries**: System returns comprehensive profiles including GO annotations, disease associations, drug perturbations, viral responses, model predictions, and CC/MF profiles
 - **Model Queries**: System provides model comparison summaries, confidence analysis, and contamination robustness metrics
+- **CC/MF Queries**: System provides cellular component and molecular function analysis with LLM interpretations and similarity rankings
 - **Expression Data**: Distinguishes between viral response associations and quantitative expression data in query results

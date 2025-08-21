@@ -6,7 +6,7 @@ or Neo4j (for persistent storage and complex queries).
 """
 
 import networkx as nx
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 import logging
 from pathlib import Path
 import json
@@ -1584,6 +1584,9 @@ class ComprehensiveBiomedicalKnowledgeGraph:
         # Add model comparison data integration
         self._add_model_comparison_data()
         
+        # Add CC_MF_Branch data integration
+        self._add_cc_mf_branch_data()
+        
         # Calculate comprehensive statistics
         self._calculate_comprehensive_stats()
         
@@ -2236,6 +2239,264 @@ class ComprehensiveBiomedicalKnowledgeGraph:
         
         logger.info("Added contamination analysis results")
     
+    def _add_cc_mf_branch_data(self):
+        """Add CC_MF_Branch data (CC and MF GO terms with LLM interpretations) to the knowledge graph."""
+        logger.info("Adding CC_MF_Branch data...")
+        
+        if 'cc_mf_branch_data' not in self.parsed_data:
+            logger.info("No CC_MF_Branch data available")
+            return
+        
+        cc_mf_data = self.parsed_data['cc_mf_branch_data']
+        
+        # Add CC and MF GO term nodes
+        self._add_cc_mf_go_term_nodes(cc_mf_data)
+        
+        # Add gene-GO term associations for CC and MF
+        self._add_cc_mf_gene_associations(cc_mf_data)
+        
+        # Add LLM interpretations and confidence scores
+        self._add_cc_mf_llm_interpretations(cc_mf_data)
+        
+        # Add similarity rankings for CC and MF terms
+        self._add_cc_mf_similarity_rankings(cc_mf_data)
+        
+        logger.info("CC_MF_Branch data integration complete")
+    
+    def _add_cc_mf_go_term_nodes(self, cc_mf_data):
+        """Add CC and MF GO term nodes to the graph."""
+        cc_terms = cc_mf_data.get('cc_go_terms', {})
+        mf_terms = cc_mf_data.get('mf_go_terms', {})
+        
+        # Add CC GO terms
+        for go_id, term_data in cc_terms.items():
+            node_attrs = {
+                'node_type': 'go_term',
+                'name': term_data.get('term_description', ''),
+                'namespace': 'CC',
+                'description': term_data.get('term_description', ''),
+                'gene_count': term_data.get('gene_count', 0),
+                'source': 'CC_MF_branch'
+            }
+            self.graph.add_node(go_id, **node_attrs)
+        
+        # Add MF GO terms  
+        for go_id, term_data in mf_terms.items():
+            node_attrs = {
+                'node_type': 'go_term',
+                'name': term_data.get('term_description', ''),
+                'namespace': 'MF',
+                'description': term_data.get('term_description', ''),
+                'gene_count': term_data.get('gene_count', 0),
+                'source': 'CC_MF_branch'
+            }
+            self.graph.add_node(go_id, **node_attrs)
+        
+        logger.info(f"Added {len(cc_terms)} CC and {len(mf_terms)} MF GO terms")
+    
+    def _add_cc_mf_gene_associations(self, cc_mf_data):
+        """Add gene-GO term associations for CC and MF terms."""
+        cc_terms = cc_mf_data.get('cc_go_terms', {})
+        mf_terms = cc_mf_data.get('mf_go_terms', {})
+        
+        gene_association_count = 0
+        
+        # Process CC terms
+        for go_id, term_data in cc_terms.items():
+            genes = term_data.get('genes', [])
+            for gene_symbol in genes:
+                # Ensure gene node exists
+                gene_node_id = f"GENE:{gene_symbol}"
+                if gene_node_id not in self.graph:
+                    self.graph.add_node(gene_node_id, 
+                                      node_type='gene',
+                                      gene_symbol=gene_symbol,
+                                      entity_type='gene')
+                
+                # Add association edge
+                self.graph.add_edge(
+                    gene_node_id,
+                    go_id,
+                    edge_type='gene_go_association',
+                    namespace='CC',
+                    association_type='annotated_to',
+                    source='CC_MF_branch'
+                )
+                gene_association_count += 1
+        
+        # Process MF terms
+        for go_id, term_data in mf_terms.items():
+            genes = term_data.get('genes', [])
+            for gene_symbol in genes:
+                # Ensure gene node exists
+                gene_node_id = f"GENE:{gene_symbol}"
+                if gene_node_id not in self.graph:
+                    self.graph.add_node(gene_node_id,
+                                      node_type='gene', 
+                                      gene_symbol=gene_symbol,
+                                      entity_type='gene')
+                
+                # Add association edge
+                self.graph.add_edge(
+                    gene_node_id,
+                    go_id,
+                    edge_type='gene_go_association',
+                    namespace='MF',
+                    association_type='annotated_to',
+                    source='CC_MF_branch'
+                )
+                gene_association_count += 1
+        
+        logger.info(f"Added {gene_association_count} CC/MF gene-GO associations")
+    
+    def _add_cc_mf_llm_interpretations(self, cc_mf_data):
+        """Add LLM interpretations and confidence scores for CC and MF terms."""
+        cc_interpretations = cc_mf_data.get('cc_llm_interpretations', {})
+        mf_interpretations = cc_mf_data.get('mf_llm_interpretations', {})
+        
+        interpretation_count = 0
+        
+        # Process CC interpretations
+        for go_id, interp_data in cc_interpretations.items():
+            interpretation_node_id = f"CC_INTERPRETATION:{go_id}"
+            
+            interp_attrs = {
+                'node_type': 'llm_interpretation',
+                'go_term_id': go_id,
+                'namespace': 'CC',
+                'llm_name': interp_data.get('llm_name', ''),
+                'llm_analysis': interp_data.get('llm_analysis', ''),
+                'llm_score': interp_data.get('llm_score', 0.0),
+                'term_description': interp_data.get('term_description', ''),
+                'gene_count': interp_data.get('gene_count', 0),
+                'source': 'CC_MF_branch'
+            }
+            
+            self.graph.add_node(interpretation_node_id, **interp_attrs)
+            
+            # Link interpretation to GO term
+            if go_id in self.graph:
+                self.graph.add_edge(
+                    interpretation_node_id,
+                    go_id,
+                    edge_type='interprets_go_term',
+                    confidence_score=interp_data.get('llm_score', 0.0),
+                    namespace='CC'
+                )
+            
+            interpretation_count += 1
+        
+        # Process MF interpretations
+        for go_id, interp_data in mf_interpretations.items():
+            interpretation_node_id = f"MF_INTERPRETATION:{go_id}"
+            
+            interp_attrs = {
+                'node_type': 'llm_interpretation',
+                'go_term_id': go_id,
+                'namespace': 'MF',
+                'llm_name': interp_data.get('llm_name', ''),
+                'llm_analysis': interp_data.get('llm_analysis', ''),
+                'llm_score': interp_data.get('llm_score', 0.0),
+                'term_description': interp_data.get('term_description', ''),
+                'gene_count': interp_data.get('gene_count', 0),
+                'source': 'CC_MF_branch'
+            }
+            
+            self.graph.add_node(interpretation_node_id, **interp_attrs)
+            
+            # Link interpretation to GO term
+            if go_id in self.graph:
+                self.graph.add_edge(
+                    interpretation_node_id,
+                    go_id,
+                    edge_type='interprets_go_term',
+                    confidence_score=interp_data.get('llm_score', 0.0),
+                    namespace='MF'
+                )
+            
+            interpretation_count += 1
+        
+        logger.info(f"Added {interpretation_count} CC/MF LLM interpretations")
+    
+    def _add_cc_mf_similarity_rankings(self, cc_mf_data):
+        """Add similarity rankings for CC and MF terms."""
+        cc_rankings = cc_mf_data.get('cc_similarity_rankings', {})
+        mf_rankings = cc_mf_data.get('mf_similarity_rankings', {})
+        
+        ranking_count = 0
+        
+        # Process CC similarity rankings
+        for go_id, ranking_data in cc_rankings.items():
+            ranking_node_id = f"CC_SIMILARITY_RANKING:{go_id}"
+            
+            ranking_attrs = {
+                'node_type': 'similarity_ranking',
+                'go_term_id': go_id,
+                'namespace': 'CC',
+                'llm_name_go_term_sim': ranking_data.get('llm_name_go_term_sim', 0.0),
+                'sim_rank': ranking_data.get('sim_rank', 0),
+                'true_go_term_sim_percentile': ranking_data.get('true_go_term_sim_percentile', 0.0),
+                'random_go_name': ranking_data.get('random_go_name', ''),
+                'random_go_llm_sim': ranking_data.get('random_go_llm_sim', 0.0),
+                'random_sim_rank': ranking_data.get('random_sim_rank', 0),
+                'random_sim_percentile': ranking_data.get('random_sim_percentile', 0.0),
+                'top_3_hits': ranking_data.get('top_3_hits', []),
+                'top_3_similarities': ranking_data.get('top_3_similarities', []),
+                'source': 'CC_MF_branch'
+            }
+            
+            self.graph.add_node(ranking_node_id, **ranking_attrs)
+            
+            # Link ranking to GO term
+            if go_id in self.graph:
+                self.graph.add_edge(
+                    ranking_node_id,
+                    go_id,
+                    edge_type='similarity_ranking_for',
+                    similarity_score=ranking_data.get('llm_name_go_term_sim', 0.0),
+                    percentile_rank=ranking_data.get('true_go_term_sim_percentile', 0.0),
+                    namespace='CC'
+                )
+            
+            ranking_count += 1
+        
+        # Process MF similarity rankings
+        for go_id, ranking_data in mf_rankings.items():
+            ranking_node_id = f"MF_SIMILARITY_RANKING:{go_id}"
+            
+            ranking_attrs = {
+                'node_type': 'similarity_ranking',
+                'go_term_id': go_id,
+                'namespace': 'MF',
+                'llm_name_go_term_sim': ranking_data.get('llm_name_go_term_sim', 0.0),
+                'sim_rank': ranking_data.get('sim_rank', 0),
+                'true_go_term_sim_percentile': ranking_data.get('true_go_term_sim_percentile', 0.0),
+                'random_go_name': ranking_data.get('random_go_name', ''),
+                'random_go_llm_sim': ranking_data.get('random_go_llm_sim', 0.0),
+                'random_sim_rank': ranking_data.get('random_sim_rank', 0),
+                'random_sim_percentile': ranking_data.get('random_sim_percentile', 0.0),
+                'top_3_hits': ranking_data.get('top_3_hits', []),
+                'top_3_similarities': ranking_data.get('top_3_similarities', []),
+                'source': 'CC_MF_branch'
+            }
+            
+            self.graph.add_node(ranking_node_id, **ranking_attrs)
+            
+            # Link ranking to GO term
+            if go_id in self.graph:
+                self.graph.add_edge(
+                    ranking_node_id,
+                    go_id,
+                    edge_type='similarity_ranking_for',
+                    similarity_score=ranking_data.get('llm_name_go_term_sim', 0.0),
+                    percentile_rank=ranking_data.get('true_go_term_sim_percentile', 0.0),
+                    namespace='MF'
+                )
+            
+            ranking_count += 1
+        
+        logger.info(f"Added {ranking_count} CC/MF similarity rankings")
+    
     def _calculate_comprehensive_stats(self):
         """Calculate comprehensive statistics for the integrated graph."""
         logger.info("Calculating comprehensive statistics...")
@@ -2536,6 +2797,210 @@ class ComprehensiveBiomedicalKnowledgeGraph:
         summary['go_term_coverage'] = len(go_terms_with_predictions)
         
         return summary
+    
+    def query_cc_mf_terms(self, namespace: str = None) -> List[Dict]:
+        """Query CC and MF GO terms.
+        
+        Args:
+            namespace: 'CC', 'MF', or None for both
+            
+        Returns:
+            List of GO term information
+        """
+        terms = []
+        
+        for node_id, attrs in self.graph.nodes(data=True):
+            if attrs.get('node_type') == 'go_term' and attrs.get('source') == 'CC_MF_branch':
+                if namespace is None or attrs.get('namespace') == namespace:
+                    term_info = {
+                        'go_id': node_id,
+                        'name': attrs.get('name', ''),
+                        'namespace': attrs.get('namespace'),
+                        'description': attrs.get('description', ''),
+                        'gene_count': attrs.get('gene_count', 0)
+                    }
+                    terms.append(term_info)
+        
+        return sorted(terms, key=lambda x: x['gene_count'], reverse=True)
+    
+    def query_cc_mf_llm_interpretations(self, go_id: str = None, namespace: str = None) -> List[Dict]:
+        """Query LLM interpretations for CC and MF terms.
+        
+        Args:
+            go_id: Specific GO term to query
+            namespace: 'CC', 'MF', or None for both
+            
+        Returns:
+            List of LLM interpretation information
+        """
+        interpretations = []
+        
+        for node_id, attrs in self.graph.nodes(data=True):
+            if attrs.get('node_type') == 'llm_interpretation' and attrs.get('source') == 'CC_MF_branch':
+                if go_id is None or attrs.get('go_term_id') == go_id:
+                    if namespace is None or attrs.get('namespace') == namespace:
+                        interp_info = {
+                            'interpretation_id': node_id,
+                            'go_term_id': attrs.get('go_term_id'),
+                            'namespace': attrs.get('namespace'),
+                            'llm_name': attrs.get('llm_name', ''),
+                            'llm_analysis': attrs.get('llm_analysis', ''),
+                            'llm_score': attrs.get('llm_score', 0.0),
+                            'term_description': attrs.get('term_description', ''),
+                            'gene_count': attrs.get('gene_count', 0)
+                        }
+                        interpretations.append(interp_info)
+        
+        return sorted(interpretations, key=lambda x: x['llm_score'], reverse=True)
+    
+    def query_cc_mf_similarity_rankings(self, go_id: str = None, namespace: str = None) -> List[Dict]:
+        """Query similarity rankings for CC and MF terms.
+        
+        Args:
+            go_id: Specific GO term to query
+            namespace: 'CC', 'MF', or None for both
+            
+        Returns:
+            List of similarity ranking information
+        """
+        rankings = []
+        
+        for node_id, attrs in self.graph.nodes(data=True):
+            if attrs.get('node_type') == 'similarity_ranking' and attrs.get('source') == 'CC_MF_branch':
+                if go_id is None or attrs.get('go_term_id') == go_id:
+                    if namespace is None or attrs.get('namespace') == namespace:
+                        ranking_info = {
+                            'ranking_id': node_id,
+                            'go_term_id': attrs.get('go_term_id'),
+                            'namespace': attrs.get('namespace'),
+                            'llm_name_go_term_sim': attrs.get('llm_name_go_term_sim', 0.0),
+                            'sim_rank': attrs.get('sim_rank', 0),
+                            'true_go_term_sim_percentile': attrs.get('true_go_term_sim_percentile', 0.0),
+                            'random_go_name': attrs.get('random_go_name', ''),
+                            'top_3_hits': attrs.get('top_3_hits', []),
+                            'top_3_similarities': attrs.get('top_3_similarities', [])
+                        }
+                        rankings.append(ranking_info)
+        
+        return sorted(rankings, key=lambda x: x['true_go_term_sim_percentile'], reverse=True)
+    
+    def query_gene_cc_mf_profile(self, gene_symbol: str) -> Dict[str, Any]:
+        """Query comprehensive CC and MF profile for a gene.
+        
+        Args:
+            gene_symbol: Gene symbol to query
+            
+        Returns:
+            Dictionary containing CC and MF associations, interpretations, and rankings
+        """
+        gene_node_id = f"GENE:{gene_symbol}"
+        
+        if gene_node_id not in self.graph:
+            return {'error': f'Gene {gene_symbol} not found in knowledge graph'}
+        
+        profile = {
+            'gene_symbol': gene_symbol,
+            'cc_associations': [],
+            'mf_associations': [],
+            'cc_interpretations': [],
+            'mf_interpretations': [],
+            'cc_similarity_rankings': [],
+            'mf_similarity_rankings': []
+        }
+        
+        # Find GO term associations
+        for neighbor in self.graph.neighbors(gene_node_id):
+            edge_data = self.graph.get_edge_data(gene_node_id, neighbor, 0)
+            
+            if edge_data and edge_data.get('edge_type') == 'gene_go_association':
+                namespace = edge_data.get('namespace')
+                go_node_attrs = self.graph.nodes[neighbor]
+                
+                association_info = {
+                    'go_id': neighbor,
+                    'name': go_node_attrs.get('name', ''),
+                    'description': go_node_attrs.get('description', ''),
+                    'gene_count': go_node_attrs.get('gene_count', 0)
+                }
+                
+                if namespace == 'CC':
+                    profile['cc_associations'].append(association_info)
+                elif namespace == 'MF':
+                    profile['mf_associations'].append(association_info)
+                
+                # Find related interpretations and rankings
+                go_id = neighbor
+                interpretations = self.query_cc_mf_llm_interpretations(go_id=go_id, namespace=namespace)
+                rankings = self.query_cc_mf_similarity_rankings(go_id=go_id, namespace=namespace)
+                
+                if namespace == 'CC':
+                    profile['cc_interpretations'].extend(interpretations)
+                    profile['cc_similarity_rankings'].extend(rankings)
+                elif namespace == 'MF':
+                    profile['mf_interpretations'].extend(interpretations)
+                    profile['mf_similarity_rankings'].extend(rankings)
+        
+        # Sort results
+        profile['cc_associations'] = sorted(profile['cc_associations'], key=lambda x: x['gene_count'], reverse=True)
+        profile['mf_associations'] = sorted(profile['mf_associations'], key=lambda x: x['gene_count'], reverse=True)
+        profile['cc_interpretations'] = sorted(profile['cc_interpretations'], key=lambda x: x['llm_score'], reverse=True)
+        profile['mf_interpretations'] = sorted(profile['mf_interpretations'], key=lambda x: x['llm_score'], reverse=True)
+        
+        return profile
+    
+    def get_cc_mf_branch_stats(self) -> Dict[str, Any]:
+        """Get comprehensive statistics for CC_MF_Branch data integration."""
+        stats = {
+            'cc_go_terms': 0,
+            'mf_go_terms': 0,
+            'cc_interpretations': 0,
+            'mf_interpretations': 0,
+            'cc_similarity_rankings': 0,
+            'mf_similarity_rankings': 0,
+            'cc_mf_gene_associations': 0,
+            'unique_cc_mf_genes': 0
+        }
+        
+        unique_genes = set()
+        
+        for node_id, attrs in self.graph.nodes(data=True):
+            source = attrs.get('source')
+            node_type = attrs.get('node_type')
+            namespace = attrs.get('namespace')
+            
+            if source == 'CC_MF_branch':
+                if node_type == 'go_term':
+                    if namespace == 'CC':
+                        stats['cc_go_terms'] += 1
+                    elif namespace == 'MF':
+                        stats['mf_go_terms'] += 1
+                elif node_type == 'llm_interpretation':
+                    if namespace == 'CC':
+                        stats['cc_interpretations'] += 1
+                    elif namespace == 'MF':
+                        stats['mf_interpretations'] += 1
+                elif node_type == 'similarity_ranking':
+                    if namespace == 'CC':
+                        stats['cc_similarity_rankings'] += 1
+                    elif namespace == 'MF':
+                        stats['mf_similarity_rankings'] += 1
+        
+        # Count gene associations and unique genes
+        for u, v, edge_attrs in self.graph.edges(data=True):
+            if (edge_attrs.get('source') == 'CC_MF_branch' and 
+                edge_attrs.get('edge_type') == 'gene_go_association'):
+                stats['cc_mf_gene_associations'] += 1
+                
+                # Extract gene symbol from node ID
+                if u.startswith('GENE:'):
+                    unique_genes.add(u.split(':', 1)[1])
+        
+        stats['unique_cc_mf_genes'] = len(unique_genes)
+        stats['total_cc_mf_terms'] = stats['cc_go_terms'] + stats['mf_go_terms']
+        stats['total_cc_mf_interpretations'] = stats['cc_interpretations'] + stats['mf_interpretations']
+        stats['total_cc_mf_rankings'] = stats['cc_similarity_rankings'] + stats['mf_similarity_rankings']
+        
+        return stats
     
     def save_comprehensive_graph(self, filepath: str):
         """Save the comprehensive biomedical knowledge graph."""
