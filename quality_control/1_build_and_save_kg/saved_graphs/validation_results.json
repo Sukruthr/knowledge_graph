@@ -1,0 +1,21 @@
+{
+  "timestamp": "2025-08-22T12:13:03.740950",
+  "validations": {
+    "pickle": {
+      "exists": true,
+      "load_time_seconds": 14.27407169342041,
+      "nodes_match": true,
+      "edges_match": true,
+      "original_nodes": 174210,
+      "loaded_nodes": 174210,
+      "original_edges": 5060768,
+      "loaded_edges": 5060768
+    },
+    "networkx": {
+      "exists": true,
+      "load_time_seconds": 12.807851552963257,
+      "nodes_match": true,
+      "edges_match": true
+    }
+  }
+}

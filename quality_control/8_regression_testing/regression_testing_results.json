@@ -1,0 +1,32 @@
+{
+  "timestamp": "2025-08-22T12:34:31.351519",
+  "validation_summary": {},
+  "quality_metrics": {
+    "import_compatibility_score": 100,
+    "method_preservation_score": 80.0,
+    "overall_regression_score": 90.0,
+    "regression_grade": "A"
+  },
+  "recommendations": [],
+  "detailed_results": {
+    "import_compatibility": {
+      "old_style_imports": [
+        "kg_builder import successful"
+      ],
+      "new_style_imports": [
+        "kg_builders import successful"
+      ],
+      "import_errors": [],
+      "available_methods": 22,
+      "compatibility_score": 100
+    },
+    "method_preservation": {
+      "total_key_methods": 5,
+      "preserved_methods": 4,
+      "missing_methods": [
+        "query_go_term"
+      ],
+      "preservation_rate": 80.0
+    }
+  }
+}

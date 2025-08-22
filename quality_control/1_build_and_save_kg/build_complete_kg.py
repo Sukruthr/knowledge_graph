@@ -185,7 +185,9 @@ class KnowledgeGraphBuilder:
             logger.info("Saving NetworkX graph...")
             networkx_start = time.time()
             networkx_path = os.path.join(self.output_dir, 'biomedical_graph.gpickle')
-            nx.write_gpickle(self.kg.graph, networkx_path)
+            # Use standard pickle instead of deprecated nx.write_gpickle
+            with open(networkx_path, 'wb') as f:
+                pickle.dump(self.kg.graph, f)
             networkx_time = time.time() - networkx_start
             
             save_results['formats_saved'].append('networkx')
@@ -314,7 +316,9 @@ class KnowledgeGraphBuilder:
             networkx_path = os.path.join(self.output_dir, 'biomedical_graph.gpickle')
             if os.path.exists(networkx_path):
                 load_start = time.time()
-                loaded_graph = nx.read_gpickle(networkx_path)
+                # Use standard pickle instead of deprecated nx.read_gpickle
+                with open(networkx_path, 'rb') as f:
+                    loaded_graph = pickle.load(f)
                 load_time = time.time() - load_start
                 
                 validation_results['validations']['networkx'] = {

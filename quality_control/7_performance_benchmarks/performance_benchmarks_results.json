@@ -1,0 +1,26 @@
+{
+  "timestamp": "2025-08-22T12:34:07.429240",
+  "validation_summary": {},
+  "quality_metrics": {
+    "query_performance_score": 100,
+    "memory_efficiency_score": 6.271289062500003,
+    "overall_performance_score": 53.13564453125,
+    "performance_grade": "D"
+  },
+  "recommendations": [],
+  "detailed_results": {
+    "query_performance": {
+      "queries_tested": 5,
+      "successful_queries": 5,
+      "average_query_time": 0.0008708000183105469,
+      "queries_per_second": 1148.3692914248165,
+      "meets_target": true
+    },
+    "memory_usage": {
+      "rss_mb": 5623.72265625,
+      "vms_mb": 8285.9765625,
+      "memory_percent": 2.183222395389734,
+      "within_limits": true
+    }
+  }
+}

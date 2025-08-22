@@ -1,0 +1,79 @@
+2025-08-22 12:32:24,287 - INFO - 🧪 COMPREHENSIVE FUNCTIONAL TESTING
+2025-08-22 12:32:24,287 - INFO - ================================================================================
+2025-08-22 12:32:24,287 - INFO - Executing: Load Knowledge Graph
+2025-08-22 12:32:24,287 - INFO - 📊 LOADING KNOWLEDGE GRAPH FOR FUNCTIONAL TESTING
+2025-08-22 12:32:24,287 - INFO - ======================================================================
+2025-08-22 12:32:24,287 - INFO - Loading knowledge graph from: /home/mreddy1/knowledge_graph/quality_control/1_build_and_save_kg/saved_graphs/complete_biomedical_kg.pkl
+2025-08-22 12:32:37,071 - INFO - ✅ Knowledge graph loaded successfully in 12.78 seconds
+2025-08-22 12:32:37,071 - INFO -    Nodes: 174,210
+2025-08-22 12:32:38,175 - INFO -    Edges: 5,060,768
+2025-08-22 12:32:38,175 - INFO - ✅ Load Knowledge Graph completed successfully
+2025-08-22 12:32:38,175 - INFO - Executing: Prepare Test Data
+2025-08-22 12:32:38,175 - INFO - 🧪 PREPARING TEST DATA
+2025-08-22 12:32:38,175 - INFO - --------------------------------------------------
+2025-08-22 12:32:38,243 - INFO - Prepared test data:
+2025-08-22 12:32:38,243 - INFO -    Sample genes: 0
+2025-08-22 12:32:38,243 - INFO -    Sample GO terms: 0
+2025-08-22 12:32:38,243 - INFO -    Sample diseases: 0
+2025-08-22 12:32:38,243 - INFO -    Gene symbols for testing: 0
+2025-08-22 12:32:38,243 - INFO -    GO IDs for testing: 0
+2025-08-22 12:32:38,243 - INFO - ✅ Prepare Test Data completed successfully
+2025-08-22 12:32:38,243 - INFO - Executing: Discover Methods
+2025-08-22 12:32:38,243 - INFO - 🔍 DISCOVERING AVAILABLE METHODS
+2025-08-22 12:32:38,243 - INFO - --------------------------------------------------
+2025-08-22 12:32:38,244 - INFO - Discovered 22 methods:
+2025-08-22 12:32:38,244 - INFO -    data_loading: 1 methods
+2025-08-22 12:32:38,244 - INFO -    graph_building: 1 methods
+2025-08-22 12:32:38,244 - INFO -    gene_queries: 4 methods
+2025-08-22 12:32:38,244 - INFO -    go_queries: 3 methods
+2025-08-22 12:32:38,244 - INFO -    model_queries: 2 methods
+2025-08-22 12:32:38,244 - INFO -    statistics: 4 methods
+2025-08-22 12:32:38,244 - INFO -    utility: 7 methods
+2025-08-22 12:32:38,244 - INFO - ✅ Discover Methods completed successfully
+2025-08-22 12:32:38,244 - INFO - Executing: Test Method Categories
+2025-08-22 12:32:38,244 - INFO - 🧪 TESTING METHODS BY CATEGORY
+2025-08-22 12:32:38,244 - INFO - --------------------------------------------------
+2025-08-22 12:32:38,244 - INFO - Testing gene query methods...
+2025-08-22 12:32:38,244 - INFO - Testing GO query methods...
+2025-08-22 12:32:38,244 - INFO - Testing statistics methods...
+2025-08-22 12:32:43,989 - INFO - Testing utility methods...
+2025-08-22 12:32:44,097 - INFO - Method testing summary:
+2025-08-22 12:32:44,097 - INFO -    Total tests: 10
+2025-08-22 12:32:44,097 - INFO -    Passed tests: 10
+2025-08-22 12:32:44,097 - INFO -    Success rate: 100.0%
+2025-08-22 12:32:44,097 - INFO - ✅ Test Method Categories completed successfully
+2025-08-22 12:32:44,097 - INFO - Executing: Run Biological Query Suite
+2025-08-22 12:32:44,097 - INFO - 🧬 RUNNING BIOLOGICAL QUERY SUITE
+2025-08-22 12:32:44,097 - INFO - --------------------------------------------------
+2025-08-22 12:32:44,102 - INFO - Running performance stress test...
+2025-08-22 12:32:44,102 - INFO - Biological query suite results:
+2025-08-22 12:32:44,102 - INFO -    Total queries: 5
+2025-08-22 12:32:44,102 - INFO -    Successful queries: 5
+2025-08-22 12:32:44,102 - INFO -    Success rate: 100.0%
+2025-08-22 12:32:44,102 - INFO - ✅ Run Biological Query Suite completed successfully
+2025-08-22 12:32:44,102 - INFO - Executing: Generate Performance Metrics
+2025-08-22 12:32:44,102 - INFO - 📊 GENERATING PERFORMANCE METRICS
+2025-08-22 12:32:44,102 - INFO - --------------------------------------------------
+2025-08-22 12:32:44,102 - INFO - Performance metrics generated:
+2025-08-22 12:32:44,102 - INFO -    Average method execution time: 0.585 seconds
+2025-08-22 12:32:44,102 - INFO -    Query throughput: 0.0 queries/second
+2025-08-22 12:32:44,102 - INFO - ✅ Generate Performance Metrics completed successfully
+2025-08-22 12:32:44,102 - INFO - Executing: Generate Recommendations
+2025-08-22 12:32:44,102 - INFO - Functional Testing Recommendations:
+2025-08-22 12:32:44,102 - INFO -    [MEDIUM] Performance: Optimize query methods for better performance
+2025-08-22 12:32:44,102 - INFO -    [LOW] Performance: Profile and optimize slow methods
+2025-08-22 12:32:44,102 - ERROR - ❌ Generate Recommendations failed
+2025-08-22 12:32:44,103 - INFO - Executing: Save Results
+2025-08-22 12:32:44,103 - INFO - 📄 Results saved to: /home/mreddy1/knowledge_graph/quality_control/4_functional_testing/functional_testing_results.json
+2025-08-22 12:32:44,103 - INFO - ✅ Save Results completed successfully
+2025-08-22 12:32:44,103 - INFO - ================================================================================
+2025-08-22 12:32:44,103 - INFO - 📊 FUNCTIONAL TESTING SUMMARY
+2025-08-22 12:32:44,103 - INFO - ================================================================================
+2025-08-22 12:32:44,103 - INFO - Steps completed: 7/8
+2025-08-22 12:32:44,103 - INFO - Success rate: 87.5%
+2025-08-22 12:32:44,103 - INFO - Execution time: 19.82 seconds
+2025-08-22 12:32:44,103 - INFO - Overall status: FAILED
+2025-08-22 12:32:44,103 - INFO - Methods tested: 22
+2025-08-22 12:32:44,103 - INFO - Method success rate: 100.0%
+2025-08-22 12:32:44,103 - INFO - Biological queries: 5
+2025-08-22 12:32:44,103 - INFO - Bio query success rate: 100.0%

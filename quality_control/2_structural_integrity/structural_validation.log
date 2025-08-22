@@ -1,0 +1,97 @@
+2025-08-22 12:30:27,863 - INFO - 🔍 COMPREHENSIVE STRUCTURAL INTEGRITY VALIDATION
+2025-08-22 12:30:27,863 - INFO - ================================================================================
+2025-08-22 12:30:27,863 - INFO - Executing: Load Knowledge Graph
+2025-08-22 12:30:27,863 - INFO - 📊 LOADING KNOWLEDGE GRAPH FOR STRUCTURAL VALIDATION
+2025-08-22 12:30:27,863 - INFO - ======================================================================
+2025-08-22 12:30:27,863 - INFO - Loading knowledge graph from: /home/mreddy1/knowledge_graph/quality_control/1_build_and_save_kg/saved_graphs/complete_biomedical_kg.pkl
+2025-08-22 12:30:40,492 - INFO - ✅ Knowledge graph loaded successfully in 12.63 seconds
+2025-08-22 12:30:40,493 - INFO -    Nodes: 174,210
+2025-08-22 12:30:41,601 - INFO -    Edges: 5,060,768
+2025-08-22 12:30:41,601 - INFO - ✅ Load Knowledge Graph completed successfully
+2025-08-22 12:30:41,601 - INFO - Executing: Validate Graph Topology
+2025-08-22 12:30:41,601 - INFO - 🔍 VALIDATING GRAPH TOPOLOGY
+2025-08-22 12:30:41,601 - INFO - --------------------------------------------------
+2025-08-22 12:30:44,942 - INFO - Basic metrics: 174,210 nodes, 5,060,768 edges
+2025-08-22 12:30:44,942 - INFO - Graph type: Directed
+2025-08-22 12:30:44,942 - INFO - Density: 0.000167
+2025-08-22 12:30:46,729 - INFO - Strongly connected components: 174210
+2025-08-22 12:30:46,729 - INFO - Weakly connected components: 15889
+2025-08-22 12:30:47,852 - INFO - Degree distribution: min=0, max=221525, mean=58.10
+2025-08-22 12:30:48,948 - WARNING - ⚠️ Found 15697 isolated nodes (9.01%)
+2025-08-22 12:30:53,911 - INFO - Cycle detection: Acyclic
+2025-08-22 12:30:53,911 - INFO - ✅ Graph topology validation completed
+2025-08-22 12:30:53,939 - INFO - ✅ Validate Graph Topology completed successfully
+2025-08-22 12:30:53,939 - INFO - Executing: Validate Node Structure
+2025-08-22 12:30:53,939 - INFO - 🔍 VALIDATING NODE STRUCTURE
+2025-08-22 12:30:53,939 - INFO - --------------------------------------------------
+2025-08-22 12:30:54,023 - INFO - Node type distribution:
+2025-08-22 12:30:54,023 - INFO -    Unknown: 174,210
+2025-08-22 12:30:54,023 - WARNING - ⚠️ 174210 nodes missing type information (100.00%)
+2025-08-22 12:30:54,023 - INFO - Biological node type coverage: 0.0%
+2025-08-22 12:30:54,023 - WARNING - Missing expected types: ['viral_condition', 'gene_set', 'disease', 'llm_interpretation', 'cluster', 'model_prediction', 'go_term', 'gene', 'drug']
+2025-08-22 12:30:54,055 - INFO - ❌ Gene identifier coverage: 0.0% (threshold: 95.0%)
+2025-08-22 12:30:54,055 - INFO - ❌ GO term namespace coverage: 0.0% (threshold: 90.0%)
+2025-08-22 12:30:54,055 - INFO - ✅ Node structure validation completed
+2025-08-22 12:30:54,056 - INFO - ✅ Validate Node Structure completed successfully
+2025-08-22 12:30:54,056 - INFO - Executing: Validate Edge Structure
+2025-08-22 12:30:54,056 - INFO - 🔍 VALIDATING EDGE STRUCTURE
+2025-08-22 12:30:54,056 - INFO - --------------------------------------------------
+2025-08-22 12:30:59,826 - INFO - Edge type distribution:
+2025-08-22 12:30:59,826 - INFO -    Unknown: 5,060,768
+2025-08-22 12:30:59,826 - WARNING - ⚠️ 5060768 edges missing type information (100.00%)
+2025-08-22 12:30:59,827 - INFO - Biological edge type coverage: 0.0%
+2025-08-22 12:30:59,827 - WARNING - Missing expected edge types: ['gene_disease_association', 'gene_viral_association', 'gene_go_association', 'llm_interpretation', 'similarity_ranking', 'gene_drug_association', 'model_prediction', 'cluster_relationship', 'go_hierarchy']
+2025-08-22 12:31:02,054 - INFO - ✅ No self-loops found
+2025-08-22 12:31:02,054 - ERROR - ❌ Edge structure validation failed: not enough values to unpack (expected 3, got 2)
+2025-08-22 12:31:02,055 - ERROR - Traceback: Traceback (most recent call last):
+  File "/home/mreddy1/knowledge_graph/quality_control/2_structural_integrity/structural_validation.py", line 376, in validate_edge_structure
+    simple_edges = len(set((u, v) for u, v, _ in self.graph.edges()))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mreddy1/knowledge_graph/quality_control/2_structural_integrity/structural_validation.py", line 376, in <genexpr>
+    simple_edges = len(set((u, v) for u, v, _ in self.graph.edges()))
+                                      ^^^^^^^
+ValueError: not enough values to unpack (expected 3, got 2)
+
+2025-08-22 12:31:02,243 - ERROR - ❌ Validate Edge Structure failed
+2025-08-22 12:31:02,243 - INFO - Executing: Validate Referential Integrity
+2025-08-22 12:31:02,243 - INFO - 🔍 VALIDATING REFERENTIAL INTEGRITY
+2025-08-22 12:31:02,243 - INFO - --------------------------------------------------
+2025-08-22 12:31:02,259 - INFO - Gene identifier consistency:
+2025-08-22 12:31:02,259 - INFO -    Total gene nodes: 0
+2025-08-22 12:31:02,259 - INFO -    Unique symbols: 0
+2025-08-22 12:31:02,259 - INFO -    Symbol coverage: 0.0%
+2025-08-22 12:31:02,259 - INFO - Cross-modal connectivity:
+2025-08-22 12:31:02,259 - INFO -    Genes with connections: 0
+2025-08-22 12:31:02,260 - INFO -    Average connection types per gene: 0.00
+2025-08-22 12:31:02,260 - INFO -    Highly connected genes (≥5 types): 0
+2025-08-22 12:31:03,420 - INFO - Orphaned nodes: 15697 (9.01%)
+2025-08-22 12:31:03,420 - INFO -    Unknown: 15697
+2025-08-22 12:31:03,420 - INFO - ✅ Referential integrity validation completed
+2025-08-22 12:31:03,420 - INFO - ✅ Validate Referential Integrity completed successfully
+2025-08-22 12:31:03,420 - INFO - Executing: Generate Quality Metrics
+2025-08-22 12:31:03,420 - INFO - 📊 GENERATING QUALITY METRICS
+2025-08-22 12:31:03,420 - INFO - --------------------------------------------------
+2025-08-22 12:31:03,420 - INFO - Quality Scores:
+2025-08-22 12:31:03,420 - INFO -    Topology Quality: 82.0/100
+2025-08-22 12:31:03,420 - INFO -    Node Structure: 15.0/100
+2025-08-22 12:31:03,420 - INFO -    Edge Structure: 100.0/100
+2025-08-22 12:31:03,420 - INFO -    Referential Integrity: 30.0/100
+2025-08-22 12:31:03,420 - INFO -    Overall Structural Quality: 56.7/100 (Grade: D)
+2025-08-22 12:31:03,420 - INFO - ✅ Generate Quality Metrics completed successfully
+2025-08-22 12:31:03,420 - INFO - Executing: Generate Recommendations
+2025-08-22 12:31:03,420 - INFO - Recommendations:
+2025-08-22 12:31:03,420 - INFO -    [HIGH] Topology: Review data integration to ensure all nodes are properly connected
+2025-08-22 12:31:03,420 - INFO -    [MEDIUM] Node Structure: Add type information to all nodes during data parsing
+2025-08-22 12:31:03,421 - INFO -    [HIGH] Referential Integrity: Review data integration pipeline to ensure proper node connections
+2025-08-22 12:31:03,421 - ERROR - ❌ Generate Recommendations failed
+2025-08-22 12:31:03,421 - INFO - Executing: Save Results
+2025-08-22 12:31:03,421 - INFO - 📄 Results saved to: /home/mreddy1/knowledge_graph/quality_control/2_structural_integrity/structural_validation_results.json
+2025-08-22 12:31:03,421 - INFO - ✅ Save Results completed successfully
+2025-08-22 12:31:03,421 - INFO - ================================================================================
+2025-08-22 12:31:03,421 - INFO - 📊 STRUCTURAL VALIDATION SUMMARY
+2025-08-22 12:31:03,421 - INFO - ================================================================================
+2025-08-22 12:31:03,421 - INFO - Steps completed: 6/8
+2025-08-22 12:31:03,421 - INFO - Success rate: 75.0%
+2025-08-22 12:31:03,421 - INFO - Execution time: 35.56 seconds
+2025-08-22 12:31:03,421 - INFO - Overall status: FAILED
+2025-08-22 12:31:03,421 - INFO - Structural Quality Score: 56.7/100 (Grade: D)

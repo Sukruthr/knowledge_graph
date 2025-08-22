@@ -1,0 +1,146 @@
+{
+  "timestamp": "2025-08-22T12:33:25.580569",
+  "validation_summary": {},
+  "detailed_results": {
+    "go_hierarchy_integrity": {
+      "total_go_terms": 0,
+      "total_relationships": 0,
+      "namespace_distribution": {},
+      "hierarchy_violations": 0,
+      "cross_namespace_relationships": 0,
+      "orphaned_terms": 0,
+      "biological_violations": 0,
+      "hierarchy_integrity_percentage": 100.0,
+      "violation_details": {
+        "hierarchy_violations": [],
+        "cross_namespace_sample": [],
+        "orphaned_sample": [],
+        "biological_violations": []
+      }
+    },
+    "gene_function_relationships": {
+      "total_gene_go_associations": 0,
+      "genes_with_functions": 0,
+      "average_functions_per_gene": 0,
+      "namespace_coverage": {},
+      "function_consistency_issues": 0,
+      "under_annotated_essential_genes": 0,
+      "over_annotated_genes": 0,
+      "consistency_rate": 100.0,
+      "issue_details": {
+        "consistency_issues_sample": [],
+        "under_annotated_sample": [],
+        "over_annotated_sample": []
+      }
+    },
+    "disease_gene_associations": {
+      "total_disease_gene_associations": 0,
+      "unique_diseases": 0,
+      "unique_genes": 0,
+      "plausibility_issues": 0,
+      "high_impact_genes": 0,
+      "cancer_gene_coverage_rate": 0,
+      "plausibility_rate": 100.0,
+      "issue_details": {
+        "plausibility_issues_sample": [],
+        "high_impact_genes_sample": []
+      }
+    },
+    "pathway_coherence": {
+      "total_pathways_analyzed": 0,
+      "average_pathway_size": 0,
+      "size_distribution": {},
+      "average_coherence_score": 0,
+      "coherence_issues": 0,
+      "overall_coherence_rate": 100.0,
+      "issue_details": {
+        "coherence_issues_sample": []
+      }
+    }
+  },
+  "biological_constraints": {
+    "total_constraints_checked": 5,
+    "violated_constraints": 0,
+    "constraint_adherence_percentage": 100.0,
+    "constraint_details": {
+      "gene_uniqueness": {
+        "valid": true,
+        "total_genes": 0,
+        "unique_genes": 0,
+        "duplicates": 0,
+        "message": "All gene symbols unique"
+      },
+      "go_term_uniqueness": {
+        "valid": true,
+        "total_go_terms": 0,
+        "unique_go_terms": 0,
+        "duplicates": 0,
+        "message": "All GO IDs unique"
+      },
+      "species_consistency": {
+        "valid": true,
+        "total_genes": 0,
+        "non_human_indicators": 0,
+        "human_ratio": 100,
+        "message": "100.0% appear to be human genes"
+      },
+      "temporal_consistency": {
+        "valid": true,
+        "temporal_relationships": 0,
+        "violations": 0,
+        "consistency_rate": 100,
+        "message": "0 temporal inconsistencies found"
+      },
+      "localization_consistency": {
+        "valid": true,
+        "genes_checked": 0,
+        "issues": 0,
+        "consistency_rate": 100,
+        "message": "0 localization inconsistencies found"
+      }
+    }
+  },
+  "semantic_consistency": {},
+  "quality_metrics": {
+    "go_hierarchy_quality_score": 100.0,
+    "gene_function_quality_score": 100.0,
+    "disease_gene_quality_score": 100.0,
+    "pathway_coherence_score": 100.0,
+    "cross_modal_consistency_score": 0,
+    "biological_constraints_score": 100.0,
+    "overall_semantic_quality": 100.0,
+    "semantic_quality_grade": "A+",
+    "quality_breakdown": {
+      "go_hierarchy_integrity": 100.0,
+      "gene_function_consistency": 100.0,
+      "disease_gene_plausibility": 100.0,
+      "pathway_coherence": 100.0,
+      "cross_modal_consistency": 0,
+      "biological_constraints": 100.0
+    }
+  },
+  "recommendations": [
+    {
+      "category": "Disease-Gene Associations",
+      "priority": "MEDIUM",
+      "issue": "Disease-gene plausibility is 100.0%, cancer gene coverage is 0.0%",
+      "recommendation": "Enhance disease-gene association quality and coverage",
+      "specific_actions": [
+        "Review implausible disease-gene associations",
+        "Add missing cancer gene-disease links",
+        "Validate rare disease associations"
+      ]
+    },
+    {
+      "category": "Cross-Modal Consistency",
+      "priority": "MEDIUM",
+      "issue": "Cross-modal consistency is 0.0%",
+      "recommendation": "Improve semantic consistency across data modalities",
+      "specific_actions": [
+        "Align GO annotations with disease associations",
+        "Ensure drug targets have appropriate molecular functions",
+        "Validate cross-modal gene profiles"
+      ]
+    }
+  ]
+}

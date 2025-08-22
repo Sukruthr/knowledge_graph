@@ -3,7 +3,7 @@ INFO:__main__:==================================================================
 INFO:__main__:🚀 STARTING COMPLETE KNOWLEDGE GRAPH CONSTRUCTION
 INFO:__main__:================================================================================
 INFO:__main__:Initializing ComprehensiveBiomedicalKnowledgeGraph...
-INFO:__main__:Memory after initialization: 83.5 MB
+INFO:__main__:Memory after initialization: 98.3 MB
 INFO:__main__:Loading data from: /home/mreddy1/knowledge_graph/llm_evaluation_for_gene_set_interpretation/data
 INFO:kg_builders.comprehensive_graph:Loading comprehensive biomedical data from /home/mreddy1/knowledge_graph/llm_evaluation_for_gene_set_interpretation/data
 INFO:parsers.core_parsers:Initialized parser for biological_process
@@ -208,8 +208,8 @@ INFO:parsers.remaining_data_parser:Supplement table parsed: 300 evaluations, 300
 INFO:parsers.parser_orchestrator:Remaining Data integrated successfully
 INFO:parsers.parser_orchestrator:Comprehensive biomedical data parsing complete
 INFO:kg_builders.comprehensive_graph:Comprehensive biomedical data loading complete
-INFO:__main__:Data loading completed in 22.89 seconds
-INFO:__main__:Memory after data loading: 2899.2 MB
+INFO:__main__:Data loading completed in 28.08 seconds
+INFO:__main__:Memory after data loading: 3530.4 MB
 INFO:__main__:Building comprehensive biomedical knowledge graph...
 INFO:kg_builders.comprehensive_graph:Building comprehensive biomedical knowledge graph...
 INFO:kg_builders.comprehensive_graph:Building GO component...
@@ -249,3 +249,69 @@ INFO:kg_builders.comprehensive_graph:LLM data covers 7514 unique genes
 INFO:kg_builders.comprehensive_graph:LLM_processed data integration complete
 INFO:kg_builders.comprehensive_graph:Adding GO Analysis Data...
 INFO:kg_builders.comprehensive_graph:Added 1100 core GO analysis nodes
+INFO:kg_builders.comprehensive_graph:Added 1100 contamination analysis nodes
+INFO:kg_builders.comprehensive_graph:Added 24 confidence evaluation nodes
+INFO:kg_builders.comprehensive_graph:Added 97 GO hierarchy relationships
+INFO:kg_builders.comprehensive_graph:Added 1 similarity score datasets
+INFO:kg_builders.comprehensive_graph:Creating additional GO analysis data connections...
+INFO:kg_builders.comprehensive_graph:GO analysis data covers 15558 unique genes
+INFO:kg_builders.comprehensive_graph:GO Analysis Data integration complete
+INFO:kg_builders.comprehensive_graph:Adding remaining data integration...
+INFO:kg_builders.comprehensive_graph:Adding GMT data (GO gene sets)...
+INFO:kg_builders.comprehensive_graph:Added 11943 GMT gene sets with 17023 gene associations
+INFO:kg_builders.comprehensive_graph:Adding reference evaluation data...
+INFO:kg_builders.comprehensive_graph:Added 1816 references and 85 gene set evaluations
+INFO:kg_builders.comprehensive_graph:Adding L1000 perturbation data...
+INFO:kg_builders.comprehensive_graph:Added 9916 perturbations, 69 cell lines, 2679 reagents
+INFO:kg_builders.comprehensive_graph:Adding GO term embeddings...
+INFO:kg_builders.comprehensive_graph:Added 11943 GO term embeddings, 0 connected to existing GO terms
+INFO:kg_builders.comprehensive_graph:Adding supplement table LLM evaluation data...
+INFO:kg_builders.comprehensive_graph:Added 300 supplement evaluations and 111 LLM analyses
+INFO:kg_builders.comprehensive_graph:Remaining data integration complete
+INFO:kg_builders.comprehensive_graph:No talisman gene sets available for integration
+INFO:kg_builders.comprehensive_graph:Calculating comprehensive statistics...
+INFO:kg_builders.comprehensive_graph:Comprehensive graph statistics calculated: {'total_nodes': 174210, 'total_edges': 5060768, 'node_counts': {'go_term': 46228, 'gene': 55161, 'disease': 163, 'drug': 132, 'viral_condition': 280, 'network_cluster': 21374, 'study': 292, 'gene_set': 300, 'llm_model': 5, 'model_prediction': 1500, 'similarity_ranking': 3511, 'llm_interpretation': 3000, 'contamination_analysis': 88, 'similarity_pvalues': 1000, 'model_comparison': 89, 'go_core_analysis': 1100, 'go_contamination_analysis': 1100, 'go_confidence_evaluation': 24, 'similarity_scores': 1, 'gmt_gene_set': 11943, 'literature_reference': 1816, 'gene_set_evaluation': 85, 'l1000_perturbation': 9916, 'cell_line': 69, 'l1000_reagent': 2679, 'go_term_embedding': 11943, 'supplement_llm_evaluation': 300, 'supplement_llm_analysis': 111}, 'edge_counts': {'go_hierarchy': 83444, 'go_hierarchy_relationship': 97, 'gene_annotation': 635268, 'gene_viral_expression': 1633354, 'gene_disease_association': 128864, 'gene_drug_perturbation': 291407, 'gene_viral_response': 199616, 'gene_in_set': 10589, 'cluster_hierarchy': 39463, 'validated_by_go_term': 300, 'model_predicts': 1500, 'model_similarity_ranking': 500, 'predicts_go_term': 1500, 'prediction_uses_gene': 34630, 'similarity_evaluated_for': 500, 'gene_go_association': 596421, 'interprets_go_term': 2000, 'similarity_ranking_for': 2000, 'interprets': 1000, 'interprets_gene': 20299, 'contamination_analysis': 88, 'contamination_analysis_gene': 2552, 'similarity_ranking': 1011, 'similarity_pvalues': 1000, 'model_comparison': 89, 'analyzes_go_term': 1100, 'contamination_study_of_go_term': 1100, 'confidence_evaluation_of_go_term': 24, 'unknown': 1371052}, 'integration_metrics': {'go_connected_genes': 38138, 'omics_connected_genes': 17509, 'integrated_genes': 17509, 'integration_ratio': 0.45909591483559703}}
+INFO:kg_builders.comprehensive_graph:Validating comprehensive graph...
+INFO:kg_builders.comprehensive_graph:✅ Comprehensive graph validation passed
+INFO:kg_builders.comprehensive_graph:Comprehensive biomedical knowledge graph construction complete
+INFO:__main__:Graph construction completed in 2164.96 seconds
+INFO:__main__:Memory after graph building: 6661.1 MB
+INFO:__main__:✅ KNOWLEDGE GRAPH CONSTRUCTION COMPLETED
+INFO:__main__:Total construction time: 2193.04 seconds
+INFO:__main__:Peak memory usage: 6661.1 MB
+INFO:__main__:💾 SAVING KNOWLEDGE GRAPH IN MULTIPLE FORMATS
+INFO:__main__:============================================================
+INFO:__main__:Saving complete KG object as pickle...
+INFO:__main__:✅ Pickle saved in 17.78s (1022.8 MB)
+INFO:__main__:Saving NetworkX graph...
+INFO:__main__:✅ NetworkX graph saved in 9.96s (517.1 MB)
+INFO:__main__:Saving graph statistics and metadata...
+INFO:__main__:✅ Statistics and metadata saved
+INFO:__main__:Generating Neo4j export commands...
+INFO:__main__:✅ Neo4j export commands generated in 1.15s
+INFO:__main__:✅ ALL FORMATS SAVED SUCCESSFULLY
+INFO:__main__:🔍 VALIDATING SAVED GRAPH INTEGRITY
+INFO:__main__:==================================================
+INFO:__main__:Validating pickle file integrity...
+INFO:__main__:✅ Pickle validation: 14.27s load time
+INFO:__main__:   Nodes match: True (174210 vs 174210)
+INFO:__main__:   Edges match: True (5060768 vs 5060768)
+INFO:__main__:Validating NetworkX graph...
+INFO:__main__:✅ NetworkX validation: 12.81s load time
+INFO:__main__:   Structure matches: True
+INFO:__main__:✅ VALIDATION COMPLETED
+INFO:__main__:================================================================================
+INFO:__main__:🎉 PHASE 1 COMPLETED SUCCESSFULLY!
+INFO:__main__:================================================================================
+INFO:__main__:📊 BUILD SUMMARY:
+INFO:__main__:   Construction Time: 2193.04 seconds
+INFO:__main__:   Peak Memory Usage: 6661.1 MB
+INFO:__main__:   Total Nodes: 174210
+INFO:__main__:   Total Edges: 5060768
+INFO:__main__:💾 SAVED FORMATS:
+INFO:__main__:   ✅ Complete KG Object (pickle) - Fastest loading
+INFO:__main__:   ✅ NetworkX Graph (gpickle) - Graph analysis
+INFO:__main__:   ✅ Statistics & Metadata (JSON) - QC reference
+INFO:__main__:   ✅ Neo4j Export Commands (Cypher) - Database import
+INFO:__main__:📁 All files saved to: /home/mreddy1/knowledge_graph/quality_control/1_build_and_save_kg/saved_graphs
+INFO:__main__:🚀 Ready for Phase 2: Structural Integrity Validation

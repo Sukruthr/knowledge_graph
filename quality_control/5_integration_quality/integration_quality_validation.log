@@ -1,0 +1,24 @@
+2025-08-22 12:32:58,121 - INFO - 🔍 INTEGRATION QUALITY VALIDATION
+2025-08-22 12:32:58,121 - INFO - Executing: Load Knowledge Graph
+2025-08-22 12:32:58,122 - INFO - 📊 LOADING KNOWLEDGE GRAPH FOR INTEGRATION QUALITY VALIDATION
+2025-08-22 12:32:58,122 - INFO - Loading knowledge graph from: /home/mreddy1/knowledge_graph/quality_control/1_build_and_save_kg/saved_graphs/complete_biomedical_kg.pkl
+2025-08-22 12:33:11,457 - INFO - ✅ Knowledge graph loaded successfully
+2025-08-22 12:33:11,457 - INFO - ✅ Load Knowledge Graph completed
+2025-08-22 12:33:11,457 - INFO - Executing: Validate Integration Coverage
+2025-08-22 12:33:11,457 - INFO - 🔍 VALIDATING INTEGRATION COVERAGE
+2025-08-22 12:33:11,479 - INFO - Integration coverage: 0.0%
+2025-08-22 12:33:11,479 - INFO - Total node types: 1
+2025-08-22 12:33:11,479 - INFO - ✅ Validate Integration Coverage completed
+2025-08-22 12:33:11,479 - INFO - Executing: Validate Cross-Modal Connectivity
+2025-08-22 12:33:11,479 - INFO - 🔗 VALIDATING CROSS-MODAL CONNECTIVITY
+2025-08-22 12:33:11,493 - INFO - Average connection types per gene: 0.00
+2025-08-22 12:33:11,493 - INFO - Highly connected genes (≥5 types): 0
+2025-08-22 12:33:11,493 - INFO - ✅ Validate Cross-Modal Connectivity completed
+2025-08-22 12:33:11,493 - INFO - Executing: Generate Quality Metrics
+2025-08-22 12:33:11,493 - INFO - 📊 GENERATING INTEGRATION QUALITY METRICS
+2025-08-22 12:33:11,493 - INFO - Integration Quality Score: 0.0/100 (Grade: D)
+2025-08-22 12:33:11,493 - INFO - ✅ Generate Quality Metrics completed
+2025-08-22 12:33:11,493 - INFO - Executing: Save Results
+2025-08-22 12:33:11,493 - INFO - 📄 Results saved to: /home/mreddy1/knowledge_graph/quality_control/5_integration_quality/integration_quality_validation_results.json
+2025-08-22 12:33:11,493 - INFO - ✅ Save Results completed
+2025-08-22 12:33:11,493 - INFO - Integration Quality Validation: 100.0% success rate

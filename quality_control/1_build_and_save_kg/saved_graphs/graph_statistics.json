@@ -1,0 +1,22 @@
+{
+  "build_timestamp": "2025-08-22T12:11:45.267385",
+  "total_build_time_seconds": 2193.044796705246,
+  "data_loading_time_seconds": 28.080406427383423,
+  "graph_construction_time_seconds": 2164.9632844924927,
+  "memory_usage": {
+    "initial_mb": 98.26171875,
+    "after_init_mb": 98.26171875,
+    "after_loading_mb": 3530.375,
+    "after_building_mb": 6661.078125,
+    "peak_mb": 6661.078125
+  },
+  "graph_statistics": {
+    "total_nodes": 174210,
+    "total_edges": 5060768,
+    "node_types": {},
+    "edge_types": {},
+    "connected_components": 15889,
+    "density": 0.0001667526559680909,
+    "is_directed": true
+  }
+}

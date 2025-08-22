@@ -247,3 +247,126 @@
 2025-08-22 10:20:58,640 - INFO - LLM data covers 7514 unique genes
 2025-08-22 10:20:58,640 - INFO - LLM_processed data integration complete
 2025-08-22 10:20:58,640 - INFO - Adding GO Analysis Data...
+2025-08-22 12:33:25,580 - INFO - 🔬 COMPREHENSIVE SEMANTIC VALIDATION
+2025-08-22 12:33:25,580 - INFO - ================================================================================
+2025-08-22 12:33:25,580 - INFO - This validation ensures biological logic, semantic consistency,
+2025-08-22 12:33:25,580 - INFO - and scientific accuracy across all knowledge graph components.
+2025-08-22 12:33:25,580 - INFO - ================================================================================
+2025-08-22 12:33:25,580 - INFO - Executing: Load Knowledge Graph
+2025-08-22 12:33:25,580 - INFO - 📊 LOADING KNOWLEDGE GRAPH FOR COMPREHENSIVE SEMANTIC VALIDATION
+2025-08-22 12:33:25,581 - INFO - ================================================================================
+2025-08-22 12:33:25,581 - INFO - Loading knowledge graph from: /home/mreddy1/knowledge_graph/quality_control/1_build_and_save_kg/saved_graphs/complete_biomedical_kg.pkl
+2025-08-22 12:33:38,626 - INFO - ✅ Knowledge graph loaded successfully
+2025-08-22 12:33:38,626 - INFO -    Nodes: 174,210
+2025-08-22 12:33:39,723 - INFO -    Edges: 5,060,768
+2025-08-22 12:33:39,723 - INFO - ✅ Load Knowledge Graph completed successfully
+2025-08-22 12:33:39,723 - INFO - Executing: Initialize Biological Knowledge
+2025-08-22 12:33:39,723 - INFO - 🧬 INITIALIZING BIOLOGICAL KNOWLEDGE BASES
+2025-08-22 12:33:39,723 - INFO - ------------------------------------------------------------
+2025-08-22 12:33:39,785 - INFO - Biological knowledge initialized:
+2025-08-22 12:33:39,785 - INFO -    Essential genes: 0
+2025-08-22 12:33:39,785 - INFO -    Oncogenes: 0
+2025-08-22 12:33:39,785 - INFO -    Tumor suppressors: 0
+2025-08-22 12:33:39,785 - INFO -    Protein-coding genes: 0
+2025-08-22 12:33:39,785 - INFO -    GO namespaces: []
+2025-08-22 12:33:39,785 - INFO - ✅ Initialize Biological Knowledge completed successfully
+2025-08-22 12:33:39,785 - INFO - Executing: Validate GO Hierarchy Integrity
+2025-08-22 12:33:39,785 - INFO - 🔬 VALIDATING GO HIERARCHY INTEGRITY & BIOLOGICAL LOGIC
+2025-08-22 12:33:39,786 - INFO - ------------------------------------------------------------
+2025-08-22 12:33:41,603 - INFO - GO hierarchy validation:
+2025-08-22 12:33:41,603 - INFO -    Total GO terms: 0
+2025-08-22 12:33:41,603 - INFO -    Total relationships: 0
+2025-08-22 12:33:41,603 - INFO -    Hierarchy integrity: 100.0%
+2025-08-22 12:33:41,603 - INFO -    Namespace violations: 0
+2025-08-22 12:33:41,603 - INFO -    Orphaned terms: 0
+2025-08-22 12:33:41,603 - INFO -    Biological violations: 0
+2025-08-22 12:33:41,603 - INFO - ✅ Validate GO Hierarchy Integrity completed successfully
+2025-08-22 12:33:41,603 - INFO - Executing: Validate Gene-Function Relationships
+2025-08-22 12:33:41,603 - INFO - 🧬 VALIDATING GENE-FUNCTION RELATIONSHIPS
+2025-08-22 12:33:41,603 - INFO - ------------------------------------------------------------
+2025-08-22 12:33:43,209 - INFO - Gene-function relationship validation:
+2025-08-22 12:33:43,209 - INFO -    Total associations: 0
+2025-08-22 12:33:43,209 - INFO -    Genes with functions: 0
+2025-08-22 12:33:43,209 - INFO -    Average functions per gene: 0.0
+2025-08-22 12:33:43,209 - INFO -    Consistency rate: 100.0%
+2025-08-22 12:33:43,209 - INFO -    Under-annotated essential genes: 0
+2025-08-22 12:33:43,209 - INFO - ✅ Validate Gene-Function Relationships completed successfully
+2025-08-22 12:33:43,209 - INFO - Executing: Validate Disease-Gene Associations
+2025-08-22 12:33:43,209 - INFO - 🏥 VALIDATING DISEASE-GENE ASSOCIATIONS
+2025-08-22 12:33:43,209 - INFO - ------------------------------------------------------------
+2025-08-22 12:33:44,690 - INFO - Disease-gene association validation:
+2025-08-22 12:33:44,691 - INFO -    Total associations: 0
+2025-08-22 12:33:44,691 - INFO -    Unique diseases: 0
+2025-08-22 12:33:44,691 - INFO -    Unique genes: 0
+2025-08-22 12:33:44,691 - INFO -    Plausibility rate: 100.0%
+2025-08-22 12:33:44,691 - INFO -    Cancer gene coverage: 0.0%
+2025-08-22 12:33:44,691 - INFO - ✅ Validate Disease-Gene Associations completed successfully
+2025-08-22 12:33:44,691 - INFO - Executing: Validate Pathway Coherence
+2025-08-22 12:33:44,691 - INFO - 🛤️ VALIDATING PATHWAY COHERENCE & COMPLETENESS
+2025-08-22 12:33:44,691 - INFO - ------------------------------------------------------------
+2025-08-22 12:33:44,705 - INFO - Pathway coherence validation:
+2025-08-22 12:33:44,705 - INFO -    Pathways analyzed: 0
+2025-08-22 12:33:44,705 - INFO -    Average coherence score: 0.0
+2025-08-22 12:33:44,705 - INFO -    Overall coherence rate: 100.0%
+2025-08-22 12:33:44,705 - INFO -    Coherence issues: 0
+2025-08-22 12:33:44,705 - INFO - ✅ Validate Pathway Coherence completed successfully
+2025-08-22 12:33:44,705 - INFO - Executing: Validate Cross-Modal Consistency
+2025-08-22 12:33:44,705 - INFO - 🔗 VALIDATING CROSS-MODAL SEMANTIC CONSISTENCY
+2025-08-22 12:33:44,705 - INFO - ------------------------------------------------------------
+2025-08-22 12:33:44,719 - ERROR - ❌ Cross-modal consistency validation failed: division by zero
+2025-08-22 12:33:44,720 - ERROR - Traceback: Traceback (most recent call last):
+  File "/home/mreddy1/knowledge_graph/quality_control/6_semantic_validation/comprehensive_semantic_validation.py", line 806, in validate_cross_modal_semantic_consistency
+    consistency_rate = max(0, 100 - (len(consistency_issues) / len(sample_genes) * 100))
+                                     ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~
+ZeroDivisionError: division by zero
+
+2025-08-22 12:33:44,720 - ERROR - ❌ Validate Cross-Modal Consistency failed
+2025-08-22 12:33:44,720 - INFO - Executing: Validate Biological Constraints
+2025-08-22 12:33:44,720 - INFO - ⚖️ VALIDATING BIOLOGICAL CONSTRAINTS
+2025-08-22 12:33:44,720 - INFO - ------------------------------------------------------------
+2025-08-22 12:33:50,440 - INFO - Biological constraints validation:
+2025-08-22 12:33:50,440 - INFO -    Constraints checked: 5
+2025-08-22 12:33:50,440 - INFO -    Violations found: 0
+2025-08-22 12:33:50,440 - INFO -    Adherence rate: 100.0%
+2025-08-22 12:33:50,440 - INFO -    gene_uniqueness: ✅ All gene symbols unique
+2025-08-22 12:33:50,440 - INFO -    go_term_uniqueness: ✅ All GO IDs unique
+2025-08-22 12:33:50,440 - INFO -    species_consistency: ✅ 100.0% appear to be human genes
+2025-08-22 12:33:50,440 - INFO -    temporal_consistency: ✅ 0 temporal inconsistencies found
+2025-08-22 12:33:50,440 - INFO -    localization_consistency: ✅ 0 localization inconsistencies found
+2025-08-22 12:33:50,440 - INFO - ✅ Validate Biological Constraints completed successfully
+2025-08-22 12:33:50,440 - INFO - Executing: Generate Quality Metrics
+2025-08-22 12:33:50,440 - INFO - 📊 GENERATING COMPREHENSIVE SEMANTIC QUALITY METRICS
+2025-08-22 12:33:50,440 - INFO - ------------------------------------------------------------
+2025-08-22 12:33:50,440 - INFO - Comprehensive Semantic Quality Scores:
+2025-08-22 12:33:50,440 - INFO -    GO Hierarchy Integrity: 100.0%
+2025-08-22 12:33:50,440 - INFO -    Gene-Function Consistency: 100.0%
+2025-08-22 12:33:50,440 - INFO -    Disease-Gene Plausibility: 100.0%
+2025-08-22 12:33:50,440 - INFO -    Pathway Coherence: 100.0%
+2025-08-22 12:33:50,440 - INFO -    Cross-Modal Consistency: 0.0%
+2025-08-22 12:33:50,440 - INFO -    Biological Constraints: 100.0%
+2025-08-22 12:33:50,440 - INFO -    Overall Semantic Quality: 100.0% (Grade: A+)
+2025-08-22 12:33:50,440 - INFO - ✅ Generate Quality Metrics completed successfully
+2025-08-22 12:33:50,441 - INFO - Executing: Generate Recommendations
+2025-08-22 12:33:50,441 - INFO - Comprehensive Semantic Validation Recommendations:
+2025-08-22 12:33:50,441 - INFO -    [MEDIUM] Disease-Gene Associations: Enhance disease-gene association quality and coverage
+2025-08-22 12:33:50,441 - INFO -    [MEDIUM] Cross-Modal Consistency: Improve semantic consistency across data modalities
+2025-08-22 12:33:50,441 - ERROR - ❌ Generate Recommendations failed
+2025-08-22 12:33:50,441 - INFO - Executing: Save Results
+2025-08-22 12:33:50,441 - INFO - 📄 Comprehensive results saved to: /home/mreddy1/knowledge_graph/quality_control/6_semantic_validation/comprehensive_semantic_validation_results.json
+2025-08-22 12:33:50,441 - INFO - ✅ Save Results completed successfully
+2025-08-22 12:33:50,441 - INFO - ================================================================================
+2025-08-22 12:33:50,441 - INFO - 📊 COMPREHENSIVE SEMANTIC VALIDATION SUMMARY
+2025-08-22 12:33:50,441 - INFO - ================================================================================
+2025-08-22 12:33:50,441 - INFO - Steps completed: 9/11
+2025-08-22 12:33:50,441 - INFO - Success rate: 81.8%
+2025-08-22 12:33:50,441 - INFO - Execution time: 24.86 seconds
+2025-08-22 12:33:50,441 - INFO - Overall status: FAILED
+2025-08-22 12:33:50,441 - INFO - Semantic Quality Score: 100.0/100 (Grade: A+)
+2025-08-22 12:33:50,441 - INFO - Quality Breakdown:
+2025-08-22 12:33:50,441 - INFO -    go_hierarchy_integrity: 100.0%
+2025-08-22 12:33:50,441 - INFO -    gene_function_consistency: 100.0%
+2025-08-22 12:33:50,441 - INFO -    disease_gene_plausibility: 100.0%
+2025-08-22 12:33:50,442 - INFO -    pathway_coherence: 100.0%
+2025-08-22 12:33:50,442 - INFO -    cross_modal_consistency: 0.0%
+2025-08-22 12:33:50,442 - INFO -    biological_constraints: 100.0%
+2025-08-22 12:33:50,442 - INFO - 🎯 SEMANTIC VALIDATION COMPLETED - Knowledge graph validated for biological accuracy!

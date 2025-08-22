@@ -1,0 +1,101 @@
+2025-08-22 12:34:40,880 - INFO - 🎯 COMPREHENSIVE BIOMEDICAL KNOWLEDGE GRAPH QC FRAMEWORK
+2025-08-22 12:34:40,880 - INFO - ================================================================================
+2025-08-22 12:34:40,880 - INFO - This framework will perform comprehensive quality control across all dimensions:
+2025-08-22 12:34:40,880 - INFO - - Structural Integrity
+2025-08-22 12:34:40,880 - INFO - - Data Quality
+2025-08-22 12:34:40,880 - INFO - - Functional Testing
+2025-08-22 12:34:40,880 - INFO - - Integration Quality
+2025-08-22 12:34:40,880 - INFO - - Semantic Validation
+2025-08-22 12:34:40,880 - INFO - - Performance Benchmarks
+2025-08-22 12:34:40,880 - INFO - - Regression Testing
+2025-08-22 12:34:40,880 - INFO - ================================================================================
+2025-08-22 12:34:40,880 - INFO - 🔍 CHECKING QC FRAMEWORK PREREQUISITES
+2025-08-22 12:34:40,881 - INFO - ============================================================
+2025-08-22 12:34:40,881 - INFO - Python version: 3.12.4
+2025-08-22 12:34:40,881 - INFO - Available memory: 245.3 GB
+2025-08-22 12:34:40,881 - INFO - Available disk space: 463.9 GB
+2025-08-22 12:34:40,881 - INFO - ✅ Data directory exists: /home/mreddy1/knowledge_graph/llm_evaluation_for_gene_set_interpretation/data
+2025-08-22 12:34:40,881 - INFO - ✅ Source directory exists: /home/mreddy1/knowledge_graph/src
+2025-08-22 12:34:40,881 - INFO - ✅ All prerequisites satisfied
+2025-08-22 12:34:40,881 - INFO - 🚀 PHASE 1: Build & Persist KG
+2025-08-22 12:34:40,881 - INFO - ============================================================
+2025-08-22 12:34:40,881 - INFO - Description: Build complete knowledge graph and save in multiple formats
+2025-08-22 12:34:40,881 - INFO - Estimated time: 60 seconds
+2025-08-22 12:34:40,881 - INFO - Critical: True
+2025-08-22 12:34:40,881 - INFO - Executing: python /home/mreddy1/knowledge_graph/quality_control/1_build_and_save_kg/build_complete_kg.py
+2025-08-22 12:47:47,952 - INFO - 🎯 COMPREHENSIVE BIOMEDICAL KNOWLEDGE GRAPH QC FRAMEWORK
+2025-08-22 12:47:47,952 - INFO - ================================================================================
+2025-08-22 12:47:47,952 - INFO - This framework will perform comprehensive quality control across all dimensions:
+2025-08-22 12:47:47,952 - INFO - - Structural Integrity
+2025-08-22 12:47:47,952 - INFO - - Data Quality
+2025-08-22 12:47:47,952 - INFO - - Functional Testing
+2025-08-22 12:47:47,952 - INFO - - Integration Quality
+2025-08-22 12:47:47,952 - INFO - - Semantic Validation
+2025-08-22 12:47:47,952 - INFO - - Performance Benchmarks
+2025-08-22 12:47:47,952 - INFO - - Regression Testing
+2025-08-22 12:47:47,952 - INFO - ================================================================================
+2025-08-22 12:47:47,952 - INFO - 🔍 CHECKING QC FRAMEWORK PREREQUISITES
+2025-08-22 12:47:47,952 - INFO - ============================================================
+2025-08-22 12:47:47,952 - INFO - Python version: 3.10.18
+2025-08-22 12:47:47,952 - INFO - Available memory: 245.4 GB
+2025-08-22 12:47:47,952 - INFO - Available disk space: 463.9 GB
+2025-08-22 12:47:47,952 - INFO - ✅ Data directory exists: /home/mreddy1/knowledge_graph/llm_evaluation_for_gene_set_interpretation/data
+2025-08-22 12:47:47,952 - INFO - ✅ Source directory exists: /home/mreddy1/knowledge_graph/src
+2025-08-22 12:47:47,952 - INFO - ✅ All prerequisites satisfied
+2025-08-22 12:47:47,952 - INFO - 🚀 PHASE 1: Build & Persist KG
+2025-08-22 12:47:47,952 - INFO - ============================================================
+2025-08-22 12:47:47,952 - INFO - Description: Build complete knowledge graph and save in multiple formats
+2025-08-22 12:47:47,952 - INFO - Estimated time: 60 seconds
+2025-08-22 12:47:47,953 - INFO - Critical: True
+2025-08-22 12:47:47,953 - INFO - Executing: python /home/mreddy1/knowledge_graph/quality_control/1_build_and_save_kg/build_complete_kg.py
+2025-08-22 12:48:21,388 - INFO - 🎯 COMPREHENSIVE BIOMEDICAL KNOWLEDGE GRAPH QC FRAMEWORK
+2025-08-22 12:48:21,388 - INFO - ================================================================================
+2025-08-22 12:48:21,388 - INFO - This framework will perform comprehensive quality control across all dimensions:
+2025-08-22 12:48:21,388 - INFO - - Structural Integrity
+2025-08-22 12:48:21,388 - INFO - - Data Quality
+2025-08-22 12:48:21,388 - INFO - - Functional Testing
+2025-08-22 12:48:21,388 - INFO - - Integration Quality
+2025-08-22 12:48:21,388 - INFO - - Semantic Validation
+2025-08-22 12:48:21,388 - INFO - - Performance Benchmarks
+2025-08-22 12:48:21,388 - INFO - - Regression Testing
+2025-08-22 12:48:21,388 - INFO - ================================================================================
+2025-08-22 12:48:21,388 - INFO - 🔍 CHECKING QC FRAMEWORK PREREQUISITES
+2025-08-22 12:48:21,388 - INFO - ============================================================
+2025-08-22 12:48:21,388 - INFO - Python version: 3.10.18
+2025-08-22 12:48:21,388 - INFO - Available memory: 245.4 GB
+2025-08-22 12:48:21,388 - INFO - Available disk space: 463.9 GB
+2025-08-22 12:48:21,388 - INFO - ✅ Data directory exists: /home/mreddy1/knowledge_graph/llm_evaluation_for_gene_set_interpretation/data
+2025-08-22 12:48:21,388 - INFO - ✅ Source directory exists: /home/mreddy1/knowledge_graph/src
+2025-08-22 12:48:21,388 - INFO - ✅ All prerequisites satisfied
+2025-08-22 12:48:21,388 - INFO - 🚀 PHASE 1: Build & Persist KG
+2025-08-22 12:48:21,389 - INFO - ============================================================
+2025-08-22 12:48:21,389 - INFO - Description: Build complete knowledge graph and save in multiple formats
+2025-08-22 12:48:21,389 - INFO - Estimated time: 60 seconds
+2025-08-22 12:48:21,389 - INFO - Critical: True
+2025-08-22 12:48:21,389 - INFO - Executing: python /home/mreddy1/knowledge_graph/quality_control/1_build_and_save_kg/build_complete_kg.py
+2025-08-22 13:08:22,046 - ERROR - ❌ Phase 1 timed out after 1200.7s
+2025-08-22 13:08:22,046 - ERROR - ❌ Critical phase 1 failed - aborting QC framework
+2025-08-22 13:08:22,046 - INFO - 📊 GENERATING COMPREHENSIVE QC REPORT
+2025-08-22 13:08:22,046 - INFO - ============================================================
+2025-08-22 13:08:22,047 - INFO - Comprehensive QC Report Summary:
+2025-08-22 13:08:22,047 - INFO -    Total phases: 8
+2025-08-22 13:08:22,047 - INFO -    Executed phases: 1
+2025-08-22 13:08:22,047 - INFO -    Successful phases: 0
+2025-08-22 13:08:22,047 - INFO -    Overall success rate: 0.0%
+2025-08-22 13:08:22,047 - INFO -    Total execution time: 20.0 minutes
+2025-08-22 13:08:22,047 - INFO -    Final assessment: D
+2025-08-22 13:08:22,047 - INFO - 📄 Comprehensive results saved to: /home/mreddy1/knowledge_graph/quality_control/comprehensive_results/comprehensive_qc_results.json
+2025-08-22 13:08:22,048 - INFO - 📄 Executive summary saved to: /home/mreddy1/knowledge_graph/quality_control/comprehensive_results/EXECUTIVE_SUMMARY.md
+2025-08-22 13:08:22,048 - INFO - ================================================================================
+2025-08-22 13:08:22,048 - INFO - 🏁 COMPREHENSIVE QC FRAMEWORK COMPLETED
+2025-08-22 13:08:22,048 - INFO - ================================================================================
+2025-08-22 13:08:22,048 - INFO - Total execution time: 20.0 minutes
+2025-08-22 13:08:22,048 - INFO - Phases executed: 1/8
+2025-08-22 13:08:22,048 - INFO - Overall success rate: 0.0%
+2025-08-22 13:08:22,048 - INFO - Final quality score: 0.0/100
+2025-08-22 13:08:22,048 - INFO - Quality grade: D
+2025-08-22 13:08:22,048 - INFO - Production ready: NO ❌
+2025-08-22 13:08:22,048 - INFO - 
+Results saved to: /home/mreddy1/knowledge_graph/quality_control/comprehensive_results
+2025-08-22 13:08:22,049 - INFO - 📄 Check EXECUTIVE_SUMMARY.md for detailed assessment
+2025-08-22 13:08:22,049 - INFO - ⚠️ Knowledge graph requires improvements before production

@@ -1,0 +1,339 @@
+{
+  "timestamp": "2025-08-22T12:30:27.863127",
+  "validation_summary": {},
+  "detailed_results": {
+    "topology": {
+      "basic_metrics": {
+        "total_nodes": 174210,
+        "total_edges": 5060768,
+        "is_directed": true,
+        "density": 0.0001667526559680909,
+        "average_degree": 58.099626887090295
+      },
+      "connectivity": {
+        "strongly_connected_components": 174210,
+        "weakly_connected_components": 15889,
+        "largest_strongly_connected_size": 1,
+        "largest_weakly_connected_size": 93197
+      },
+      "degree_distribution": {
+        "min_degree": 0,
+        "max_degree": 221525,
+        "mean_degree": 58.099626887090295,
+        "median_degree": 5.0,
+        "std_degree": 675.5898026644461
+      },
+      "isolated_nodes": {
+        "count": 15697,
+        "percentage": 9.010389759485678,
+        "sample_isolated_nodes": [
+          "GO:0019952",
+          "GO:0050876",
+          "GO:1905121",
+          "GO:0006594",
+          "GO:0006871",
+          "GO:0000057",
+          "GO:0000058",
+          "GO:0016359",
+          "GO:0030475",
+          "GO:0031576"
+        ]
+      },
+      "cycles": {
+        "has_cycles": false,
+        "analysis": "Cycles expected in biological networks (feedback loops, etc.)"
+      }
+    },
+    "nodes": {
+      "type_distribution": {
+        "Unknown": 174210
+      },
+      "properties_by_type": {
+        "Unknown": [
+          "scenarios",
+          "has_literature",
+          "random_percentile",
+          "score_bin",
+          "reference",
+          "sources",
+          "enrichment_analysis",
+          "true_go_term_sim_percentile",
+          "confidence_score",
+          "llm_support_analysis",
+          "num_references",
+          "raw_score",
+          "node_type",
+          "gprofiler_success_tf",
+          "llm_analysis",
+          "gene_name",
+          "score_range",
+          "default_name",
+          "supporting_count",
+          "total_lines",
+          "mean_percentile",
+          "random_go_llm_sim",
+          "unique_cell_lines",
+          "50perc_contaminated_score",
+          "synonyms",
+          "model",
+          "gene_symbol",
+          "intersections",
+          "scenario",
+          "gse_id",
+          "go_p_value",
+          "query_size",
+          "llm_go_match",
+          "random_sim_rank",
+          "reagent",
+          "adj_pvals",
+          "total_evaluations",
+          "median_confidence",
+          "reviewer_score_bin",
+          "top_10_percent_count",
+          "mean_confidence",
+          "score",
+          "perturbation_count",
+          "gprofiler_ji",
+          "file_size",
+          "taxon",
+          "llm_best_matching_go",
+          "title_supports",
+          "term",
+          "random_rank",
+          "gprofiler_validation_success",
+          "bottom_50_percent_count",
+          "llm_validation_success",
+          "random_sim_percentile",
+          "random_similarity",
+          "experimental_p_value",
+          "genes",
+          "default_analysis",
+          "llm_coverage",
+          "sample_count",
+          "sim_rank",
+          "go_term",
+          "random_pvals",
+          "gene_set_name",
+          "contamination_levels",
+          "url_or_desc",
+          "n_genes",
+          "predicted_name",
+          "contaminated_100perc",
+          "llm_name_go_term_sim",
+          "namespace",
+          "true_percentile",
+          "pvals",
+          "go_term_id",
+          "n_genesets",
+          "is_obsolete",
+          "description",
+          "definition",
+          "keywords",
+          "contaminated_genes_100perc_count",
+          "paragraph",
+          "adjusted_p-value",
+          "contaminated_50perc",
+          "gene_type",
+          "default_score",
+          "severe_drops",
+          "best_matching_go_term_size",
+          "top_3_similarities",
+          "viral_condition",
+          "dosage_unit",
+          "term_description",
+          "experimental_genes",
+          "dataset",
+          "original_genes",
+          "reviewer_score_bin_final",
+          "top_3_hits",
+          "abstract_supports",
+          "similarity_percentile",
+          "mean_rank",
+          "moderate_drops",
+          "go_term_size",
+          "similarity_rank",
+          "100perc_contaminated_name",
+          "100perc_contaminated_analysis",
+          "validated_go_term",
+          "llm_go_similarity",
+          "referenced_analysis",
+          "drug_name",
+          "go_intersection_size",
+          "performance_improvements",
+          "contaminated_genes_50perc_count",
+          "total_genesets",
+          "random_similarity_percentile",
+          "gene_count",
+          "go_id",
+          "100perc_contaminated_score",
+          "cell_line_name",
+          "unique_reagents",
+          "evaluation_id",
+          "term_size",
+          "uniprot_id",
+          "llm_success_tf",
+          "notes",
+          "go_term_similarity",
+          "source",
+          "datasets",
+          "data_source",
+          "intersection_size",
+          "stable_performance",
+          "has_enrichment_data",
+          "contamination_robustness_score",
+          "llm_score",
+          "50perc_contaminated_name",
+          "cell_line",
+          "true_description",
+          "supporting_genes",
+          "50perc_contaminated_analysis",
+          "model_name",
+          "disease_name",
+          "llm_name",
+          "dosage",
+          "embedding_dimension",
+          "unique_analyses",
+          "analysis",
+          "score_type",
+          "total_references",
+          "gene_set_id",
+          "gene_list",
+          "random_go_name",
+          "low_confidence_count",
+          "reagent_name",
+          "experimental_overlap",
+          "dataset_type",
+          "confidence_bin",
+          "validated_go_id",
+          "unique_gene_sets",
+          "has_embedding_vector",
+          "evaluation_count",
+          "llm_ji",
+          "random_go_similarity",
+          "duration_unit",
+          "duration",
+          "mean_similarity",
+          "paragraphs",
+          "sample_scores",
+          "has_human_review",
+          "name",
+          "entity_type",
+          "high_confidence_count",
+          "comment",
+          "genes_used",
+          "cluster_id",
+          "random_adj_pvals",
+          "random_similarity_rank"
+        ]
+      },
+      "missing_type_count": 174210,
+      "missing_type_percentage": 100.0,
+      "biological_type_coverage": {
+        "expected_types": [
+          "viral_condition",
+          "gene_set",
+          "disease",
+          "llm_interpretation",
+          "cluster",
+          "model_prediction",
+          "go_term",
+          "gene",
+          "drug"
+        ],
+        "found_types": [],
+        "coverage_percentage": 0.0,
+        "missing_types": [
+          "viral_condition",
+          "gene_set",
+          "disease",
+          "llm_interpretation",
+          "cluster",
+          "model_prediction",
+          "go_term",
+          "gene",
+          "drug"
+        ]
+      },
+      "property_completeness": {},
+      "specific_validations": {
+        "gene_validation": {
+          "total_genes": 0,
+          "with_identifier": 0,
+          "identifier_coverage": 0
+        },
+        "go_validation": {
+          "total_go_terms": 0,
+          "with_namespace": 0,
+          "namespace_coverage": 0
+        }
+      },
+      "quality_checks": [
+        {
+          "check": "Gene identifier coverage",
+          "actual": 0,
+          "threshold": 95.0,
+          "passed": false
+        },
+        {
+          "check": "GO term namespace coverage",
+          "actual": 0,
+          "threshold": 90.0,
+          "passed": false
+        }
+      ]
+    },
+    "edges": {
+      "error": "not enough values to unpack (expected 3, got 2)"
+    },
+    "referential_integrity": {
+      "gene_identifier_consistency": {
+        "total_gene_nodes": 0,
+        "unique_symbols": 0,
+        "unique_entrez": 0,
+        "unique_uniprot": 0,
+        "symbol_coverage": 0
+      },
+      "cross_modal_connectivity": {
+        "genes_with_connections": 0,
+        "average_connection_types_per_gene": 0,
+        "connection_distribution": {},
+        "highly_connected_genes": 0
+      },
+      "orphaned_nodes": {
+        "total_orphaned": 15697,
+        "orphaned_percentage": 9.010389759485678,
+        "orphaned_by_type": {
+          "Unknown": 15697
+        }
+      }
+    }
+  },
+  "quality_metrics": {
+    "topology_quality_score": 81.97922048102865,
+    "node_structure_quality_score": 15.0,
+    "edge_structure_quality_score": 100.0,
+    "referential_integrity_score": 30.0,
+    "overall_structural_quality": 56.74480512025716,
+    "structural_quality_grade": "D"
+  },
+  "recommendations": [
+    {
+      "category": "Topology",
+      "priority": "HIGH",
+      "issue": "9.0% isolated nodes found",
+      "recommendation": "Review data integration to ensure all nodes are properly connected"
+    },
+    {
+      "category": "Node Structure",
+      "priority": "MEDIUM",
+      "issue": "100.0% nodes missing type information",
+      "recommendation": "Add type information to all nodes during data parsing"
+    },
+    {
+      "category": "Referential Integrity",
+      "priority": "HIGH",
+      "issue": "9.0% orphaned nodes detected",
+      "recommendation": "Review data integration pipeline to ensure proper node connections"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "timestamp": "2025-08-22T12:32:58.121856",
+  "validation_summary": {},
+  "detailed_results": {
+    "integration_coverage": {
+      "expected_integrations": [
+        "GO_BP",
+        "GO_CC",
+        "GO_MF",
+        "Omics_Data",
+        "Model_Compare",
+        "CC_MF_Branch",
+        "LLM_processed",
+        "GO_Analysis_Data",
+        "Remaining_Data"
+      ],
+      "integration_indicators": {
+        "GO_integration": false,
+        "Gene_integration": false,
+        "Disease_integration": false,
+        "Drug_integration": false,
+        "Viral_integration": false,
+        "Model_integration": false,
+        "LLM_integration": false,
+        "Cluster_integration": false
+      },
+      "total_node_types": 1,
+      "integration_coverage_percentage": 0.0,
+      "node_type_distribution": {
+        "unknown": 174210
+      }
+    },
+    "cross_modal_connectivity": {
+      "genes_analyzed": 0,
+      "connection_type_distribution": {},
+      "genes_by_connection_count": {},
+      "average_connection_types_per_gene": 0,
+      "highly_connected_genes": 0
+    }
+  },
+  "quality_metrics": {
+    "integration_coverage_score": 0.0,
+    "connectivity_score": 0,
+    "overall_integration_quality": 0.0,
+    "integration_quality_grade": "D"
+  },
+  "recommendations": []
+}

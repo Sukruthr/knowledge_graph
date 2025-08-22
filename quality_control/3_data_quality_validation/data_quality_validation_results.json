@@ -1,0 +1,64 @@
+{
+  "timestamp": "2025-08-22T12:31:18.953637",
+  "validation_summary": {},
+  "detailed_results": {
+    "gene_symbols": {
+      "total_gene_nodes": 0,
+      "genes_with_symbols": 0,
+      "symbol_coverage_percentage": 0,
+      "valid_symbol_format_count": 0,
+      "format_accuracy_percentage": 0,
+      "reference_consistent_count": 0,
+      "reference_consistency_percentage": 0,
+      "duplicate_symbols": 0,
+      "invalid_symbols_sample": [],
+      "invalid_symbols_count": 0
+    },
+    "go_terms": {
+      "total_go_terms": 0,
+      "valid_go_format_count": 0,
+      "format_accuracy_percentage": 0,
+      "terms_with_names": 0,
+      "name_coverage_percentage": 0,
+      "terms_with_namespaces": 0,
+      "namespace_coverage_percentage": 0,
+      "namespace_distribution": {},
+      "invalid_go_ids_sample": [],
+      "invalid_go_ids_count": 0
+    },
+    "biological_relationships": {
+      "error": "name 'np' is not defined"
+    },
+    "data_completeness": {
+      "error": "name 'np' is not defined"
+    }
+  },
+  "quality_metrics": {
+    "gene_symbol_quality_score": 0.0,
+    "go_term_quality_score": 0.0,
+    "biological_relationship_quality_score": 0,
+    "data_completeness_score": 0,
+    "overall_data_quality_score": 0,
+    "data_quality_grade": "D"
+  },
+  "recommendations": [
+    {
+      "category": "Gene Symbols",
+      "priority": "HIGH",
+      "issue": "Only 0.0% of genes have symbol information",
+      "recommendation": "Improve gene identifier mapping during data integration"
+    },
+    {
+      "category": "Gene Symbols",
+      "priority": "MEDIUM",
+      "issue": "Only 0.0% of gene symbols follow standard format",
+      "recommendation": "Implement gene symbol standardization and validation"
+    },
+    {
+      "category": "GO Terms",
+      "priority": "HIGH",
+      "issue": "Only 0.0% of GO terms have namespace information",
+      "recommendation": "Ensure all GO terms include namespace during parsing"
+    }
+  ]
+}

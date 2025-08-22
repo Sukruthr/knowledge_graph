@@ -1,0 +1,269 @@
+{
+  "timestamp": "2025-08-22T12:32:24.287244",
+  "test_summary": {},
+  "detailed_results": {
+    "discovered_methods": {
+      "initialization": [],
+      "data_loading": [
+        "load_data"
+      ],
+      "graph_building": [
+        "build_comprehensive_graph"
+      ],
+      "gene_queries": [
+        "query_gene_cc_mf_profile",
+        "query_gene_comprehensive",
+        "query_gene_go_analysis_profile",
+        "query_gene_llm_profile"
+      ],
+      "go_queries": [
+        "query_go_confidence_evaluations",
+        "query_go_contamination_analysis",
+        "query_go_core_analysis"
+      ],
+      "disease_queries": [],
+      "drug_queries": [],
+      "viral_queries": [],
+      "model_queries": [
+        "query_model_comparison_summary",
+        "query_model_predictions"
+      ],
+      "statistics": [
+        "get_cc_mf_branch_stats",
+        "get_comprehensive_stats",
+        "get_go_analysis_stats",
+        "get_llm_processed_stats"
+      ],
+      "validation": [],
+      "utility": [
+        "query_cc_mf_llm_interpretations",
+        "query_cc_mf_similarity_rankings",
+        "query_cc_mf_terms",
+        "query_contamination_analysis",
+        "query_llm_interpretations",
+        "query_llm_similarity_rankings",
+        "save_comprehensive_graph"
+      ]
+    },
+    "method_testing": {
+      "gene_queries": {
+        "total_tests": 0,
+        "passed_tests": 0,
+        "method_results": {
+          "query_gene_cc_mf_profile": [],
+          "query_gene_comprehensive": [],
+          "query_gene_go_analysis_profile": [],
+          "query_gene_llm_profile": []
+        }
+      },
+      "go_queries": {
+        "total_tests": 0,
+        "passed_tests": 0,
+        "method_results": {
+          "query_go_confidence_evaluations": [],
+          "query_go_contamination_analysis": [],
+          "query_go_core_analysis": []
+        }
+      },
+      "statistics": {
+        "total_tests": 4,
+        "passed_tests": 4,
+        "method_results": {
+          "get_cc_mf_branch_stats": {
+            "success": true,
+            "execution_time": 1.5903685092926025,
+            "result_keys": [
+              "cc_go_terms",
+              "mf_go_terms",
+              "cc_interpretations",
+              "mf_interpretations",
+              "cc_similarity_rankings",
+              "mf_similarity_rankings",
+              "cc_mf_gene_associations",
+              "unique_cc_mf_genes",
+              "total_cc_mf_terms",
+              "total_cc_mf_interpretations",
+              "total_cc_mf_rankings"
+            ]
+          },
+          "get_comprehensive_stats": {
+            "success": true,
+            "execution_time": 4.0531158447265625e-06,
+            "result_keys": [
+              "total_nodes",
+              "total_edges",
+              "node_counts",
+              "edge_counts",
+              "integration_metrics"
+            ]
+          },
+          "get_go_analysis_stats": {
+            "success": true,
+            "execution_time": 2.758138656616211,
+            "result_keys": [
+              "core_analyses",
+              "contamination_analyses",
+              "confidence_evaluations",
+              "hierarchy_relationships",
+              "similarity_datasets",
+              "datasets_analyzed",
+              "unique_go_terms",
+              "unique_genes",
+              "enrichment_analyses",
+              "human_reviewed"
+            ]
+          },
+          "get_llm_processed_stats": {
+            "success": true,
+            "execution_time": 1.3964173793792725,
+            "result_keys": [
+              "llm_interpretations",
+              "contamination_analyses",
+              "similarity_rankings",
+              "similarity_pvalues",
+              "model_comparisons",
+              "models_analyzed",
+              "datasets_analyzed",
+              "unique_go_terms",
+              "unique_genes"
+            ]
+          }
+        }
+      },
+      "utility": {
+        "total_tests": 6,
+        "passed_tests": 6,
+        "method_results": {
+          "query_cc_mf_llm_interpretations": {
+            "success": true,
+            "execution_time": 0.015895605087280273,
+            "result_type": "list"
+          },
+          "query_cc_mf_similarity_rankings": {
+            "success": true,
+            "execution_time": 0.02558279037475586,
+            "result_type": "list"
+          },
+          "query_cc_mf_terms": {
+            "success": true,
+            "execution_time": 0.01998162269592285,
+            "result_type": "list"
+          },
+          "query_contamination_analysis": {
+            "success": true,
+            "execution_time": 0.015385866165161133,
+            "result_type": "list"
+          },
+          "query_llm_interpretations": {
+            "success": true,
+            "execution_time": 0.015102386474609375,
+            "result_type": "list"
+          },
+          "query_llm_similarity_rankings": {
+            "success": true,
+            "execution_time": 0.01551055908203125,
+            "result_type": "list"
+          }
+        }
+      },
+      "overall_summary": {
+        "total_methods_tested": 22,
+        "total_tests": 10,
+        "passed_tests": 10,
+        "success_rate": 100.0
+      }
+    }
+  },
+  "performance_metrics": {
+    "method_execution": {
+      "total_methods_timed": 10,
+      "average_execution_time": 0.5852387428283692,
+      "min_execution_time": 4.0531158447265625e-06,
+      "max_execution_time": 2.758138656616211,
+      "fast_methods_count": 7,
+      "slow_methods_count": 3
+    },
+    "gene_queries": {
+      "average_time": 0.0008653640747070312,
+      "min_time": 0.0006525516510009766,
+      "max_time": 0.0011401176452636719
+    },
+    "query_throughput": {
+      "queries_per_second": 0.0,
+      "test_size": 0
+    }
+  },
+  "biological_queries": {
+    "gene_queries": [
+      {
+        "query": "TP53 gene profile",
+        "input": "TP53",
+        "success": true,
+        "execution_time": 0.0011401176452636719,
+        "quality_score": 40.0,
+        "result_size": 9
+      },
+      {
+        "query": "BRCA1 gene profile",
+        "input": "BRCA1",
+        "success": true,
+        "execution_time": 0.00070953369140625,
+        "quality_score": 40.0,
+        "result_size": 9
+      },
+      {
+        "query": "EGFR gene profile",
+        "input": "EGFR",
+        "success": true,
+        "execution_time": 0.0010917186737060547,
+        "quality_score": 40.0,
+        "result_size": 9
+      },
+      {
+        "query": "MYC gene profile",
+        "input": "MYC",
+        "success": true,
+        "execution_time": 0.0006525516510009766,
+        "quality_score": 40.0,
+        "result_size": 9
+      },
+      {
+        "query": "PTEN gene profile",
+        "input": "PTEN",
+        "success": true,
+        "execution_time": 0.0007328987121582031,
+        "quality_score": 40.0,
+        "result_size": 9
+      }
+    ],
+    "go_queries": [],
+    "cross_modal_queries": [],
+    "performance_queries": [
+      {
+        "test_type": "sequential_queries",
+        "queries_count": 0,
+        "total_time": 4.76837158203125e-07,
+        "queries_per_second": 0.0
+      }
+    ],
+    "summary": {
+      "total_biological_queries": 5,
+      "successful_queries": 5,
+      "success_rate": 100.0
+    }
+  },
+  "recommendations": [
+    {
+      "category": "Performance",
+      "priority": "MEDIUM",
+      "issue": "Query throughput is only 0.0 queries/second",
+      "recommendation": "Optimize query methods for better performance"
+    },
+    {
+      "category": "Performance",
+      "priority": "LOW",
+      "issue": "3 methods take >1 second to execute",
+      "recommendation": "Profile and optimize slow methods"
+    }
+  ]
+}

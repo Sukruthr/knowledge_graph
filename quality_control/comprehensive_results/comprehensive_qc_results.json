@@ -1,0 +1,46 @@
+{
+  "timestamp": "2025-08-22T12:48:21.388100",
+  "qc_framework_version": "1.0",
+  "overall_summary": {
+    "total_phases": 8,
+    "executed_phases": 1,
+    "successful_phases": 0,
+    "overall_success_rate": 0.0,
+    "total_execution_time_seconds": 1200.657078742981,
+    "total_execution_time_minutes": 20.010951312383018
+  },
+  "phase_results": {
+    "Build & Persist KG": {
+      "phase": 1,
+      "name": "Build & Persist KG",
+      "execution_time_seconds": 1200.657078742981,
+      "error": "timeout",
+      "success": false
+    }
+  },
+  "quality_metrics": {},
+  "final_assessment": {
+    "overall_score": 0,
+    "grade": "D",
+    "production_ready": false,
+    "certification_level": "NOT_CERTIFIED",
+    "critical_issues": [],
+    "recommendations": []
+  },
+  "recommendations": [
+    {
+      "category": "Critical Issues",
+      "priority": "CRITICAL",
+      "issue": "1 critical QC phases failed",
+      "recommendation": "Address critical failures before any deployment",
+      "action_required": true
+    },
+    {
+      "category": "Quality Score",
+      "priority": "HIGH",
+      "issue": "Overall quality score is 0.0%",
+      "recommendation": "Comprehensive quality improvements required",
+      "action_required": true
+    }
+  ]
+}

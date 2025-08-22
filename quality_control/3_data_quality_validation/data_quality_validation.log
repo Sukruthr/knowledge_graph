@@ -1,0 +1,89 @@
+2025-08-22 12:31:18,953 - INFO - 🔍 COMPREHENSIVE DATA QUALITY VALIDATION
+2025-08-22 12:31:18,953 - INFO - ================================================================================
+2025-08-22 12:31:18,954 - INFO - Executing: Load Knowledge Graph
+2025-08-22 12:31:18,954 - INFO - 📊 LOADING KNOWLEDGE GRAPH FOR DATA QUALITY VALIDATION
+2025-08-22 12:31:18,954 - INFO - ======================================================================
+2025-08-22 12:31:18,954 - INFO - Loading knowledge graph from: /home/mreddy1/knowledge_graph/quality_control/1_build_and_save_kg/saved_graphs/complete_biomedical_kg.pkl
+2025-08-22 12:31:32,246 - INFO - ✅ Knowledge graph loaded successfully in 13.29 seconds
+2025-08-22 12:31:32,246 - INFO -    Nodes: 174,210
+2025-08-22 12:31:33,344 - INFO -    Edges: 5,060,768
+2025-08-22 12:31:33,345 - INFO - ✅ Load Knowledge Graph completed successfully
+2025-08-22 12:31:33,345 - INFO - Executing: Load Reference Data
+2025-08-22 12:31:33,345 - INFO - 📚 LOADING REFERENCE DATA FOR VALIDATION
+2025-08-22 12:31:33,345 - INFO - --------------------------------------------------
+2025-08-22 12:31:33,361 - INFO - Loaded 0 valid gene symbols
+2025-08-22 12:31:33,377 - INFO - Loaded 0 valid GO terms
+2025-08-22 12:31:34,813 - INFO - Loaded 0 known gene-GO associations
+2025-08-22 12:31:34,813 - INFO - ✅ Reference data loading completed
+2025-08-22 12:31:34,813 - INFO - ✅ Load Reference Data completed successfully
+2025-08-22 12:31:34,813 - INFO - Executing: Validate Gene Symbols
+2025-08-22 12:31:34,813 - INFO - 🧬 VALIDATING GENE SYMBOLS
+2025-08-22 12:31:34,813 - INFO - --------------------------------------------------
+2025-08-22 12:31:34,829 - INFO - Gene symbol validation results:
+2025-08-22 12:31:34,829 - INFO -    Total gene nodes: 0
+2025-08-22 12:31:34,830 - INFO -    Genes with symbols: 0 (0.0%)
+2025-08-22 12:31:34,830 - INFO -    Valid symbol format: 0 (0.0%)
+2025-08-22 12:31:34,830 - INFO -    Reference consistent: 0 (0.0%)
+2025-08-22 12:31:34,830 - INFO - ✅ Gene symbol validation completed
+2025-08-22 12:31:34,830 - INFO - ✅ Validate Gene Symbols completed successfully
+2025-08-22 12:31:34,830 - INFO - Executing: Validate GO Terms
+2025-08-22 12:31:34,830 - INFO - 🔬 VALIDATING GO TERMS
+2025-08-22 12:31:34,830 - INFO - --------------------------------------------------
+2025-08-22 12:31:34,846 - INFO - GO term validation results:
+2025-08-22 12:31:34,846 - INFO -    Total GO terms: 0
+2025-08-22 12:31:34,846 - INFO -    Valid GO format: 0 (0.0%)
+2025-08-22 12:31:34,846 - INFO -    Terms with names: 0 (0.0%)
+2025-08-22 12:31:34,846 - INFO -    Terms with namespaces: 0 (0.0%)
+2025-08-22 12:31:34,846 - WARNING - ⚠️ Missing expected namespaces: {'molecular_function', 'cellular_component', 'biological_process'}
+2025-08-22 12:31:34,846 - INFO - Namespace distribution:
+2025-08-22 12:31:34,846 - INFO - ✅ GO term validation completed
+2025-08-22 12:31:34,846 - INFO - ✅ Validate GO Terms completed successfully
+2025-08-22 12:31:34,846 - INFO - Executing: Validate Biological Relationships
+2025-08-22 12:31:34,846 - INFO - 🔗 VALIDATING BIOLOGICAL RELATIONSHIPS
+2025-08-22 12:31:34,846 - INFO - --------------------------------------------------
+2025-08-22 12:32:00,710 - ERROR - ❌ Biological relationship validation failed: name 'np' is not defined
+2025-08-22 12:32:00,711 - ERROR - Traceback: Traceback (most recent call last):
+  File "/home/mreddy1/knowledge_graph/quality_control/3_data_quality_validation/data_quality_validation.py", line 391, in validate_biological_relationships
+    'overall_plausibility': np.mean([v['plausibility_percentage'] for v in validated_relationships.values()]) if validated_relationships else 0
+                            ^^
+NameError: name 'np' is not defined
+
+2025-08-22 12:32:00,711 - ERROR - ❌ Validate Biological Relationships failed
+2025-08-22 12:32:00,711 - INFO - Executing: Validate Data Completeness
+2025-08-22 12:32:00,711 - INFO - 📋 VALIDATING DATA COMPLETENESS
+2025-08-22 12:32:00,711 - INFO - --------------------------------------------------
+2025-08-22 12:32:03,243 - ERROR - ❌ Data completeness validation failed: name 'np' is not defined
+2025-08-22 12:32:03,244 - ERROR - Traceback: Traceback (most recent call last):
+  File "/home/mreddy1/knowledge_graph/quality_control/3_data_quality_validation/data_quality_validation.py", line 503, in validate_data_completeness
+    overall_node_completeness = np.mean(type_completeness_scores) if type_completeness_scores else 0
+                                ^^
+NameError: name 'np' is not defined
+
+2025-08-22 12:32:03,244 - ERROR - ❌ Validate Data Completeness failed
+2025-08-22 12:32:03,244 - INFO - Executing: Generate Quality Metrics
+2025-08-22 12:32:03,244 - INFO - 📊 GENERATING DATA QUALITY METRICS
+2025-08-22 12:32:03,244 - INFO - --------------------------------------------------
+2025-08-22 12:32:03,244 - INFO - Data Quality Scores:
+2025-08-22 12:32:03,244 - INFO -    Gene Symbol Quality: 0.0/100
+2025-08-22 12:32:03,244 - INFO -    GO Term Quality: 0.0/100
+2025-08-22 12:32:03,244 - INFO -    Relationship Quality: 0.0/100
+2025-08-22 12:32:03,244 - INFO -    Data Completeness: 0.0/100
+2025-08-22 12:32:03,244 - INFO -    Overall Data Quality: 0.0/100 (Grade: D)
+2025-08-22 12:32:03,244 - INFO - ✅ Generate Quality Metrics completed successfully
+2025-08-22 12:32:03,244 - INFO - Executing: Generate Recommendations
+2025-08-22 12:32:03,244 - INFO - Data Quality Recommendations:
+2025-08-22 12:32:03,244 - INFO -    [HIGH] Gene Symbols: Improve gene identifier mapping during data integration
+2025-08-22 12:32:03,245 - INFO -    [MEDIUM] Gene Symbols: Implement gene symbol standardization and validation
+2025-08-22 12:32:03,245 - INFO -    [HIGH] GO Terms: Ensure all GO terms include namespace during parsing
+2025-08-22 12:32:03,245 - ERROR - ❌ Generate Recommendations failed
+2025-08-22 12:32:03,245 - INFO - Executing: Save Results
+2025-08-22 12:32:03,245 - INFO - 📄 Results saved to: /home/mreddy1/knowledge_graph/quality_control/3_data_quality_validation/data_quality_validation_results.json
+2025-08-22 12:32:03,245 - INFO - ✅ Save Results completed successfully
+2025-08-22 12:32:03,245 - INFO - ================================================================================
+2025-08-22 12:32:03,245 - INFO - 📊 DATA QUALITY VALIDATION SUMMARY
+2025-08-22 12:32:03,245 - INFO - ================================================================================
+2025-08-22 12:32:03,245 - INFO - Steps completed: 6/9
+2025-08-22 12:32:03,245 - INFO - Success rate: 66.7%
+2025-08-22 12:32:03,245 - INFO - Execution time: 44.29 seconds
+2025-08-22 12:32:03,245 - INFO - Overall status: FAILED
+2025-08-22 12:32:03,245 - INFO - Data Quality Score: 0.0/100 (Grade: D)
