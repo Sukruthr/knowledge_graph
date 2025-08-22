@@ -75,8 +75,11 @@ Thumbs.db
 # Project specific
 *.pkl
 *.pickle
+*.gpickle
 data/*.pkl
 data/*.pickle
+quality_control/1_build_and_save_kg/saved_graphs/*.gpickle
+
 temp/
 tmp/
 logs/
