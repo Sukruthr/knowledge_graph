@@ -1,0 +1,117 @@
+{
+  "total_tests": 49,
+  "passed": 48,
+  "failed": 1,
+  "success_rate": 97.95918367346938,
+  "detailed_results": {
+    "load_file_safe": {
+      "passed": 13,
+      "failed": 0,
+      "details": [
+        "\u2705 CSV file loading: PASSED",
+        "\u2705 TSV file loading: PASSED",
+        "\u2705 JSON file loading: PASSED",
+        "\u2705 YAML file loading: PASSED",
+        "\u2705 TXT file loading: PASSED",
+        "\u2705 GZIP file loading: PASSED",
+        "\u2705 GAF.GZ file loading: PASSED",
+        "\u2705 Auto detection - CSV: PASSED",
+        "\u2705 Auto detection - JSON: PASSED",
+        "\u2705 Auto detection - YAML: PASSED",
+        "\u2705 Non-existent file: PASSED (correctly failed)",
+        "\u2705 Empty file: PASSED (correctly failed)",
+        "\u2705 Corrupted JSON file: PASSED (correctly failed)"
+      ]
+    },
+    "validate_required_columns": {
+      "passed": 4,
+      "failed": 0,
+      "details": [
+        "\u2705 validate_required_columns test: PASSED",
+        "\u2705 validate_required_columns test: PASSED",
+        "\u2705 validate_required_columns test: PASSED",
+        "\u2705 validate_required_columns test: PASSED"
+      ]
+    },
+    "clean_gene_identifiers": {
+      "passed": 4,
+      "failed": 0,
+      "details": [
+        "\u2705 clean_gene_identifiers test: PASSED",
+        "\u2705 clean_gene_identifiers test: PASSED",
+        "\u2705 clean_gene_identifiers test: PASSED",
+        "\u2705 clean_gene_identifiers test: PASSED"
+      ]
+    },
+    "extract_metadata": {
+      "passed": 5,
+      "failed": 0,
+      "details": [
+        "\u2705 Complete metadata extraction: PASSED",
+        "\u2705 Missing required field: PASSED",
+        "\u2705 Missing optional fields: PASSED",
+        "\u2705 No optional fields specified: PASSED",
+        "\u2705 Null values in content: PASSED"
+      ]
+    },
+    "validate_go_id": {
+      "passed": 6,
+      "failed": 0,
+      "details": [
+        "\u2705 validate_go_id test: PASSED",
+        "\u2705 validate_go_id test: PASSED",
+        "\u2705 validate_go_id test: PASSED",
+        "\u2705 validate_go_id test: PASSED",
+        "\u2705 validate_go_id test: PASSED",
+        "\u2705 validate_go_id test: PASSED"
+      ]
+    },
+    "validate_gene_symbol": {
+      "passed": 6,
+      "failed": 0,
+      "details": [
+        "\u2705 validate_gene_symbol test: PASSED",
+        "\u2705 validate_gene_symbol test: PASSED",
+        "\u2705 validate_gene_symbol test: PASSED",
+        "\u2705 validate_gene_symbol test: PASSED",
+        "\u2705 validate_gene_symbol test: PASSED",
+        "\u2705 validate_gene_symbol test: PASSED"
+      ]
+    },
+    "extract_unique_values": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 extract_unique_values test: PASSED"
+      ]
+    },
+    "create_cross_references": {
+      "passed": 3,
+      "failed": 1,
+      "details": [
+        "\u274c Basic cross-reference mapping: Expected 0, got forward=2, reverse=2",
+        "\u2705 One-to-one mapping: PASSED",
+        "\u2705 Partial overlap: PASSED",
+        "\u2705 Empty dictionaries: PASSED"
+      ]
+    },
+    "calculate_statistics": {
+      "passed": 5,
+      "failed": 0,
+      "details": [
+        "\u2705 Basic statistics with numeric fields: PASSED",
+        "\u2705 Statistics with mixed data types: PASSED",
+        "\u2705 Empty data list: PASSED",
+        "\u2705 No numeric fields specified: PASSED",
+        "\u2705 Statistics with missing fields: PASSED"
+      ]
+    },
+    "log_parsing_progress": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 log_parsing_progress test: PASSED"
+      ]
+    }
+  }
+}

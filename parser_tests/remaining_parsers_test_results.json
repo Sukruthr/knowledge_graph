@@ -1,0 +1,63 @@
+{
+  "total_tests": 13,
+  "passed": 13,
+  "failed": 0,
+  "success_rate": 100.0,
+  "detailed_results": {
+    "imports": {
+      "passed": 4,
+      "failed": 0,
+      "details": [
+        "\u2705 Direct parser imports: PASSED",
+        "\u2705 Backward compatibility alias: PASSED",
+        "\u2705 Import structure consistency: PASSED",
+        "\u2705 Module-level imports: PASSED"
+      ]
+    },
+    "backward_compatibility": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 GOBPDataParser alias works correctly"
+      ]
+    },
+    "combined_go_parser_init": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 CombinedGOParser initialized successfully"
+      ]
+    },
+    "combined_go_parser_methods": {
+      "passed": 2,
+      "failed": 0,
+      "details": [
+        "\u2705 parse_all_namespaces: Executed successfully",
+        "\u2705 get_combined_summary: Executed successfully"
+      ]
+    },
+    "combined_biomedical_parser_init": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 CombinedBiomedicalParser initialized successfully"
+      ]
+    },
+    "combined_biomedical_parser_methods": {
+      "passed": 3,
+      "failed": 0,
+      "details": [
+        "\u2705 get_comprehensive_summary: Executed successfully",
+        "\u2705 validate_comprehensive_data: Executed successfully",
+        "\u2705 get_available_parsers: Executed successfully"
+      ]
+    },
+    "integration": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 parse_all_biomedical_data method available and callable"
+      ]
+    }
+  }
+}

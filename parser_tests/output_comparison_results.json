@@ -1,0 +1,35 @@
+{
+  "total_tests": 9,
+  "passed": 8,
+  "failed": 1,
+  "success_rate": 88.88888888888889,
+  "detailed_results": {
+    "go_parser_comparison": {
+      "passed": 3,
+      "failed": 0,
+      "details": [
+        "\u2705 GO BP terms: 29,602 (expected >20K)",
+        "\u2705 GO BP associations: 161,332 (expected >100K)",
+        "\u2705 GO BP alt IDs: 1,434 (expected >1K)"
+      ]
+    },
+    "omics_parser_comparison": {
+      "passed": 3,
+      "failed": 1,
+      "details": [
+        "\u2705 Drug associations: 318,530 (expected >200K)",
+        "\u2705 Viral associations: 222,682 (expected >200K)",
+        "\u274c Viral expression: Invalid type",
+        "\u2705 Unique entities: ['diseases', 'drugs', 'viral_conditions', 'clusters', 'studies']"
+      ]
+    },
+    "integration_comparison": {
+      "passed": 2,
+      "failed": 0,
+      "details": [
+        "\u2705 Integration: 2/8 parsers active",
+        "\u2705 Summary generation successful"
+      ]
+    }
+  }
+}

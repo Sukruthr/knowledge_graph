@@ -1,0 +1,406 @@
+{
+  "total_methods": 37,
+  "passed": 37,
+  "failed": 0,
+  "success_rate": 100.0,
+  "class_summaries": {
+    "GODataParser": {
+      "passed": 17,
+      "failed": 0,
+      "methods": [
+        [
+          "GODataParser.__init__",
+          5,
+          0
+        ],
+        [
+          "GODataParser.parse_go_terms",
+          1,
+          0
+        ],
+        [
+          "GODataParser.parse_go_relationships",
+          1,
+          0
+        ],
+        [
+          "GODataParser.parse_gene_go_associations_from_gaf",
+          1,
+          0
+        ],
+        [
+          "GODataParser.parse_collapsed_go_file",
+          1,
+          0
+        ],
+        [
+          "GODataParser.parse_go_term_clustering",
+          1,
+          0
+        ],
+        [
+          "GODataParser.parse_go_alternative_ids",
+          1,
+          0
+        ],
+        [
+          "GODataParser.parse_all_gene_associations_from_collapsed_files",
+          1,
+          0
+        ],
+        [
+          "GODataParser.parse_gene_identifier_mappings",
+          1,
+          0
+        ],
+        [
+          "GODataParser._create_cross_references",
+          1,
+          0
+        ],
+        [
+          "GODataParser.parse_obo_ontology",
+          1,
+          0
+        ],
+        [
+          "GODataParser.validate_parsed_data",
+          1,
+          0
+        ],
+        [
+          "GODataParser.get_data_summary",
+          1,
+          0
+        ]
+      ]
+    },
+    "OmicsDataParser": {
+      "passed": 17,
+      "failed": 0,
+      "methods": [
+        [
+          "OmicsDataParser.__init__",
+          3,
+          0
+        ],
+        [
+          "OmicsDataParser.parse_disease_gene_associations",
+          1,
+          0
+        ],
+        [
+          "OmicsDataParser.parse_drug_gene_associations",
+          1,
+          0
+        ],
+        [
+          "OmicsDataParser.parse_viral_gene_associations",
+          1,
+          0
+        ],
+        [
+          "OmicsDataParser.parse_cluster_relationships",
+          1,
+          0
+        ],
+        [
+          "OmicsDataParser.parse_disease_expression_matrix",
+          1,
+          0
+        ],
+        [
+          "OmicsDataParser.parse_viral_expression_matrix",
+          1,
+          0
+        ],
+        [
+          "OmicsDataParser.get_unique_entities",
+          1,
+          0
+        ],
+        [
+          "OmicsDataParser.validate_omics_data",
+          1,
+          0
+        ],
+        [
+          "OmicsDataParser.get_omics_summary",
+          1,
+          0
+        ],
+        [
+          "OmicsDataParser.parse_gene_set_annotations",
+          1,
+          0
+        ],
+        [
+          "OmicsDataParser.parse_literature_references",
+          1,
+          0
+        ],
+        [
+          "OmicsDataParser.parse_go_term_validations",
+          1,
+          0
+        ],
+        [
+          "OmicsDataParser.parse_experimental_metadata",
+          1,
+          0
+        ],
+        [
+          "OmicsDataParser.parse_all_enhanced_data",
+          1,
+          0
+        ]
+      ]
+    },
+    "CombinedGOParser": {
+      "passed": 3,
+      "failed": 0,
+      "methods": [
+        [
+          "CombinedGOParser.__init__",
+          1,
+          0
+        ],
+        [
+          "CombinedGOParser.parse_all_namespaces",
+          1,
+          0
+        ],
+        [
+          "CombinedGOParser.get_combined_summary",
+          1,
+          0
+        ]
+      ]
+    }
+  },
+  "detailed_results": {
+    "GODataParser.__init__": {
+      "passed": 5,
+      "failed": 0,
+      "details": [
+        "\u2705 BP namespace initialization: SKIPPED (data not available)",
+        "\u2705 CC namespace initialization: SKIPPED (data not available)",
+        "\u2705 MF namespace initialization: SKIPPED (data not available)",
+        "\u2705 Auto-detect namespace (BP): SKIPPED (data not available)",
+        "\u2705 Invalid directory: PASSED (handled gracefully)"
+      ]
+    },
+    "GODataParser.parse_go_terms": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "GODataParser.parse_go_relationships": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "GODataParser.parse_gene_go_associations_from_gaf": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "GODataParser.parse_collapsed_go_file": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "GODataParser.parse_go_term_clustering": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "GODataParser.parse_go_alternative_ids": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "GODataParser.parse_all_gene_associations_from_collapsed_files": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "GODataParser.parse_gene_identifier_mappings": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "GODataParser._create_cross_references": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "GODataParser.parse_obo_ontology": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "GODataParser.validate_parsed_data": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "GODataParser.get_data_summary": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "OmicsDataParser.__init__": {
+      "passed": 3,
+      "failed": 0,
+      "details": [
+        "\u2705 Omics data only: SKIPPED (data not available)",
+        "\u2705 Omics data with enhanced data: SKIPPED (data not available)",
+        "\u2705 Invalid omics directory: PASSED (handled gracefully)"
+      ]
+    },
+    "OmicsDataParser.parse_disease_gene_associations": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "OmicsDataParser.parse_drug_gene_associations": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "OmicsDataParser.parse_viral_gene_associations": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "OmicsDataParser.parse_cluster_relationships": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "OmicsDataParser.parse_disease_expression_matrix": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "OmicsDataParser.parse_viral_expression_matrix": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "OmicsDataParser.get_unique_entities": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "OmicsDataParser.validate_omics_data": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "OmicsDataParser.get_omics_summary": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "OmicsDataParser.parse_gene_set_annotations": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "OmicsDataParser.parse_literature_references": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "OmicsDataParser.parse_go_term_validations": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "OmicsDataParser.parse_experimental_metadata": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "OmicsDataParser.parse_all_enhanced_data": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "CombinedGOParser.__init__": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "CombinedGOParser.parse_all_namespaces": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    },
+    "CombinedGOParser.get_combined_summary": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Skipped (data not available)"
+      ]
+    }
+  }
+}

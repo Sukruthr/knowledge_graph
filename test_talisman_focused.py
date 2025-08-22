@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 def test_parser():
     """Test parser functionality"""
-    from talisman_gene_sets_parser import TalismanGeneSetsParser
+    from parsers.talisman_gene_sets_parser import TalismanGeneSetsParser
     
     parser = TalismanGeneSetsParser()
     start_time = time.time()
@@ -42,7 +42,7 @@ def test_parser():
 
 def test_kg_integration(talisman_data):
     """Test minimal KG integration with just talisman data"""
-    from kg_builder import ComprehensiveBiomedicalKnowledgeGraph
+    from src.kg_builder import ComprehensiveBiomedicalKnowledgeGraph
     import networkx as nx
     
     # Create minimal KG

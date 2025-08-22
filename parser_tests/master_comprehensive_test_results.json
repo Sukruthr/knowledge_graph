@@ -1,0 +1,63 @@
+{
+  "timestamp": "2025-08-21 23:10:19",
+  "execution_time": 1.332918643951416,
+  "test_suites": 4,
+  "successful_suites": 4,
+  "failed_suites": 0,
+  "suite_success_rate": 100.0,
+  "total_tests": 57,
+  "total_passed": 170,
+  "total_failed": 1,
+  "overall_success_rate": 298.2456140350877,
+  "final_status": "\u26a0\ufe0f 1 INDIVIDUAL TESTS FAILED",
+  "detailed_results": {
+    "Enhanced Parser Utils Test": {
+      "success": true,
+      "return_code": 0,
+      "execution_time": 0.34920239448547363,
+      "stdout_lines": 0,
+      "stderr_lines": 82,
+      "total_tests": 49,
+      "passed": 48,
+      "failed": 1,
+      "success_rate": 97.95918367346938,
+      "error": null
+    },
+    "Comprehensive Core Parsers Test": {
+      "success": true,
+      "return_code": 0,
+      "execution_time": 0.325836181640625,
+      "stdout_lines": 0,
+      "stderr_lines": 71,
+      "total_tests": 0,
+      "passed": 37,
+      "failed": 0,
+      "success_rate": 100.0,
+      "error": null
+    },
+    "Comprehensive Orchestrator Test": {
+      "success": true,
+      "return_code": 0,
+      "execution_time": 0.3264038562774658,
+      "stdout_lines": 0,
+      "stderr_lines": 56,
+      "total_tests": 8,
+      "passed": 8,
+      "failed": 0,
+      "success_rate": 100.0,
+      "error": null
+    },
+    "Comprehensive Specialized Parsers Test": {
+      "success": true,
+      "return_code": 0,
+      "execution_time": 0.3295290470123291,
+      "stdout_lines": 0,
+      "stderr_lines": 35,
+      "total_tests": 0,
+      "passed": 77,
+      "failed": 0,
+      "success_rate": 100.0,
+      "error": null
+    }
+  }
+}

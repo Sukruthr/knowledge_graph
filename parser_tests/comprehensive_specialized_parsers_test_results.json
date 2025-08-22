@@ -1,0 +1,980 @@
+{
+  "total_methods": 77,
+  "passed": 77,
+  "failed": 0,
+  "success_rate": 100.0,
+  "class_summaries": {
+    "ModelCompareParser": {
+      "passed": 13,
+      "failed": 0,
+      "methods": [
+        [
+          "ModelCompareParser.__init__",
+          1,
+          0
+        ],
+        [
+          "ModelCompareParser.parse_all_model_data",
+          1,
+          0
+        ],
+        [
+          "ModelCompareParser.parse_llm_processed_files",
+          1,
+          0
+        ],
+        [
+          "ModelCompareParser.parse_similarity_ranking_files",
+          1,
+          0
+        ],
+        [
+          "ModelCompareParser.extract_evaluation_metrics",
+          1,
+          0
+        ],
+        [
+          "ModelCompareParser.analyze_contamination_effects",
+          1,
+          0
+        ],
+        [
+          "ModelCompareParser.compute_summary_statistics",
+          1,
+          0
+        ],
+        [
+          "ModelCompareParser._parse_gene_list",
+          1,
+          0
+        ],
+        [
+          "ModelCompareParser._compute_score_distributions",
+          1,
+          0
+        ],
+        [
+          "ModelCompareParser._compute_confidence_bins",
+          1,
+          0
+        ],
+        [
+          "ModelCompareParser._compute_ranking_performance",
+          1,
+          0
+        ],
+        [
+          "ModelCompareParser.extract_model_name",
+          1,
+          0
+        ],
+        [
+          "ModelCompareParser.get_model_compare_summary",
+          1,
+          0
+        ]
+      ]
+    },
+    "CCMFBranchParser": {
+      "passed": 14,
+      "failed": 0,
+      "methods": [
+        [
+          "CCMFBranchParser.__init__",
+          0,
+          0
+        ],
+        [
+          "CCMFBranchParser.parse_all_cc_mf_data",
+          1,
+          0
+        ],
+        [
+          "CCMFBranchParser._parse_go_terms",
+          1,
+          0
+        ],
+        [
+          "CCMFBranchParser._parse_llm_interpretations",
+          1,
+          0
+        ],
+        [
+          "CCMFBranchParser._parse_similarity_rankings",
+          1,
+          0
+        ],
+        [
+          "CCMFBranchParser._generate_processing_stats",
+          1,
+          0
+        ],
+        [
+          "CCMFBranchParser.get_cc_terms",
+          1,
+          0
+        ],
+        [
+          "CCMFBranchParser.get_mf_terms",
+          1,
+          0
+        ],
+        [
+          "CCMFBranchParser.get_cc_mf_terms",
+          1,
+          0
+        ],
+        [
+          "CCMFBranchParser.get_llm_interpretations",
+          1,
+          0
+        ],
+        [
+          "CCMFBranchParser.get_similarity_rankings",
+          1,
+          0
+        ],
+        [
+          "CCMFBranchParser.get_genes_for_namespace",
+          1,
+          0
+        ],
+        [
+          "CCMFBranchParser.get_all_unique_genes",
+          1,
+          0
+        ],
+        [
+          "CCMFBranchParser.query_go_term",
+          1,
+          0
+        ],
+        [
+          "CCMFBranchParser.get_stats",
+          1,
+          0
+        ]
+      ]
+    },
+    "LLMProcessedParser": {
+      "passed": 15,
+      "failed": 0,
+      "methods": [
+        [
+          "LLMProcessedParser.__init__",
+          1,
+          0
+        ],
+        [
+          "LLMProcessedParser.parse_all_llm_processed_data",
+          1,
+          0
+        ],
+        [
+          "LLMProcessedParser._parse_main_llm_datasets",
+          1,
+          0
+        ],
+        [
+          "LLMProcessedParser._parse_model_comparison_data",
+          1,
+          0
+        ],
+        [
+          "LLMProcessedParser._parse_contamination_analysis",
+          1,
+          0
+        ],
+        [
+          "LLMProcessedParser._parse_similarity_rankings",
+          1,
+          0
+        ],
+        [
+          "LLMProcessedParser._parse_similarity_pvalues",
+          1,
+          0
+        ],
+        [
+          "LLMProcessedParser._update_processing_stats",
+          1,
+          0
+        ],
+        [
+          "LLMProcessedParser.get_llm_interpretations",
+          1,
+          0
+        ],
+        [
+          "LLMProcessedParser.get_contamination_analysis",
+          1,
+          0
+        ],
+        [
+          "LLMProcessedParser.get_similarity_rankings",
+          1,
+          0
+        ],
+        [
+          "LLMProcessedParser.get_model_comparison_data",
+          1,
+          0
+        ],
+        [
+          "LLMProcessedParser.get_similarity_pvalues",
+          1,
+          0
+        ],
+        [
+          "LLMProcessedParser.query_go_term_llm_profile",
+          1,
+          0
+        ],
+        [
+          "LLMProcessedParser.get_processing_stats",
+          1,
+          0
+        ]
+      ]
+    },
+    "GOAnalysisDataParser": {
+      "passed": 15,
+      "failed": 0,
+      "methods": [
+        [
+          "GOAnalysisDataParser.__init__",
+          1,
+          0
+        ],
+        [
+          "GOAnalysisDataParser.parse_all_go_analysis_data",
+          1,
+          0
+        ],
+        [
+          "GOAnalysisDataParser._parse_core_go_terms",
+          1,
+          0
+        ],
+        [
+          "GOAnalysisDataParser._parse_contamination_datasets",
+          1,
+          0
+        ],
+        [
+          "GOAnalysisDataParser._parse_confidence_evaluations",
+          1,
+          0
+        ],
+        [
+          "GOAnalysisDataParser._parse_hierarchy_data",
+          1,
+          0
+        ],
+        [
+          "GOAnalysisDataParser._parse_similarity_scores",
+          1,
+          0
+        ],
+        [
+          "GOAnalysisDataParser._calculate_final_stats",
+          1,
+          0
+        ],
+        [
+          "GOAnalysisDataParser.get_core_go_terms",
+          1,
+          0
+        ],
+        [
+          "GOAnalysisDataParser.get_contamination_datasets",
+          1,
+          0
+        ],
+        [
+          "GOAnalysisDataParser.get_confidence_evaluations",
+          1,
+          0
+        ],
+        [
+          "GOAnalysisDataParser.get_hierarchy_data",
+          1,
+          0
+        ],
+        [
+          "GOAnalysisDataParser.get_similarity_scores",
+          1,
+          0
+        ],
+        [
+          "GOAnalysisDataParser.query_go_term_analysis_profile",
+          1,
+          0
+        ],
+        [
+          "GOAnalysisDataParser.get_processing_stats",
+          1,
+          0
+        ]
+      ]
+    },
+    "RemainingDataParser": {
+      "passed": 8,
+      "failed": 0,
+      "methods": [
+        [
+          "RemainingDataParser.__init__",
+          1,
+          0
+        ],
+        [
+          "RemainingDataParser.parse_all_remaining_data",
+          1,
+          0
+        ],
+        [
+          "RemainingDataParser._parse_gmt_file",
+          1,
+          0
+        ],
+        [
+          "RemainingDataParser._parse_reference_evaluation",
+          1,
+          0
+        ],
+        [
+          "RemainingDataParser._parse_l1000_data",
+          1,
+          0
+        ],
+        [
+          "RemainingDataParser._parse_embeddings",
+          1,
+          0
+        ],
+        [
+          "RemainingDataParser._parse_supplement_table",
+          1,
+          0
+        ],
+        [
+          "RemainingDataParser.get_parsing_statistics",
+          1,
+          0
+        ]
+      ]
+    },
+    "TalismanGeneSetsParser": {
+      "passed": 12,
+      "failed": 0,
+      "methods": [
+        [
+          "TalismanGeneSetsParser.__init__",
+          1,
+          0
+        ],
+        [
+          "TalismanGeneSetsParser.parse_all_gene_sets",
+          1,
+          0
+        ],
+        [
+          "TalismanGeneSetsParser._parse_single_gene_set",
+          1,
+          0
+        ],
+        [
+          "TalismanGeneSetsParser._load_file_content",
+          1,
+          0
+        ],
+        [
+          "TalismanGeneSetsParser._extract_gene_set_data",
+          1,
+          0
+        ],
+        [
+          "TalismanGeneSetsParser._extract_id_type",
+          1,
+          0
+        ],
+        [
+          "TalismanGeneSetsParser._classify_gene_set_type",
+          1,
+          0
+        ],
+        [
+          "TalismanGeneSetsParser._generate_parsing_statistics",
+          1,
+          0
+        ],
+        [
+          "TalismanGeneSetsParser._get_all_unique_genes",
+          1,
+          0
+        ],
+        [
+          "TalismanGeneSetsParser.get_parsing_statistics",
+          1,
+          0
+        ],
+        [
+          "TalismanGeneSetsParser.get_gene_set_summary",
+          1,
+          0
+        ],
+        [
+          "TalismanGeneSetsParser.validate_parsing_quality",
+          1,
+          0
+        ]
+      ]
+    }
+  },
+  "detailed_results": {
+    "ModelCompareParser.__init__": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Invalid directory: PASSED (handled gracefully)"
+      ]
+    },
+    "ModelCompareParser.parse_all_model_data": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "ModelCompareParser.parse_llm_processed_files": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "ModelCompareParser.parse_similarity_ranking_files": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "ModelCompareParser.extract_evaluation_metrics": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "ModelCompareParser.analyze_contamination_effects": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "ModelCompareParser.compute_summary_statistics": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "ModelCompareParser._parse_gene_list": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "ModelCompareParser._compute_score_distributions": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "ModelCompareParser._compute_confidence_bins": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "ModelCompareParser._compute_ranking_performance": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "ModelCompareParser.extract_model_name": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "ModelCompareParser.get_model_compare_summary": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "CCMFBranchParser.__init__": {
+      "passed": 0,
+      "failed": 0,
+      "details": []
+    },
+    "CCMFBranchParser.parse_all_cc_mf_data": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "CCMFBranchParser._parse_go_terms": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "CCMFBranchParser._parse_llm_interpretations": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "CCMFBranchParser._parse_similarity_rankings": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "CCMFBranchParser._generate_processing_stats": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "CCMFBranchParser.get_cc_terms": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "CCMFBranchParser.get_mf_terms": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "CCMFBranchParser.get_cc_mf_terms": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "CCMFBranchParser.get_llm_interpretations": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "CCMFBranchParser.get_similarity_rankings": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "CCMFBranchParser.get_genes_for_namespace": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "CCMFBranchParser.get_all_unique_genes": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "CCMFBranchParser.query_go_term": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "CCMFBranchParser.get_stats": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "LLMProcessedParser.__init__": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "LLMProcessedParser.parse_all_llm_processed_data": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "LLMProcessedParser._parse_main_llm_datasets": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "LLMProcessedParser._parse_model_comparison_data": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "LLMProcessedParser._parse_contamination_analysis": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "LLMProcessedParser._parse_similarity_rankings": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "LLMProcessedParser._parse_similarity_pvalues": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "LLMProcessedParser._update_processing_stats": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "LLMProcessedParser.get_llm_interpretations": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "LLMProcessedParser.get_contamination_analysis": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "LLMProcessedParser.get_similarity_rankings": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "LLMProcessedParser.get_model_comparison_data": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "LLMProcessedParser.get_similarity_pvalues": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "LLMProcessedParser.query_go_term_llm_profile": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "LLMProcessedParser.get_processing_stats": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "GOAnalysisDataParser.__init__": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "GOAnalysisDataParser.parse_all_go_analysis_data": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "GOAnalysisDataParser._parse_core_go_terms": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "GOAnalysisDataParser._parse_contamination_datasets": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "GOAnalysisDataParser._parse_confidence_evaluations": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "GOAnalysisDataParser._parse_hierarchy_data": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "GOAnalysisDataParser._parse_similarity_scores": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "GOAnalysisDataParser._calculate_final_stats": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "GOAnalysisDataParser.get_core_go_terms": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "GOAnalysisDataParser.get_contamination_datasets": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "GOAnalysisDataParser.get_confidence_evaluations": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "GOAnalysisDataParser.get_hierarchy_data": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "GOAnalysisDataParser.get_similarity_scores": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "GOAnalysisDataParser.query_go_term_analysis_profile": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "GOAnalysisDataParser.get_processing_stats": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "RemainingDataParser.__init__": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "RemainingDataParser.parse_all_remaining_data": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "RemainingDataParser._parse_gmt_file": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "RemainingDataParser._parse_reference_evaluation": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "RemainingDataParser._parse_l1000_data": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "RemainingDataParser._parse_embeddings": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "RemainingDataParser._parse_supplement_table": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "RemainingDataParser.get_parsing_statistics": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "TalismanGeneSetsParser.__init__": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "TalismanGeneSetsParser.parse_all_gene_sets": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "TalismanGeneSetsParser._parse_single_gene_set": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "TalismanGeneSetsParser._load_file_content": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "TalismanGeneSetsParser._extract_gene_set_data": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "TalismanGeneSetsParser._extract_id_type": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "TalismanGeneSetsParser._classify_gene_set_type": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "TalismanGeneSetsParser._generate_parsing_statistics": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "TalismanGeneSetsParser._get_all_unique_genes": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "TalismanGeneSetsParser.get_parsing_statistics": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "TalismanGeneSetsParser.get_gene_set_summary": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    },
+    "TalismanGeneSetsParser.validate_parsing_quality": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 SKIPPED (data not available)"
+      ]
+    }
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "total_tests": 15,
+  "passed": 12,
+  "failed": 3,
+  "success_rate": 80.0,
+  "detailed_results": {
+    "__init__": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Parser initialization successful"
+      ]
+    },
+    "parse_disease_gene_associations": {
+      "passed": 0,
+      "failed": 1,
+      "details": [
+        "\u274c Invalid or empty disease associations - count: 139800"
+      ]
+    },
+    "parse_drug_gene_associations": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Parsed 318,530 drug-gene associations"
+      ]
+    },
+    "parse_viral_gene_associations": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Parsed 222,682 viral-gene associations"
+      ]
+    },
+    "parse_cluster_relationships": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Parsed 39,463 cluster relationships"
+      ]
+    },
+    "parse_disease_expression_matrix": {
+      "passed": 0,
+      "failed": 1,
+      "details": [
+        "\u274c Expected list, got <class 'dict'>"
+      ]
+    },
+    "parse_viral_expression_matrix": {
+      "passed": 0,
+      "failed": 1,
+      "details": [
+        "\u274c Expected list, got <class 'dict'>"
+      ]
+    },
+    "get_unique_entities": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Retrieved unique entities summary"
+      ]
+    },
+    "validate_omics_data": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Validation completed"
+      ]
+    },
+    "get_omics_summary": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Summary generated"
+      ]
+    },
+    "parse_gene_set_annotations": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 parse_gene_set_annotations: Executed successfully"
+      ]
+    },
+    "parse_literature_references": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 parse_literature_references: Executed successfully"
+      ]
+    },
+    "parse_go_term_validations": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 parse_go_term_validations: Executed successfully"
+      ]
+    },
+    "parse_experimental_metadata": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 parse_experimental_metadata: Executed successfully"
+      ]
+    },
+    "parse_all_enhanced_data": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 parse_all_enhanced_data: Executed successfully"
+      ]
+    }
+  }
+}

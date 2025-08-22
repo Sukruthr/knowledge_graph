@@ -1,0 +1,44 @@
+{
+  "timestamp": "2025-08-21T22:36:48.930432",
+  "summary": {
+    "total_scripts": 4,
+    "successful_scripts": 3,
+    "failed_scripts": 1,
+    "script_success_rate": 75.0,
+    "total_individual_tests": 0,
+    "total_passed": 0,
+    "total_failed": 0,
+    "overall_success_rate": 0,
+    "final_status": "\u274c NEEDS ATTENTION - 0.0% SUCCESS RATE"
+  },
+  "detailed_results": {
+    "test_parser_utils.py": {
+      "success": false,
+      "return_code": 1,
+      "error": "No JSON results file found",
+      "stdout_lines": 1,
+      "stderr_lines": 105
+    },
+    "test_go_data_parser.py": {
+      "success": true,
+      "return_code": 0,
+      "error": "No JSON results file found",
+      "stdout_lines": 1,
+      "stderr_lines": 175
+    },
+    "test_omics_data_parser.py": {
+      "success": true,
+      "return_code": 0,
+      "error": "No JSON results file found",
+      "stdout_lines": 1,
+      "stderr_lines": 139
+    },
+    "test_remaining_parsers.py": {
+      "success": true,
+      "return_code": 0,
+      "error": "No JSON results file found",
+      "stdout_lines": 1,
+      "stderr_lines": 155
+    }
+  }
+}

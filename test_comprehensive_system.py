@@ -17,7 +17,7 @@ from pathlib import Path
 # Add src to path
 sys.path.append('src')
 
-from data_parsers import CombinedBiomedicalParser
+from parsers import CombinedBiomedicalParser
 from kg_builder import ComprehensiveBiomedicalKnowledgeGraph
 
 # Configure logging

@@ -1,0 +1,106 @@
+{
+  "total_tests": 22,
+  "passed": 18,
+  "failed": 4,
+  "success_rate": 81.81818181818183,
+  "detailed_results": {
+    "__init__": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 Parser initialization successful"
+      ]
+    },
+    "parse_go_terms": {
+      "passed": 3,
+      "failed": 0,
+      "details": [
+        "\u2705 GO_BP: Parsed 29,602 GO terms successfully",
+        "\u2705 GO_CC: Parsed 4,303 GO terms successfully",
+        "\u2705 GO_MF: Parsed 12,323 GO terms successfully"
+      ]
+    },
+    "parse_go_relationships": {
+      "passed": 0,
+      "failed": 3,
+      "details": [
+        "\u274c GO_BP: Invalid or empty relationships",
+        "\u274c GO_CC: Invalid or empty relationships",
+        "\u274c GO_MF: Invalid or empty relationships"
+      ]
+    },
+    "parse_gene_go_associations_from_gaf": {
+      "passed": 3,
+      "failed": 0,
+      "details": [
+        "\u2705 GO_BP: Parsed 161,332 GAF associations",
+        "\u2705 GO_CC: Parsed 181,005 GAF associations",
+        "\u2705 GO_MF: Parsed 292,931 GAF associations"
+      ]
+    },
+    "parse_collapsed_go_file": {
+      "passed": 4,
+      "failed": 0,
+      "details": [
+        "\u2705 GO_BP_symbol: Parsed 2 GO term mappings",
+        "\u2705 GO_BP_entrez: Parsed 2 GO term mappings",
+        "\u2705 GO_CC_symbol: Parsed 2 GO term mappings",
+        "\u2705 GO_MF_uniprot: Parsed 2 GO term mappings"
+      ]
+    },
+    "parse_go_term_clustering": {
+      "passed": 0,
+      "failed": 0,
+      "details": []
+    },
+    "parse_go_alternative_ids": {
+      "passed": 3,
+      "failed": 0,
+      "details": [
+        "\u2705 GO_BP: Parsed 1,434 alternative ID mappings",
+        "\u2705 GO_CC: Parsed 163 alternative ID mappings",
+        "\u2705 GO_MF: Parsed 713 alternative ID mappings"
+      ]
+    },
+    "parse_all_gene_associations_from_collapsed_files": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 parse_all_gene_associations_from_collapsed_files: Executed successfully"
+      ]
+    },
+    "parse_gene_identifier_mappings": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 parse_gene_identifier_mappings: Executed successfully"
+      ]
+    },
+    "_create_cross_references": {
+      "passed": 0,
+      "failed": 0,
+      "details": []
+    },
+    "parse_obo_ontology": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 parse_obo_ontology: Executed successfully"
+      ]
+    },
+    "validate_parsed_data": {
+      "passed": 0,
+      "failed": 1,
+      "details": [
+        "\u274c validate_parsed_data: Exception - GODataParser.validate_parsed_data() takes 1 positional argument but 2 were given"
+      ]
+    },
+    "get_data_summary": {
+      "passed": 1,
+      "failed": 0,
+      "details": [
+        "\u2705 get_data_summary: Executed successfully"
+      ]
+    }
+  }
+}

@@ -13,9 +13,9 @@ import json
 import pickle
 
 try:
-    from .data_parsers import GOBPDataParser, GODataParser, CombinedGOParser, OmicsDataParser, CombinedBiomedicalParser
+    from .parsers import GOBPDataParser, GODataParser, CombinedGOParser, OmicsDataParser, CombinedBiomedicalParser
 except ImportError:
-    from data_parsers import GOBPDataParser, GODataParser, CombinedGOParser, OmicsDataParser, CombinedBiomedicalParser
+    from parsers import GOBPDataParser, GODataParser, CombinedGOParser, OmicsDataParser, CombinedBiomedicalParser
 
 logger = logging.getLogger(__name__)
 

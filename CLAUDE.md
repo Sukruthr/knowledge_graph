@@ -62,6 +62,9 @@ python test_remaining_data_simple.py
 # Test Talisman Gene Sets integration specifically
 python test_talisman_gene_sets_simple.py
 
+# Test parser reorganization 
+python test_parser_reorganization.py
+
 # Test viral expression matrix integration specifically
 python viral_expression_test.py
 
@@ -79,6 +82,9 @@ python validation/combined_go_validation.py
 python3
 import sys; sys.path.append('src')
 from kg_builder import ComprehensiveBiomedicalKnowledgeGraph
+
+# Alternative: Import parsers directly (new organized structure)
+from parsers import CombinedBiomedicalParser, GODataParser, OmicsDataParser
 
 # Load and build full system (~37 seconds)
 kg = ComprehensiveBiomedicalKnowledgeGraph()
@@ -125,18 +131,33 @@ cat validation/omics_validation_results.json | python -m json.tool
 
 ## Code Architecture
 
-### Data Parser Hierarchy
-- **`CombinedBiomedicalParser`**: Top-level parser integrating GO + Omics + Model comparison + LLM_processed data
-  - **`CombinedGOParser`**: Multi-namespace GO parsing (BP, CC, MF)
-    - **`GODataParser`**: Single-namespace GO parser  
-  - **`OmicsDataParser`**: Multi-modal omics data parser
-    - Disease/drug associations, viral responses, expression matrices, network clusters
-  - **`ModelCompareParser`**: LLM model comparison and evaluation parser
-    - Model predictions, confidence scores, similarity rankings, contamination analysis
-  - **`CCMFBranchParser`**: CC/MF GO terms with enhanced LLM analysis
-    - LLM interpretations, confidence scoring, similarity rankings for CC/MF namespaces
-  - **`LLMProcessedParser`**: Multi-model LLM analysis with 8 models
-    - LLM interpretations, contamination robustness, similarity rankings, statistical validation
+### Reorganized Parser Structure (Clean & Modular)
+```
+src/parsers/
+├── __init__.py                    # Clean imports and backward compatibility
+├── parser_utils.py                # Common utilities (file loading, validation, gene cleaning)
+├── core_parsers.py                # Core GO & Omics parsers
+│   ├── GODataParser              # Single-namespace GO parser (BP, CC, MF)
+│   ├── OmicsDataParser           # Multi-modal omics data parser
+│   └── CombinedGOParser          # Multi-namespace GO coordinator
+├── parser_orchestrator.py         # Clean orchestration without messy imports
+│   └── CombinedBiomedicalParser  # Top-level parser with clean dependency management
+└── specialized parsers/           # Individual data type parsers
+    ├── model_compare_parser.py    # LLM model comparison and evaluation
+    ├── cc_mf_branch_parser.py     # CC/MF GO terms with enhanced LLM analysis
+    ├── llm_processed_parser.py    # Multi-model LLM analysis with 8 models
+    ├── go_analysis_data_parser.py # Core GO datasets and enrichment analysis
+    ├── remaining_data_parser.py   # GMT files, L1000, embeddings, references
+    └── talisman_gene_sets_parser.py # HALLMARK pathways and gene sets
+```
+
+### Parser Organization Benefits
+- **Single Responsibility**: Each parser handles one clear data type
+- **Clean Imports**: No more try/except import blocks
+- **Shared Utilities**: Common functionality in `parser_utils.py`
+- **Logical Grouping**: Core parsers separate from specialized parsers
+- **Easy Extension**: Simple to add new parsers following established patterns
+- **Backward Compatibility**: All existing code continues to work
 
 ### Knowledge Graph Builders
 - **`ComprehensiveBiomedicalKnowledgeGraph`**: Full multi-modal system (current primary)
