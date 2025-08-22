@@ -85,4 +85,4 @@ tmp/
 logs/
 
 # Claude Code
-.claude/
+.claude/quality_control/1_build_and_save_kg/saved_graphs/biomedical_graph.gpickle
