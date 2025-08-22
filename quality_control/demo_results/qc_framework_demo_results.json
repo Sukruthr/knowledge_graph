@@ -1,0 +1,91 @@
+{
+  "timestamp": "2025-08-22T10:14:33.330567",
+  "demo_phases": [],
+  "framework_capabilities": {
+    "structure_validation": {
+      "expected_phases": 8,
+      "ready_phases": 5,
+      "completeness_percentage": 62.5,
+      "phase_status": {
+        "1_build_and_save_kg": {
+          "directory_exists": true,
+          "script_exists": false,
+          "status": "\u274c MISSING"
+        },
+        "2_structural_integrity": {
+          "directory_exists": true,
+          "script_exists": false,
+          "status": "\u274c MISSING"
+        },
+        "3_data_quality_validation": {
+          "directory_exists": true,
+          "script_exists": true,
+          "status": "\u2705 READY"
+        },
+        "4_functional_testing": {
+          "directory_exists": true,
+          "script_exists": true,
+          "status": "\u2705 READY"
+        },
+        "5_integration_quality": {
+          "directory_exists": true,
+          "script_exists": false,
+          "status": "\u274c MISSING"
+        },
+        "6_semantic_validation": {
+          "directory_exists": true,
+          "script_exists": true,
+          "status": "\u2705 READY"
+        },
+        "7_performance_benchmarks": {
+          "directory_exists": true,
+          "script_exists": true,
+          "status": "\u2705 READY"
+        },
+        "8_regression_testing": {
+          "directory_exists": true,
+          "script_exists": true,
+          "status": "\u2705 READY"
+        }
+      }
+    },
+    "orchestrator_validation": {
+      "file_exists": true,
+      "has_phase_definitions": true,
+      "has_orchestration_logic": true,
+      "has_reporting": true,
+      "has_assessment": true,
+      "content_size_kb": 25.7509765625
+    },
+    "compatibility_test": {
+      "import_tests": {
+        "new_style": "\u2705 SUCCESS",
+        "old_style": "\u2705 SUCCESS (with deprecation)"
+      },
+      "method_availability": {
+        "load_data": "\u2705 AVAILABLE",
+        "build_comprehensive_graph": "\u2705 AVAILABLE",
+        "get_comprehensive_stats": "\u2705 AVAILABLE",
+        "query_gene_comprehensive": "\u2705 AVAILABLE",
+        "query_go_term": "\u274c MISSING"
+      },
+      "system_readiness": {
+        "data_directory": "\u2705 READY",
+        "source_directory": "\u2705 READY",
+        "imports_working": "\u2705 READY"
+      }
+    }
+  },
+  "recommendations": [],
+  "demo_summary": {
+    "overall_readiness_score": 80.83333333333333,
+    "readiness_grade": "A",
+    "readiness_status": "\u2705 FRAMEWORK READY",
+    "component_scores": {
+      "structure_completeness": 62.5,
+      "orchestrator_readiness": 100,
+      "compatibility_score": 80.0
+    },
+    "recommendation": "The QC framework is ready for execution with minor enhancements possible."
+  }
+}
