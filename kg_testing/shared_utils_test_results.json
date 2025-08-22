@@ -1,0 +1,45 @@
+{
+  "timestamp": "1755837947.7565534",
+  "total_tests": 9,
+  "passed": 9,
+  "failed": 0,
+  "success_rate": 100.0,
+  "results": {
+    "Save Graph to Pickle": {
+      "status": "PASSED",
+      "details": "Successfully saved and verified pickle format. Nodes: 6, Edges: 4"
+    },
+    "Save Graph to GraphML": {
+      "status": "PASSED",
+      "details": "Successfully saved and verified GraphML format. Nodes: 6, Edges: 4"
+    },
+    "Load Graph from Pickle": {
+      "status": "PASSED",
+      "details": "Successfully loaded pickle format. Verified 6 nodes, 4 edges"
+    },
+    "Load Graph from GraphML": {
+      "status": "PASSED",
+      "details": "Successfully loaded GraphML format. Verified 6 nodes, 4 edges"
+    },
+    "Initialize Graph Attributes": {
+      "status": "PASSED",
+      "details": "Successfully initialized and preserved graph attributes"
+    },
+    "Validate Basic Graph Structure": {
+      "status": "PASSED",
+      "details": "Validated graph structure: {'has_nodes': True, 'has_edges': True, 'is_multigraph': True}"
+    },
+    "Count Nodes by Type": {
+      "status": "PASSED",
+      "details": "Node counts: {'go_term': 2, 'gene': 2, 'disease': 1, 'gene_identifier': 1}"
+    },
+    "Count Edges by Type": {
+      "status": "PASSED",
+      "details": "Edge counts: {'go_hierarchy': 1, 'gene_annotation': 2, 'gene_disease_association': 1}"
+    },
+    "Get Basic Graph Stats": {
+      "status": "PASSED",
+      "details": "Basic stats: {'total_nodes': 6, 'total_edges': 4, 'node_counts': {'go_term': 2, 'gene': 2, 'disease': 1, 'gene_identifier': 1}, 'edge_counts': {'go_hierarchy': 1, 'gene_annotation': 2, 'gene_disease_association': 1}}"
+    }
+  }
+}

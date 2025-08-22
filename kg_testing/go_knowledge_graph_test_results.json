@@ -1,0 +1,49 @@
+{
+  "timestamp": "1755838018.856381",
+  "total_tests": 10,
+  "passed": 10,
+  "failed": 0,
+  "success_rate": 100.0,
+  "results": {
+    "Initialization": {
+      "status": "PASSED",
+      "details": "Initialized GOKnowledgeGraph with namespace: biological_process"
+    },
+    "Method Existence": {
+      "status": "PASSED",
+      "details": "All 17 expected methods are present"
+    },
+    "Load Data Basic": {
+      "status": "PASSED",
+      "details": "Loaded 29602 GO terms and 161332 gene associations"
+    },
+    "Build Graph Basic": {
+      "status": "PASSED",
+      "details": "Built graph with 66397 nodes and 520358 edges"
+    },
+    "Graph Structure": {
+      "status": "PASSED",
+      "details": "Graph structure verified. Node types: {'gene', 'gene_identifier', 'go_term'}, Edge types: {'gene_cross_reference', 'gene_annotation', 'go_clustering', 'alternative_id_mapping', 'go_hierarchy'}"
+    },
+    "Query Gene Functions": {
+      "status": "PASSED",
+      "details": "Successfully queried IGKV3-7, found 5 GO annotations"
+    },
+    "Query GO Term Genes": {
+      "status": "PASSED",
+      "details": "Successfully queried GO:0000001, found 0 associated genes"
+    },
+    "Get Stats": {
+      "status": "PASSED",
+      "details": "Stats retrieved: 66397 nodes, 520358 edges"
+    },
+    "Validate Graph Integrity": {
+      "status": "PASSED",
+      "details": "Graph validation: {'has_nodes': True, 'has_edges': True, 'go_terms_valid': True, 'gene_nodes_valid': True, 'relationships_valid': True, 'associations_valid': True, 'cross_references_valid': True, 'overall_valid': True}"
+    },
+    "Save Load Graph": {
+      "status": "PASSED",
+      "details": "Successfully saved and loaded graph with 66397 nodes, 520358 edges"
+    }
+  }
+}

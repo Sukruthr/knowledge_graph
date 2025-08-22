@@ -1,0 +1,41 @@
+{
+  "timestamp": "1755838769.3356743",
+  "total_tests": 8,
+  "passed": 8,
+  "failed": 0,
+  "success_rate": 100.0,
+  "results": {
+    "Old Import Style With Warnings": {
+      "status": "PASSED",
+      "details": "Old import works with 1 deprecation warning(s)"
+    },
+    "Old Import All Classes": {
+      "status": "PASSED",
+      "details": "All original classes imported and instantiated successfully"
+    },
+    "New Import Style": {
+      "status": "PASSED",
+      "details": "New import style works without warnings"
+    },
+    "Direct Module Imports": {
+      "status": "PASSED",
+      "details": "Direct module imports work correctly"
+    },
+    "Migration Helper": {
+      "status": "PASSED",
+      "details": "Migration helper function works and provides guidance"
+    },
+    "Functionality Equivalence": {
+      "status": "PASSED",
+      "details": "Old and new imports provide equivalent functionality with 5 key methods verified"
+    },
+    "Package Structure": {
+      "status": "PASSED",
+      "details": "Package structure verified with 3 classes and version 2.0.0"
+    },
+    "Original kg_builder File": {
+      "status": "PASSED",
+      "details": "Original kg_builder.py file maintains expected interface"
+    }
+  }
+}
