@@ -1,0 +1,128 @@
+# Q&A System Configuration File
+# This file contains all configurable parameters for the biomedical knowledge graph Q&A system
+
+# Ollama LLM Configuration
+ollama:
+  base_url: "http://localhost:11434"
+  default_model: "llama3.2:1b"  # Options: llama2, llama2:7b, llama2:13b, codellama, mistral, neural-chat
+  timeout: 60              # Request timeout in seconds
+  max_retries: 3           # Maximum retry attempts for failed requests
+  
+  # Model-specific parameters
+  generation_params:
+    temperature: 0.7       # Sampling temperature (0.0 to 1.0)
+    top_k: 40             # Top-k sampling parameter
+    top_p: 0.9            # Top-p sampling parameter
+
+# Knowledge Graph Configuration
+knowledge_graph:
+  graph_path: "quality_control/1_build_and_save_kg/saved_graphs/biomedical_graph.gpickle"
+  cache_size: 1000         # Maximum number of cached query results
+  query_timeout: 30        # Individual query timeout in seconds
+  enable_caching: true     # Whether to cache query results
+  
+  # Query optimization settings
+  optimization:
+    max_related_entities: 100    # Limit for related entity queries
+    max_search_results: 50       # Limit for keyword search results
+    path_search_cutoff: 5        # Maximum path length for shortest path queries
+
+# Conversation Management
+conversation:
+  max_context_length: 10         # Maximum number of Q&A exchanges to remember
+  enable_follow_ups: true        # Whether to generate follow-up questions
+  confidence_threshold: 0.3      # Minimum confidence threshold for responses
+  context_window_size: 5         # Number of previous exchanges to include in LLM context
+
+# Response Synthesis Configuration
+synthesis:
+  max_evidence_sources: 20       # Maximum evidence sources per response
+  citation_style: "numbered"     # Citation style: "numbered" or "inline"
+  include_confidence_scores: true # Whether to show confidence in responses
+  
+  # Evidence processing weights
+  evidence_weights:
+    go_annotations: 0.9
+    disease_associations: 0.9
+    pathways: 0.8
+    drug_interactions: 0.8
+    expression_data: 0.7
+    literature_refs: 0.6
+    model_predictions: 0.5
+
+# Query Planning Configuration
+query_planning:
+  max_query_steps: 10           # Maximum number of query steps per question
+  entity_extraction_confidence: 0.5  # Minimum confidence for entity extraction
+  intent_classification_threshold: 0.4  # Minimum threshold for intent classification
+  
+  # Entity recognition settings
+  entity_limits:
+    max_genes_per_query: 5
+    max_diseases_per_query: 3
+    max_drugs_per_query: 3
+    max_pathways_per_query: 3
+
+# System Performance
+performance:
+  enable_query_cache: true       # Enable query result caching
+  enable_synthesis_cache: true   # Enable response synthesis caching
+  max_cache_memory_mb: 500      # Maximum cache memory usage
+  
+  # Timeout settings
+  timeouts:
+    total_query_timeout: 120     # Total timeout for processing one question
+    kg_query_timeout: 60         # Timeout for knowledge graph queries
+    synthesis_timeout: 90        # Timeout for response synthesis
+
+# Logging Configuration
+logging:
+  level: "INFO"                  # Logging level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  file: "logs/qa_system.log"     # Log file path
+  max_file_size_mb: 100         # Maximum log file size before rotation
+  backup_count: 5               # Number of backup log files to keep
+  
+  # Console output settings
+  console:
+    enable: true                 # Enable console logging
+    level: "INFO"                # Console log level
+    format: "simple"             # Format: "simple", "detailed", "json"
+
+# System Features
+features:
+  interactive_mode: true         # Enable interactive CLI mode
+  export_sessions: true          # Enable session export functionality
+  web_interface: false           # Enable web interface (future feature)
+  api_endpoint: false            # Enable REST API endpoint (future feature)
+  
+  # Advanced features
+  advanced:
+    multi_turn_reasoning: true    # Enable multi-turn reasoning
+    explanation_generation: true  # Generate explanations for answers
+    uncertainty_quantification: true  # Quantify answer uncertainty
+    code_generation: true         # Generate query code for users
+
+# Development and Debugging
+development:
+  debug_mode: false             # Enable debug mode with verbose output
+  save_query_plans: false       # Save query plans to files for analysis
+  profile_performance: false    # Enable performance profiling
+  mock_ollama: false           # Use mock Ollama responses for testing
+  
+  # Testing configuration
+  testing:
+    test_question_file: "test_data/sample_questions.txt"
+    expected_results_file: "test_data/expected_results.json"
+    benchmark_mode: false        # Run in benchmark mode
+
+# Security and Privacy
+security:
+  sanitize_inputs: true         # Sanitize user inputs
+  rate_limiting: false          # Enable rate limiting (future feature)
+  audit_logging: false          # Enable audit logging (future feature)
+  
+  # Data handling
+  data_privacy:
+    anonymize_logs: false       # Anonymize sensitive data in logs
+    encrypt_cache: false        # Encrypt cached data (future feature)
+    retention_days: 30          # Data retention period in days
